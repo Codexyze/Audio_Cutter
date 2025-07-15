@@ -1,7 +1,9 @@
 package com.nutrino.audiocutter.presentation.Navigation
 
+import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -10,6 +12,7 @@ import com.nutrino.audiocutter.presentation.Screens.AllAudioScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimmerScreen
 
 
+@OptIn(UnstableApi::class)
 @Composable
 fun MainApp(modifier: Modifier = Modifier) {
     val navcontroller = rememberNavController()
@@ -24,6 +27,7 @@ fun MainApp(modifier: Modifier = Modifier) {
                 songDuration = data.songDuration, songName = data.songName
             )
         }
+
 
     }
 

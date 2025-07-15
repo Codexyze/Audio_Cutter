@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +42,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.data.DataClass.Song
@@ -51,50 +49,7 @@ import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERSCREEN
 import com.nutrino.audiocutter.presentation.Utils.formatDuration
 import com.nutrino.audiocutter.presentation.ViewModel.GetAllSongViewModel
 
-//
-//@Composable
-//fun AllAudioScreen() {
-//    @Composable
-//    fun SongListScreen(viewModel: GetAllSongViewModel = hiltViewModel()) {
-//        val state by viewModel.getAllSongsState.collectAsState()
-//
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .background(MaterialTheme.colorScheme.background)
-//        ) {
-//            when {
-//                state.isLoading -> {
-//                    CircularProgressIndicator(
-//                        color = MaterialTheme.colorScheme.primary,
-//                        modifier = Modifier.align(Alignment.Center)
-//                    )
-//                }
-//
-//                state.error != null -> {
-//                    Text(
-//                        text = "Error: ${state.error}",
-//                        color = MaterialTheme.colorScheme.error,
-//                        style = MaterialTheme.typography.titleMedium,
-//                        modifier = Modifier.align(Alignment.Center)
-//                    )
-//                }
-//
-//                state.data != null -> {
-//                    LazyColumn(
-//                        modifier = Modifier.fillMaxSize(),
-//                        contentPadding = PaddingValues(12.dp),
-//                        verticalArrangement = Arrangement.spacedBy(8.dp)
-//                    ) {
-//                        items(state.data) { song ->
-//                            SongItem(song = song)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
+
 @Composable
 fun AllAudioScreen(navController: NavController) {
     val context = LocalContext.current
