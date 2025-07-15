@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,8 +43,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.nutrino.audiocutter.data.DataClass.Song
+import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERSCREEN
 import com.nutrino.audiocutter.presentation.Utils.formatDuration
 import com.nutrino.audiocutter.presentation.ViewModel.GetAllSongViewModel
 
@@ -92,7 +96,7 @@ import com.nutrino.audiocutter.presentation.ViewModel.GetAllSongViewModel
 //    }
 //}
 @Composable
-fun AllAudioScreen() {
+fun AllAudioScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModel: GetAllSongViewModel = hiltViewModel()
     val state by viewModel.getAllSongsState.collectAsState()
@@ -171,8 +175,8 @@ fun AllAudioScreen() {
                         contentPadding = PaddingValues(12.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(state.data!!) { song ->
-                            SongItem(song = song)
+                        items(state.data) { song ->
+                            SongItem(song = song, navController = navController)
                         }
                     }
                 }
@@ -182,11 +186,14 @@ fun AllAudioScreen() {
 }
 
 @Composable
-fun SongItem(song: Song) {
+fun SongItem(song: Song,navController: NavController) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().clickable{
+            navController.navigate(AUDIOTRIMMERSCREEN(uri = song.path,
+                songDuration = song.duration!!.toLong(), songName = song.title.toString()))
+        }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

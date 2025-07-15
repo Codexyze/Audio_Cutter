@@ -3,6 +3,7 @@ package com.nutrino.audiocutter.di
 import android.content.Context
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import com.nutrino.audiocutter.core.MediaPlayerManager
 import com.nutrino.audiocutter.data.RepoImpl.AudioTimmerRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.GetAllSongsRepoImpl
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
@@ -41,6 +42,11 @@ object DiModule {
     fun provideGetAllSongUseCaseObj(@ApplicationContext context: Context): GetAllSongRepository {
         return GetAllSongsRepoImpl(context = context)
 
+    }
+
+    @Provides
+    fun provideMediaPlayerManager(exoPlayer: ExoPlayer): MediaPlayerManager {
+        return MediaPlayerManager(exoPlayer =exoPlayer )
     }
 
 
