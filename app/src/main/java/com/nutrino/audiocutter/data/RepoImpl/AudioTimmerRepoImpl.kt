@@ -17,7 +17,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
-import com.nutrino.audiocutter.domain.AudioTrimmerRepository
+import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
