@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.nutrino.audiocutter.data.RepoImpl.AudioTimmerRepoImpl
+import com.nutrino.audiocutter.data.RepoImpl.GetAllSongsRepoImpl
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
+import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
 import com.nutrino.audiocutter.domain.UseCases.TrimAudioUseCase
 import dagger.Module
 import dagger.Provides
@@ -32,6 +34,12 @@ object DiModule {
     @Provides
     fun provideAudioTrimmerUseCaseObj(repository: AudioTrimmerRepository): TrimAudioUseCase {
         return TrimAudioUseCase(repository = repository)
+
+    }
+
+    @Provides
+    fun provideGetAllSongUseCaseObj(@ApplicationContext context: Context): GetAllSongRepository {
+        return GetAllSongsRepoImpl(context = context)
 
     }
 

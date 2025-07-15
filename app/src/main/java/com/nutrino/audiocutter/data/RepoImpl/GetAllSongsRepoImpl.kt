@@ -28,7 +28,7 @@ class GetAllSongsRepoImpl @Inject constructor(private val context: Context): Get
 
         )
         val contentResolver = context.contentResolver
-        val selection = "${MediaStore.Audio.Media.IS_MUSIC}!=0"
+        val selection = null
         emit(ResultState.Loading)
         try {
             val cursor = contentResolver.query(uri,projection,selection,null,null)

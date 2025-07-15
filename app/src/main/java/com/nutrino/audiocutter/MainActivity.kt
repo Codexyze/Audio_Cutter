@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.nutrino.audiocutter.presentation.Navigation.MainApp
 import com.nutrino.audiocutter.ui.theme.AudioCutterTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,8 +25,7 @@ class MainActivity : ComponentActivity() {
             AudioCutterTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-
-
+                        MainApp()
                     }
 
                 }
