@@ -19,6 +19,7 @@ import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.File
@@ -26,6 +27,7 @@ import java.io.File
 
 @UnstableApi
 class AudioTimmerRepoImpl : AudioTrimmerRepository {
+
     override suspend fun TrimAudio(
         context: Context,
         uri: Uri,
@@ -34,7 +36,8 @@ class AudioTimmerRepoImpl : AudioTrimmerRepository {
         filename: String
     ): Flow<ResultState<String>> = flow {
         emit(ResultState.Loading)
-        Log.d("AudioTrim", "Starting TrimAudio function")
+
+        val resultChannel = Channel<ResultState<String>>() // ✅ Create channel for result
 
         try {
             val clippingConfiguration = MediaItem.ClippingConfiguration.Builder()
@@ -50,20 +53,13 @@ class AudioTimmerRepoImpl : AudioTrimmerRepository {
             val editedMediaItem = EditedMediaItem.Builder(mediaItem).build()
 
             val outputFile = File(context.cacheDir, filename)
-            Log.d("AudioTrim", "Output file path in cache: ${outputFile.absolutePath}")
 
             val transformer = Transformer.Builder(context)
                 .setAudioMimeType(MimeTypes.AUDIO_AAC)
                 .addListener(object : Transformer.Listener {
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
-                        super.onCompleted(composition, exportResult)
-                        Log.d("AudioTrim", "Transformation completed. Output at ${outputFile.absolutePath}")
-
                         val savedUri = saveAudioFile(context, outputFile, "${filename}_${System.currentTimeMillis()}")
-                        Log.d("AudioTrim", "File saved at: $savedUri")
-
-
-                        Toast.makeText(context, "Audio Saved to Downloads 📁", Toast.LENGTH_SHORT).show()
+                        resultChannel.trySend(ResultState.Success(savedUri.toString())) // ✅ Send success
                     }
 
                     override fun onError(
@@ -71,21 +67,20 @@ class AudioTimmerRepoImpl : AudioTrimmerRepository {
                         exportResult: ExportResult,
                         exportException: ExportException
                     ) {
-                        super.onError(composition, exportResult, exportException)
-                        Log.e("AudioTrim", "Error during export: ${exportException.message}", exportException)
-
-                        Toast.makeText(context, "Audio Trim Failed", Toast.LENGTH_SHORT).show()
+                        resultChannel.trySend(ResultState.Error(exportException.message ?: "Unknown error")) // ✅ Send error
                     }
                 })
                 .build()
 
             transformer.start(editedMediaItem, outputFile.absolutePath)
 
+            emit(resultChannel.receive()) // ✅ Await result and emit
+
         } catch (e: Exception) {
-            Log.e("AudioTrim", "Exception caught: ${e.message}", e)
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         }
     }
+
 
     private fun saveAudioFile(context: Context, sourceFile: File, displayName: String): Uri? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

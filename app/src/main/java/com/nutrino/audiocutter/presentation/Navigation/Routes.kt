@@ -8,3 +8,8 @@ object HOMESCREEN
 @Serializable
 data class AUDIOTRIMMERSCREEN(val uri: String , val songDuration : Long, val songName : String)
 
+@Serializable
+object AUDIOTRIMMERSUCCESSSTATE
+
+@Serializable
+object AUDIOTRIMMERERRORSTATE

@@ -15,7 +15,7 @@ class MediaPlayerManager @Inject constructor(private val exoPlayer: ExoPlayer) {
         exoPlayer.apply {
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
-            playWhenReady = true
+            playWhenReady = false
         }
     }
     fun releasePlayer() {

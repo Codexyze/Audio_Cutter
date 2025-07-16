@@ -39,6 +39,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
+import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERERRORSTATE
+import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERSUCCESSSTATE
 import com.nutrino.audiocutter.presentation.ViewModel.AudioTrimViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
 
@@ -122,11 +124,10 @@ fun AudioTrimmerScreen(
                 return@Column
             }
             audioTrimState.value.error != null -> {
-                Text("Error: ${audioTrimState.value.error}")
-                return@Column
+               navController.navigate(AUDIOTRIMMERERRORSTATE)
             }
-            audioTrimState.value.data != null -> {
-              Text("Success")
+            !audioTrimState.value.data.isNullOrBlank() -> {
+              navController.navigate(AUDIOTRIMMERSUCCESSSTATE)
             }
         }
 
