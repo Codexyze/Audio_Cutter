@@ -2,8 +2,19 @@
 
 An Android app to trim audio files using Jetpack Compose and ExoPlayer. Clean Architecture + MVVM + Hilt make the structure super scalable and modular.
 
----
+> 📦 [**Version 1.0.2**](https://github.com/Codexyze/Audio_Cutter/releases/tag/v1.02) is now stable and will be deployed to the Play Store very soon!  
+> 🚀 This project is a **sub-feature of my major music app LHYTHM**. You can check that out here:  
+> 👉 [https://github.com/Codexyze/Lhythm](https://github.com/Codexyze/Lhythm)
 
+---
+<div style="display: flex; flex-wrap: wrap;">
+  <img src="https://github.com/user-attachments/assets/367a2e03-8f0a-4c78-9ebf-a512308263c4" width="24%" />
+  <img src="https://github.com/user-attachments/assets/a4e71e88-e461-4aa6-bd49-651f95ee69c7" width="24%" />
+  <img src="https://github.com/user-attachments/assets/a51ed97a-c049-46db-bb33-63437463c5c7" width="24%" />
+  <img src="https://github.com/user-attachments/assets/e862064b-9ec2-400a-8c95-50bfda86a5ba" width="24%" />
+</div>
+
+---
 ## 🧠 Features
 
 * 🎧 Play any audio file
@@ -67,7 +78,15 @@ com.nutrino.audiocutter
 5. Trimmed file gets saved in local storage 🎉
 
 ---
+## Versions
+[**1.0.0**](https://github.com/Codexyze/Audio_Cutter/releases/tag/v1.0.0) : Beta Unstable
 
+
+
+
+[**1.0.2-stable**](https://github.com/Codexyze/Audio_Cutter/releases/tag/v1.02) : Soon will be deployed on [PLAYSTORE](https://play.google.com/store/apps/dev?id=9069883027072615264)
+
+---
 
 
 ## ⚙️ Permissions
@@ -79,7 +98,13 @@ com.nutrino.audiocutter
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 ```
 ---
+## 📱 More Apps & Contact
+🚀 Check out more of my apps on Google Play:
+👉 https://play.google.com/store/apps/dev?id=9069883027072615264
 
+📩 Got feedback or want to test early versions?
+Email me at nutrinonovarage@gmail.com
+---
 ## 📥 Clone the Project
 
 ```bash
