@@ -232,7 +232,7 @@ fun AudioTrimmerScreen(
                         } else {
                             Toast.makeText(
                                 context,
-                                "Please enter valid start/end time",
+                                "Please enter valid start/end time or file name",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
