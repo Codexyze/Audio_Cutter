@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,9 +18,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,8 +34,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,9 +48,11 @@ import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERSUCCESSSTATE
 import com.nutrino.audiocutter.presentation.ViewModel.AudioTrimViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
+import java.util.Locale
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @UnstableApi
 @Composable
 fun AudioTrimmerScreen(
@@ -54,35 +61,32 @@ fun AudioTrimmerScreen(
     mediaPlayerViewModel: MediaPlayerViewModel = hiltViewModel(),
     uri: String = "",
     songDuration: Long = 0,
-    songName: String = ""
 ) {
     val context = LocalContext.current
 
-    // 🔁 Inputs split into H:M:S for start and end
-    val startHours = rememberSaveable { mutableStateOf("") }
-    val startMinutes = rememberSaveable { mutableStateOf("") }
-    val startSeconds = rememberSaveable { mutableStateOf("") }
-
-    val endHours = rememberSaveable { mutableStateOf("") }
-    val endMinutes = rememberSaveable { mutableStateOf("") }
-    val endSeconds = rememberSaveable { mutableStateOf("") }
+    // 🎚️ Range slider for start and end time selection
+    val startValue = rememberSaveable { mutableStateOf(0f) }
+    val endValue = rememberSaveable { mutableStateOf(songDuration.toFloat()) }
 
     val filename = rememberSaveable { mutableStateOf("") }
 
-    // ✅ Combine HMS into total seconds
-    val startTime = (
-            (startHours.value.toLongOrNull() ?: 0L) * 3600 +
-                    (startMinutes.value.toLongOrNull() ?: 0L) * 60 +
-                    (startSeconds.value.toLongOrNull() ?: 0L)
-            )
-
-    val endTime = (
-            (endHours.value.toLongOrNull() ?: 0L) * 3600 +
-                    (endMinutes.value.toLongOrNull() ?: 0L) * 60 +
-                    (endSeconds.value.toLongOrNull() ?: 0L)
-            )
+    // ✅ Convert slider values to seconds
+    val startTime = startValue.value.toLong()
+    val endTime = endValue.value.toLong()
 
     val audioTrimState = audioTrimViewModel.audioTrimmerState.collectAsState()
+
+    // Helper function to format time from seconds to MM:SS or HH:MM:SS
+    fun formatTime(seconds: Long): String {
+        val hours = seconds / 3600
+        val minutes = (seconds % 3600) / 60
+        val secs = seconds % 60
+        return if (hours > 0) {
+            String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, secs)
+        } else {
+            String.format(Locale.getDefault(), "%d:%02d", minutes, secs)
+        }
+    }
 
     LaunchedEffect(uri) {
         mediaPlayerViewModel.initializePlayer(uri.toUri())
@@ -126,7 +130,7 @@ fun AudioTrimmerScreen(
             audioTrimState.value.error != null -> {
                navController.navigate(AUDIOTRIMMERERRORSTATE)
             }
-            !audioTrimState.value.data.isNullOrBlank() -> {
+            audioTrimState.value.data.isNotBlank() -> {
               navController.navigate(AUDIOTRIMMERSUCCESSSTATE)
             }
         }
@@ -152,64 +156,39 @@ fun AudioTrimmerScreen(
                 )
             }
 
-            // 🕓 START TIME FIELDS
+            // 🎚️ RANGE SLIDER FOR TRIMMING
             item {
-                Text("Start Time (H:M:S)", color = MaterialTheme.colorScheme.primary)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "Select Trim Range",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                RangeSlider(
+                    value = startValue.value..endValue.value,
+                    onValueChange = {
+                        startValue.value = it.start
+                        endValue.value = it.endInclusive
+                    },
+                    valueRange = 0f..songDuration.toFloat(),
+                    steps = 0, // Always allow slider to work, even for songDuration = 0
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                )
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(0.85f)
                 ) {
-                    OutlinedTextField(
-                        value = startHours.value,
-                        onValueChange = { startHours.value = it },
-                        label = { Text("HH") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
+                    Text(
+                        text = "Start: ${formatTime(startTime / 1000)}",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 14.sp
                     )
-                    OutlinedTextField(
-                        value = startMinutes.value,
-                        onValueChange = { startMinutes.value = it },
-                        label = { Text("MM") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = startSeconds.value,
-                        onValueChange = { startSeconds.value = it },
-                        label = { Text("SS") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            // ⏳ END TIME FIELDS
-            item {
-                Text("End Time (H:M:S)", color = MaterialTheme.colorScheme.primary)
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth(0.85f)
-                ) {
-                    OutlinedTextField(
-                        value = endHours.value,
-                        onValueChange = { endHours.value = it },
-                        label = { Text("HH") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = endMinutes.value,
-                        onValueChange = { endMinutes.value = it },
-                        label = { Text("MM") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = endSeconds.value,
-                        onValueChange = { endSeconds.value = it },
-                        label = { Text("SS") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.weight(1f)
+                    Text(
+                        text = "End: ${formatTime(endTime / 1000)}",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -217,7 +196,7 @@ fun AudioTrimmerScreen(
             item {
                 Button(
                     onClick = {
-                        val isStartValid = startTime > 0
+                        val isStartValid = startTime >= 0 // Allow 0
                         val isEndValid = endTime > 0
                         val isRangeValid = startTime < endTime && endTime <= songDuration
 
@@ -249,4 +228,3 @@ fun AudioTrimmerScreen(
         }
     }
 }
-

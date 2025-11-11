@@ -146,8 +146,12 @@ fun SongItem(song: Song,navController: NavController) {
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = Modifier.fillMaxWidth().clickable{
-            navController.navigate(AUDIOTRIMMERSCREEN(uri = song.path,
-                songDuration = song.duration!!.toLong(), songName = song.title.toString()))
+            val durationLong = song.duration?.toLongOrNull() ?: 0L
+            navController.navigate(AUDIOTRIMMERSCREEN(
+                uri = song.path,
+                songDuration = durationLong,
+                songName = song.title.orEmpty()
+            ))
         }
     ) {
         Row(
@@ -202,4 +206,3 @@ fun SongItem(song: Song,navController: NavController) {
         }
     }
 }
-

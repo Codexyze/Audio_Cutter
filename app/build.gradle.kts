@@ -15,7 +15,7 @@ android {
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3
+        versionCode = 4
         versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -23,7 +23,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -64,19 +65,19 @@ dependencies {
     //  implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation(libs.androidx.navigation)
     implementation(libs.androidx.media3.transformer)
-    implementation ("androidx.media3:media3-exoplayer:1.5.0")
+    implementation ("androidx.media3:media3-exoplayer:1.8.0")
     implementation ("androidx.media3:media3-ui:1.5.0")
-    implementation ("androidx.media3:media3-common:1.5.0")
+    implementation ("androidx.media3:media3-common:1.8.0")
     implementation ("androidx.media3:media3-session:1.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    implementation("com.google.dagger:hilt-android:2.57.2")
+    kapt("com.google.dagger:hilt-android-compiler:2.57.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation("androidx.compose.material:material-icons-extended:1.6.1")
-    implementation("androidx.media3:media3-effect:1.7.1")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation("androidx.media3:media3-effect:1.8.0")
     implementation("androidx.core:core-splashscreen:1.0.0")
 
     //Coil
-    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
 }

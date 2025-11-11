@@ -22,10 +22,12 @@ fun MainApp() {
             AllAudioScreen(navController = navcontroller)
 
         }
-        composable<AUDIOTRIMMERSCREEN> {backstackEntry->
+        composable<AUDIOTRIMMERSCREEN> { backstackEntry ->
             val data: AUDIOTRIMMERSCREEN = backstackEntry.toRoute()
-            AudioTrimmerScreen(navController = navcontroller, uri = data.uri,
-                songDuration = data.songDuration, songName = data.songName
+            AudioTrimmerScreen(
+                navController = navcontroller,
+                uri = data.uri,
+                songDuration = data.songDuration
             )
         }
         composable<AUDIOTRIMMERSUCCESSSTATE> {
