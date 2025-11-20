@@ -1,0 +1,7 @@
+# Copy this file to local.properties (do NOT commit local.properties)
+# and replace placeholders with your real AdMob IDs.
+# Keep local.properties out of version control.
+
+ADMOB_APP_ID=ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY
+INTERSTITIAL_AD_ID=ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ
+

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,6 +21,19 @@ android {
         versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val localProps = Properties()
+        val localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) {
+            localPropsFile.inputStream().use { stream -> localProps.load(stream) }
+        }
+        val admobAppId = (localProps.getProperty("ADMOB_APP_ID") ?: System.getenv("ADMOB_APP_ID") ?: "")
+        val interstitialAdId = (localProps.getProperty("INTERSTITIAL_AD_ID") ?: System.getenv("INTERSTITIAL_AD_ID") ?: "")
+
+        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
+
+        buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
+        buildConfigField("String", "INTERSTITIAL_AD_ID", "\"$interstitialAdId\"")
     }
 
     buildTypes {
