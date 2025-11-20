@@ -1,4 +1,3 @@
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -9,34 +8,37 @@ plugins {
     id("kotlin-kapt")
 }
 
+//val admobAppId: String = project.findProperty("ADMOB_APP_ID") as? String ?: ""
+//val interstitialAdId: String = project.findProperty("INTERSTITIAL_AD_ID") as? String ?: ""
+val admobAppId: String = project.findProperty("ADMOB_APP_ID") as? String
+    ?: throw GradleException("ADMOB_APP_ID not set in gradle.properties!")
+
+val interstitialAdId: String = project.findProperty("INTERSTITIAL_AD_ID") as? String
+    ?: throw GradleException("INTERSTITIAL_AD_ID not set in gradle.properties!")
+
+
+
 android {
     namespace = "com.nutrino.audiocutter"
     compileSdk = 36
 
     defaultConfig {
+        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
+        buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
+        buildConfigField("String", "INTERSTITIAL_AD_ID", "\"$interstitialAdId\"")
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 36
-        versionCode = 4
+        versionCode = 6
         versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val localProps = Properties()
-        val localPropsFile = rootProject.file("local.properties")
-        if (localPropsFile.exists()) {
-            localPropsFile.inputStream().use { stream -> localProps.load(stream) }
-        }
-        val admobAppId = (localProps.getProperty("ADMOB_APP_ID") ?: System.getenv("ADMOB_APP_ID") ?: "")
-        val interstitialAdId = (localProps.getProperty("INTERSTITIAL_AD_ID") ?: System.getenv("INTERSTITIAL_AD_ID") ?: "")
 
-        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
-
-        buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
-        buildConfigField("String", "INTERSTITIAL_AD_ID", "\"$interstitialAdId\"")
     }
 
     buildTypes {
+        buildFeatures.buildConfig = true
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -95,4 +97,8 @@ dependencies {
     //Coil
     implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+
+    //ads
+    implementation("com.google.android.gms:play-services-ads:24.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
 }

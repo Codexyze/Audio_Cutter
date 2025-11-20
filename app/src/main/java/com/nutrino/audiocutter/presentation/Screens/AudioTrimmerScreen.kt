@@ -1,6 +1,7 @@
 package com.nutrino.audiocutter.presentation.Screens
 
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,8 +47,10 @@ import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERSUCCESSSTATE
+import com.nutrino.audiocutter.presentation.Utils.InterstitialAdHelper
 import com.nutrino.audiocutter.presentation.ViewModel.AudioTrimViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
+import android.util.Log
 import java.util.Locale
 
 
@@ -69,6 +72,9 @@ fun AudioTrimmerScreen(
     val endValue = rememberSaveable { mutableStateOf(songDuration.toFloat()) }
 
     val filename = rememberSaveable { mutableStateOf("") }
+
+    // Flag to ensure ad only attempts once per successful trim
+    val adShown = rememberSaveable { mutableStateOf(false) }
 
     // ✅ Convert slider values to seconds
     val startTime = startValue.value.toLong()
@@ -130,8 +136,21 @@ fun AudioTrimmerScreen(
             audioTrimState.value.error != null -> {
                navController.navigate(AUDIOTRIMMERERRORSTATE)
             }
-            audioTrimState.value.data.isNotBlank() -> {
-              navController.navigate(AUDIOTRIMMERSUCCESSSTATE)
+            audioTrimState.value.data.isNotBlank() && !adShown.value -> {
+                // Successful trim; attempt to show interstitial ad once
+                adShown.value = true // prevent re-entry
+                val activity = context as? Activity
+                if (activity == null) {
+                    Log.w("AudioTrimmerScreen", "Context is not an Activity; navigating without ad")
+                    navController.navigate(AUDIOTRIMMERSUCCESSSTATE)
+                } else {
+                    // Unified ad request (show if ready, otherwise load then show) and always navigate after
+                    InterstitialAdHelper.requestAndShow(
+                        activity = activity,
+                        onAdDismissed = { navController.navigate(AUDIOTRIMMERSUCCESSSTATE) },
+                        onAdFailed = { navController.navigate(AUDIOTRIMMERSUCCESSSTATE) }
+                    )
+                }
             }
         }
 
@@ -201,11 +220,12 @@ fun AudioTrimmerScreen(
                         val isRangeValid = startTime < endTime && endTime <= songDuration
 
                         if (isStartValid && isEndValid && isRangeValid && filename.value.isNotBlank()) {
+                            // IMPORTANT: RangeSlider values already represent milliseconds; do NOT multiply by 1000
                             audioTrimViewModel.audioTrimmerState(
                                 context = context,
                                 uri = uri.toUri(),
-                                startTime = startTime * 1000,
-                                endTime = endTime * 1000,
+                                startTime = startTime,
+                                endTime = endTime,
                                 filename = filename.value.trim()
                             )
                         } else {
