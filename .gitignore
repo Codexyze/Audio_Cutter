@@ -13,4 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
-# gradle.properties removed from ignore to keep project-wide settings tracked
+gradle.properties
+# gradle.properties is now ignored to avoid committing sensitive values; project-wide settings will rely on defaults if absent
