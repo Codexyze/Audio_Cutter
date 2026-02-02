@@ -11,13 +11,18 @@ import com.nutrino.audiocutter.presentation.Screens.AllAudioScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimmerScreen
+import com.nutrino.audiocutter.presentation.Screens.SelectFeatureScreen
 
 
 @OptIn(UnstableApi::class)
 @Composable
 fun MainApp() {
     val navcontroller = rememberNavController()
-    NavHost(navController = navcontroller, startDestination = HOMESCREEN) {
+    NavHost(navController = navcontroller, startDestination = SELECTFEATURESCREEN) {
+
+        composable <SELECTFEATURESCREEN>{
+            SelectFeatureScreen(navController = navcontroller)
+        }
         composable<HOMESCREEN> {
             AllAudioScreen(navController = navcontroller)
 
