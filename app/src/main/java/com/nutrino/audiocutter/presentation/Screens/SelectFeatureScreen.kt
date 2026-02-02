@@ -34,10 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
 
 data class FeatureItem(
@@ -89,6 +89,10 @@ fun SelectFeatureScreen(navController: NavController) {
                             feature == features[0] -> {
                                 // Audio Trimmer
                                 navController.navigate(HOMESCREEN)
+                            }
+                            feature == features[1] -> {
+                                // Video Trimmer
+                                navController.navigate(ALLVIDEOSCREEN)
                             }
                         }
                         // TODO: Navigate to respective screen

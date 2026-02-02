@@ -6,13 +6,25 @@ import kotlinx.serialization.Serializable
 object HOMESCREEN
 
 @Serializable
+object ALLVIDEOSCREEN
+
+@Serializable
 data class AUDIOTRIMMERSCREEN(val uri: String , val songDuration : Long, val songName : String)
+
+@Serializable
+data class VIDEOTRIMMERSCREEN(val uri: String , val videoDuration : Long, val videoName : String)
 
 @Serializable
 object AUDIOTRIMMERSUCCESSSTATE
 
 @Serializable
 object AUDIOTRIMMERERRORSTATE
+
+@Serializable
+object VIDEOTRIMMERSUCCESSSTATE
+
+@Serializable
+object VIDEOTRIMMERERRORSTATE
 
 @Serializable
 object SELECTFEATURESCREEN

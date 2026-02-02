@@ -11,7 +11,11 @@ import com.nutrino.audiocutter.presentation.Screens.AllAudioScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimmerScreen
+import com.nutrino.audiocutter.presentation.Screens.GetAllVideoScreen
 import com.nutrino.audiocutter.presentation.Screens.SelectFeatureScreen
+import com.nutrino.audiocutter.presentation.Screens.VideoTrimErrorScreen
+import com.nutrino.audiocutter.presentation.Screens.VideoTrimSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.VideoTrimmerScreen
 
 
 @OptIn(UnstableApi::class)
@@ -27,12 +31,24 @@ fun MainApp() {
             AllAudioScreen(navController = navcontroller)
 
         }
+        composable<ALLVIDEOSCREEN> {
+            GetAllVideoScreen(navController = navcontroller)
+
+        }
         composable<AUDIOTRIMMERSCREEN> { backstackEntry ->
             val data: AUDIOTRIMMERSCREEN = backstackEntry.toRoute()
             AudioTrimmerScreen(
                 navController = navcontroller,
                 uri = data.uri,
                 songDuration = data.songDuration
+            )
+        }
+        composable<VIDEOTRIMMERSCREEN> { backstackEntry ->
+            val data: VIDEOTRIMMERSCREEN = backstackEntry.toRoute()
+            VideoTrimmerScreen(
+                navController = navcontroller,
+                uri = data.uri,
+                videoDuration = data.videoDuration
             )
         }
         composable<AUDIOTRIMMERSUCCESSSTATE> {
@@ -42,9 +58,17 @@ fun MainApp() {
             AudioTrimErrorScreen(navController = navcontroller)
 
         }
+        composable<VIDEOTRIMMERSUCCESSSTATE> {
+            VideoTrimSuccessScreen(navController = navcontroller)
+        }
+        composable<VIDEOTRIMMERERRORSTATE> {
+            VideoTrimErrorScreen(navController = navcontroller)
+
+        }
 
 
     }
 
 
 }
+
