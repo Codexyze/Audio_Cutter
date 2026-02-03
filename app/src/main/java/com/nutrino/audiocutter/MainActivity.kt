@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.media3.exoplayer.ExoPlayer
 import com.nutrino.audiocutter.presentation.Navigation.MainApp
 import com.nutrino.audiocutter.presentation.Utils.InterstitialAdHelper
@@ -21,6 +22,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var exoPlayer: ExoPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Install splash screen before calling super.onCreate()
+        installSplashScreen()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 

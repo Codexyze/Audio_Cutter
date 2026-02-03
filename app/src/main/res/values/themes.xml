@@ -2,4 +2,20 @@
 <resources>
 
     <style name="Theme.AudioCutter" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Splash Screen Theme -->
+    <style name="Theme.AudioCutter.Splash" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background color -->
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+
+        <!-- Set the splash screen icon (your app logo) -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+
+        <!-- Optional: Icon background color -->
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_icon_background</item>
+
+        <!-- Set post splash screen theme -->
+        <item name="postSplashScreenTheme">@style/Theme.AudioCutter</item>
+    </style>
 </resources>
+
