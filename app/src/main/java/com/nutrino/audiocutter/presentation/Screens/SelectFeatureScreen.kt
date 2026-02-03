@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOFORAUDIOEXTRACTSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
 
@@ -94,9 +95,11 @@ fun SelectFeatureScreen(navController: NavController) {
                                 // Video Trimmer
                                 navController.navigate(ALLVIDEOSCREEN)
                             }
+                            feature == features[2] -> {
+                                // Audio Extractor
+                                navController.navigate(ALLVIDEOFORAUDIOEXTRACTSCREEN)
+                            }
                         }
-                        // TODO: Navigate to respective screen
-                        // TODO: Handle feature selection
                     }
                 )
             }

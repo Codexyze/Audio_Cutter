@@ -41,13 +41,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
-import com.nutrino.audiocutter.presentation.Navigation.VIDEOTRIMMERERRORSTATE
-import com.nutrino.audiocutter.presentation.Navigation.VIDEOTRIMMERSUCCESSSTATE
+import com.nutrino.audiocutter.presentation.Navigation.AUDIOEXTRACTORERRORSTATE
+import com.nutrino.audiocutter.presentation.Navigation.AUDIOEXTRACTORSUCCESSSTATE
 import com.nutrino.audiocutter.presentation.Utils.InterstitialAdHelper
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.VideoViewModel
@@ -58,7 +57,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @UnstableApi
 @Composable
-fun VideoTrimmerScreen(
+fun AudioExtractorScreen(
     navController: NavController,
     videoViewModel: VideoViewModel = hiltViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = hiltViewModel(),
@@ -73,14 +72,14 @@ fun VideoTrimmerScreen(
 
     val filename = rememberSaveable { mutableStateOf("") }
 
-    // Flag to ensure ad only attempts once per successful trim
+    // Flag to ensure ad only attempts once per successful extraction
     val adShown = rememberSaveable { mutableStateOf(false) }
 
     // ✅ Convert slider values to seconds
     val startTime = startValue.value.toLong()
     val endTime = endValue.value.toLong()
 
-    val videoTrimState = videoViewModel.videoTrimmerState.collectAsState()
+    val audioExtractorState = videoViewModel.audioExtractorState.collectAsState()
 
     // Helper function to format time from seconds to MM:SS or HH:MM:SS
     fun formatTime(seconds: Long): String {
@@ -99,8 +98,6 @@ fun VideoTrimmerScreen(
         val fileUri = android.net.Uri.fromFile(File(uri))
         mediaPlayerViewModel.initializePlayer(fileUri)
     }
-
-
 
     DisposableEffect(Unit) {
         onDispose {
@@ -129,28 +126,28 @@ fun VideoTrimmerScreen(
         )
 
         when {
-            videoTrimState.value.isLoading -> {
+            audioExtractorState.value.isLoading -> {
                 CircularProgressIndicator(
                     modifier = Modifier.padding(24.dp)
                 )
                 return@Column
             }
-            videoTrimState.value.error != null -> {
-                navController.navigate(VIDEOTRIMMERERRORSTATE)
+            audioExtractorState.value.error != null -> {
+                navController.navigate(AUDIOEXTRACTORERRORSTATE)
             }
-            videoTrimState.value.data.isNotBlank() && !adShown.value -> {
-                // Successful trim; attempt to show interstitial ad once
+            audioExtractorState.value.data.isNotBlank() && !adShown.value -> {
+                // Successful extraction; attempt to show interstitial ad once
                 adShown.value = true // prevent re-entry
                 val activity = context as? Activity
                 if (activity == null) {
-                    Log.w("VideoTrimmerScreen", "Context is not an Activity; navigating without ad")
-                    navController.navigate(VIDEOTRIMMERSUCCESSSTATE)
+                    Log.w("AudioExtractorScreen", "Context is not an Activity; navigating without ad")
+                    navController.navigate(AUDIOEXTRACTORSUCCESSSTATE)
                 } else {
                     // Unified ad request (show if ready, otherwise load then show) and always navigate after
                     InterstitialAdHelper.requestAndShow(
                         activity = activity,
-                        onAdDismissed = { navController.navigate(VIDEOTRIMMERSUCCESSSTATE) },
-                        onAdFailed = { navController.navigate(VIDEOTRIMMERSUCCESSSTATE) }
+                        onAdDismissed = { navController.navigate(AUDIOEXTRACTORSUCCESSSTATE) },
+                        onAdFailed = { navController.navigate(AUDIOEXTRACTORSUCCESSSTATE) }
                     )
                 }
             }
@@ -166,7 +163,7 @@ fun VideoTrimmerScreen(
                 OutlinedTextField(
                     value = filename.value,
                     onValueChange = { filename.value = it },
-                    label = { Text("Video File Name", color = MaterialTheme.colorScheme.primary) },
+                    label = { Text("Audio File Name", color = MaterialTheme.colorScheme.primary) },
                     modifier = Modifier.fillMaxWidth(0.85f),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -177,11 +174,11 @@ fun VideoTrimmerScreen(
                 )
             }
 
-            // 🎚️ RANGE SLIDER FOR TRIMMING
+            // 🎚️ RANGE SLIDER FOR AUDIO EXTRACTION
             item {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "Select Trim Range",
+                    "Select Audio Range to Extract",
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
@@ -225,7 +222,7 @@ fun VideoTrimmerScreen(
                             // IMPORTANT: RangeSlider values already represent milliseconds; do NOT multiply by 1000
                             // Use Uri.fromFile to handle special characters in filenames like #
                             val fileUri = android.net.Uri.fromFile(File(uri))
-                            videoViewModel.trimVideo(
+                            videoViewModel.extractAudioFromVideo(
                                 uri = fileUri,
                                 startTime = startTime,
                                 endTime = endTime,
@@ -245,7 +242,7 @@ fun VideoTrimmerScreen(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Trim Video", style = MaterialTheme.typography.titleMedium)
+                    Text("Extract Audio 🎵", style = MaterialTheme.typography.titleMedium)
                 }
             }
         }

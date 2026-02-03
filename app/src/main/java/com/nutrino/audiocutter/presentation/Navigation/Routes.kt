@@ -28,3 +28,15 @@ object VIDEOTRIMMERERRORSTATE
 
 @Serializable
 object SELECTFEATURESCREEN
+
+@Serializable
+object ALLVIDEOFORAUDIOEXTRACTSCREEN
+
+@Serializable
+data class AUDIOEXTRACTORSCREEN(val uri: String , val videoDuration : Long, val videoName : String)
+
+@Serializable
+object AUDIOEXTRACTORSUCCESSSTATE
+
+@Serializable
+object AUDIOEXTRACTORERRORSTATE

@@ -8,9 +8,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.nutrino.audiocutter.presentation.Screens.AllAudioScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioExtractorErrorScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioExtractorScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioExtractorSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimmerScreen
+import com.nutrino.audiocutter.presentation.Screens.GetAllVideoForAudioExtractScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllVideoScreen
 import com.nutrino.audiocutter.presentation.Screens.SelectFeatureScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimErrorScreen
@@ -63,6 +67,25 @@ fun MainApp() {
         }
         composable<VIDEOTRIMMERERRORSTATE> {
             VideoTrimErrorScreen(navController = navcontroller)
+
+        }
+        composable<ALLVIDEOFORAUDIOEXTRACTSCREEN> {
+            GetAllVideoForAudioExtractScreen(navController = navcontroller)
+
+        }
+        composable<AUDIOEXTRACTORSCREEN> { backstackEntry ->
+            val data: AUDIOEXTRACTORSCREEN = backstackEntry.toRoute()
+            AudioExtractorScreen(
+                navController = navcontroller,
+                uri = data.uri,
+                videoDuration = data.videoDuration
+            )
+        }
+        composable<AUDIOEXTRACTORSUCCESSSTATE> {
+            AudioExtractorSuccessScreen(navController = navcontroller)
+        }
+        composable<AUDIOEXTRACTORERRORSTATE> {
+            AudioExtractorErrorScreen(navController = navcontroller)
 
         }
 

@@ -1,14 +1,15 @@
 package com.nutrino.audiocutter.presentation.ViewModel
 
-import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nutrino.audiocutter.domain.StateHandeling.GetAllVideoState
 import com.nutrino.audiocutter.domain.StateHandeling.VideoTrimmerState
+import com.nutrino.audiocutter.domain.StateHandeling.AudioExtractorState
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import com.nutrino.audiocutter.domain.UseCases.GetAllVideoUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimVideoUseCase
+import com.nutrino.audiocutter.domain.UseCases.ExtractAudioFromVideoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,13 +22,17 @@ import javax.inject.Inject
 @HiltViewModel
 class VideoViewModel @Inject constructor (
     private val getAllVideoUseCase: GetAllVideoUseCase,
-    private val trimVideoUseCase: TrimVideoUseCase
+    private val trimVideoUseCase: TrimVideoUseCase,
+    private val extractAudioFromVideoUseCase: ExtractAudioFromVideoUseCase
 ): ViewModel() {
     private val _getAllVideosState= MutableStateFlow(GetAllVideoState())
     val getAllVideosState = _getAllVideosState.asStateFlow()
 
     private val _videoTrimmerState = MutableStateFlow(VideoTrimmerState())
     val videoTrimmerState = _videoTrimmerState.asStateFlow()
+
+    private val _audioExtractorState = MutableStateFlow(AudioExtractorState())
+    val audioExtractorState = _audioExtractorState.asStateFlow()
 
     fun getAllVideo(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -49,14 +54,13 @@ class VideoViewModel @Inject constructor (
         }
     }
 
-    fun trimVideo(context: Context,
-                  uri: Uri,
+    fun trimVideo(uri: Uri,
                   startTime: Long,
                   endTime: Long,
                   filename: String){
 
         viewModelScope.launch(Dispatchers.Main) {
-            trimVideoUseCase.invoke(context = context, uri = uri, startTime = startTime, endTime = endTime,
+            trimVideoUseCase.invoke(uri = uri, startTime = startTime, endTime = endTime,
                 filename = filename).collect {result->
                 when(result){
                     is ResultState.Loading -> {
@@ -69,6 +73,35 @@ class VideoViewModel @Inject constructor (
                     }
                     is ResultState.Error->{
                         _videoTrimmerState.value = VideoTrimmerState(isLoading = false, error = result.message)
+
+                    }
+
+                }
+
+            }
+        }
+
+    }
+
+    fun extractAudioFromVideo(uri: Uri,
+                              startTime: Long,
+                              endTime: Long,
+                              filename: String){
+
+        viewModelScope.launch(Dispatchers.Main) {
+            extractAudioFromVideoUseCase.invoke(uri = uri, startTime = startTime, endTime = endTime,
+                filename = filename).collect {result->
+                when(result){
+                    is ResultState.Loading -> {
+                        _audioExtractorState.value = AudioExtractorState(isLoading = true)
+
+                    }
+                    is ResultState.Success -> {
+                        _audioExtractorState.value = AudioExtractorState(isLoading = false, data = result.data)
+
+                    }
+                    is ResultState.Error->{
+                        _audioExtractorState.value = AudioExtractorState(isLoading = false, error = result.message)
 
                     }
 

@@ -21,6 +21,12 @@ data class VideoTrimmerState(
     val error: String ? = null
 )
 
+data class AudioExtractorState(
+    val isLoading: Boolean = false,
+    val data: String= "",
+    val error: String ? = null
+)
+
 data class GetAllSongState(
     val isLoading: Boolean = false,
     val data: List<Song> = emptyList(),
