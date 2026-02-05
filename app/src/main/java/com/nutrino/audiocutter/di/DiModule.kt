@@ -23,7 +23,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DiModule {
-    @Singleton
     @Provides
     fun provideExoplayer(@ApplicationContext context: Context): ExoPlayer{
         return ExoPlayer.Builder(context).build()

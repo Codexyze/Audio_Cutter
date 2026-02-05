@@ -19,4 +19,9 @@ class MediaPlayerViewModel @Inject constructor(private val mediaPlayerManager: M
     fun releasePlayer() {
         return mediaPlayerManager.releasePlayer()
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        mediaPlayerManager.releasePlayer()
+    }
 }

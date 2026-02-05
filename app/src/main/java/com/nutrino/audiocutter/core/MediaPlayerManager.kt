@@ -13,13 +13,15 @@ class MediaPlayerManager @Inject constructor(private val exoPlayer: ExoPlayer) {
 
     fun initializePlayer(uri: Uri) {
         exoPlayer.apply {
+            stop()
+            clearMediaItems()
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
             playWhenReady = false
         }
     }
     fun releasePlayer() {
-        exoPlayer?.apply {
+        exoPlayer.apply {
             this.stop()
             this.release()
         }
