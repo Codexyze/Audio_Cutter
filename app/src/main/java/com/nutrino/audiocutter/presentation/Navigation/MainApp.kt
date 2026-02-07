@@ -11,9 +11,13 @@ import com.nutrino.audiocutter.presentation.Screens.AllAudioScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioExtractorErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioExtractorScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioExtractorSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioMergeErrorScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioMergeScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioMergeSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimmerScreen
+import com.nutrino.audiocutter.presentation.Screens.GetAllAudioForMergeScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllVideoForAudioExtractScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllVideoScreen
 import com.nutrino.audiocutter.presentation.Screens.SelectFeatureScreen
@@ -86,6 +90,25 @@ fun MainApp() {
         }
         composable<AUDIOEXTRACTORERRORSTATE> {
             AudioExtractorErrorScreen(navController = navcontroller)
+
+        }
+        composable<ALLAUDIOFORMERGESCREEN> {
+            GetAllAudioForMergeScreen(navController = navcontroller)
+
+        }
+        composable<AUDIOMERGESCREEN> { backstackEntry ->
+            val data: AUDIOMERGESCREEN = backstackEntry.toRoute()
+            AudioMergeScreen(
+                navController = navcontroller,
+                uriList = data.uriList,
+                songNames = data.songNames
+            )
+        }
+        composable<AUDIOMERGESUCCESSSTATE> {
+            AudioMergeSuccessScreen(navController = navcontroller)
+        }
+        composable<AUDIOMERGEERRORSTATE> {
+            AudioMergeErrorScreen(navController = navcontroller)
 
         }
 
