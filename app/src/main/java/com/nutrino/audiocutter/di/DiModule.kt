@@ -10,7 +10,9 @@ import com.nutrino.audiocutter.data.RepoImpl.VideoRepImpl
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
 import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
+import com.nutrino.audiocutter.domain.UseCases.GetAllSongsForMergeUseCase
 import com.nutrino.audiocutter.domain.UseCases.GetAllVideoUseCase
+import com.nutrino.audiocutter.domain.UseCases.MergeSongsUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimVideoUseCase
 import dagger.Module
@@ -66,6 +68,16 @@ object DiModule {
     @Provides
     fun provideTrimVideoUseCase(videoRepository: VideoRepository): TrimVideoUseCase{
         return TrimVideoUseCase(repository =videoRepository )
+    }
+
+    @Provides
+    fun provideGetAllSongsForMergeUseCase(repository: GetAllSongRepository): GetAllSongsForMergeUseCase{
+        return GetAllSongsForMergeUseCase(getAllSongRepository = repository)
+    }
+
+    @Provides
+    fun provideMergeSongsUseCase(repository: GetAllSongRepository): MergeSongsUseCase{
+        return MergeSongsUseCase(repository = repository)
     }
 
 

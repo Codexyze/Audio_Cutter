@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.VideoLibrary
 
 import androidx.compose.material.icons.outlined.Schedule
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.nutrino.audiocutter.presentation.Navigation.ALLAUDIOFORMERGESCREEN
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOFORAUDIOEXTRACTSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
@@ -54,6 +56,7 @@ fun SelectFeatureScreen(navController: NavController) {
         FeatureItem("Audio Trimmer", Icons.Default.ContentCut),
         FeatureItem("Video Trimmer", Icons.Default.VideoLibrary),
         FeatureItem("Audio Extractor", Icons.Default.GraphicEq),
+        FeatureItem("Audio Merge", Icons.Default.MusicNote),
         FeatureItem("Coming Soon", Icons.Outlined.Schedule, isComingSoon = true)
     )
 
@@ -98,6 +101,10 @@ fun SelectFeatureScreen(navController: NavController) {
                             feature == features[2] -> {
                                 // Audio Extractor
                                 navController.navigate(ALLVIDEOFORAUDIOEXTRACTSCREEN)
+                            }
+                            feature == features[3] -> {
+                                // Audio Track Merge
+                                navController.navigate(ALLAUDIOFORMERGESCREEN)
                             }
                         }
                     }

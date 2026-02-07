@@ -39,3 +39,15 @@ data class GetAllVideoState(
     val error: String ? = null
 )
 
+data class GetAllSongsForMergeState(
+    val isLoading: Boolean = false,
+    val data: List<Song> = emptyList(),
+    val error: String ? = null
+)
+
+data class AudioMergeState(
+    val isLoading: Boolean = false,
+    val data: String= "",
+    val error: String ? = null
+)
+

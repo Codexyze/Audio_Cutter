@@ -40,3 +40,16 @@ object AUDIOEXTRACTORSUCCESSSTATE
 
 @Serializable
 object AUDIOEXTRACTORERRORSTATE
+
+@Serializable
+object ALLAUDIOFORMERGESCREEN
+
+@Serializable
+data class AUDIOMERGESCREEN(val uriList: List<String>, val songNames: List<String>)
+
+@Serializable
+object AUDIOMERGESUCCESSSTATE
+
+@Serializable
+object AUDIOMERGEERRORSTATE
+
