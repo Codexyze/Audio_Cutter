@@ -10,11 +10,13 @@ plugins {
 
 //val admobAppId: String = project.findProperty("ADMOB_APP_ID") as? String ?: ""
 //val interstitialAdId: String = project.findProperty("INTERSTITIAL_AD_ID") as? String ?: ""
+
+//These are test IDs only if app fails
 val admobAppId: String = project.findProperty("ADMOB_APP_ID") as? String
-    ?: throw GradleException("ADMOB_APP_ID not set in gradle.properties!")
+    ?:"ca-app-pub-3940256099942544~3347511713"?: throw GradleException("ADMOB_APP_ID not set in gradle.properties!")
 
 val interstitialAdId: String = project.findProperty("INTERSTITIAL_AD_ID") as? String
-    ?: throw GradleException("INTERSTITIAL_AD_ID not set in gradle.properties!")
+    ?:"ca-app-pub-3940256099942544/1033173712"?: throw GradleException("INTERSTITIAL_AD_ID not set in gradle.properties!")
 
 
 
