@@ -8,11 +8,11 @@ It lets users **trim audio & video files, extract audio from videos, merge multi
 This project follows **Clean Architecture + MVVM + Hilt**, making it modular, testable, and scalable.
 
 > 📦 **Latest Stable Release:**  
-> 👉 [Version 2.0.0](https://github.com/Codexyze/Audio_Cutter/releases)
->
+> 👉 [Version 2.0.0](https://github.com/Codexyze/Audio_Cutter/releases)  
+>  
 > 🚀 Audio Cutter is now **live on the Play Store**:  
-> 👉 https://play.google.com/store/apps/details?id=com.nutrino.audiocutter
->
+> 👉 https://play.google.com/store/apps/details?id=com.nutrino.audiocutter  
+>  
 > 🎶 This project is a **sub-feature** of my main music app **LHYTHM**:  
 > 👉 https://github.com/Codexyze/Lhythm
 
@@ -26,8 +26,8 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
   <img src="https://github.com/user-attachments/assets/ef7f76e7-bf1e-40c5-a0bc-2ea8e89e6bc8" width="24%" />
   <img src="https://github.com/user-attachments/assets/4ef1e7d3-d91c-4a48-a243-5d4f084eb1b4" width="24%" />
   <img src="https://github.com/user-attachments/assets/26c7d1e3-9223-433a-ba56-3be221b8d4d7" width="24%" />
-
-
+  
+  
 
 
 </div>
@@ -37,39 +37,39 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
 ## 🧠 Features
 
 ### Audio Trimmer
-- 🎧 **Play any audio file**
-- ✂️ **Trim audio easily using a slider-based editor**
-- 🔊 **Real-time waveform preview & playback**
-- 💾 **Save trimmed files with your custom filename**
-- 🎵 **Create ringtones, alarms, and notification sounds**
+- 🎧 **Play any audio file**  
+- ✂️ **Trim audio easily using a slider-based editor**  
+- 🔊 **Real-time waveform preview & playback**  
+- 💾 **Save trimmed files with your custom filename**  
+- 🎵 **Create ringtones, alarms, and notification sounds**  
 
 ### Video Trimmer
-- 🎬 **Trim video files with precision**
-- 📹 **Real-time video preview while editing**
-- ⏱️ **Slider-based start and end time selection**
-- 💾 **Save trimmed videos with custom filename**
+- 🎬 **Trim video files with precision**  
+- 📹 **Real-time video preview while editing**  
+- ⏱️ **Slider-based start and end time selection**  
+- 💾 **Save trimmed videos with custom filename**  
 
 ### Audio Extractor
-- 🎵 **Extract audio from video files**
-- 🎧 **Select specific time range to extract**
-- 💾 **Save extracted audio as M4A format**
-- 📹 **Preview video before extraction**
+- 🎵 **Extract audio from video files**  
+- 🎧 **Select specific time range to extract**  
+- 💾 **Save extracted audio as M4A format**  
+- 📹 **Preview video before extraction**  
 
 ### Audio Merge
-- 🎼 **Merge multiple audio tracks into one**
-- 🔢 **Select songs in custom sequence**
-- ➕ **Combine 2 or more audio files**
-- 💾 **Save merged audio with custom filename**
+- 🎼 **Merge multiple audio tracks into one**  
+- 🔢 **Select songs in custom sequence**  
+- ➕ **Combine 2 or more audio files**  
+- 💾 **Save merged audio with custom filename**  
 
 ### General
-- ⚡ **Fast performance with clean UI**
-- 🔐 **Local processing — your files stay on device**
+- ⚡ **Fast performance with clean UI**  
+- 🔐 **Local processing — your files stay on device**  
 - 🧪 Built using modern Android stack + clean architecture
 
 ---
 ## 👨‍💻 Developer Take
 
-Hi, I’m **Akshay Sarapure** 👋
+Hi, I’m **Akshay Sarapure** 👋  
 
 This project holds a special place for me. **Audio Cutter** is my **first application published on the Google Play Store**, and it represents an important learning milestone in my Android development journey.
 
@@ -83,7 +83,7 @@ Every feature in this app helped me understand real-world challenges like media 
 
 I believe sharing this context openly reflects the ideology behind the project and the mindset .
 
-Thanks for taking the time to check out the project
+Thanks for taking the time to check out the project 
 ---
 
 ## 📂 Folder Structure
@@ -118,48 +118,48 @@ com.nutrino.audiocutter
 
 ## 🧪 Tech Stack
 
-- 💚 Jetpack Compose
-- 🔥 Kotlin
-- 🎞️ ExoPlayer
-- 🧩 Hilt (DI)
-- 🎯 Clean Architecture + MVVM
-- 📂 Scoped Storage + File I/O
+- 💚 Jetpack Compose  
+- 🔥 Kotlin  
+- 🎞️ ExoPlayer  
+- 🧩 Hilt (DI)  
+- 🎯 Clean Architecture + MVVM  
+- 📂 Scoped Storage + File I/O  
 
 ---
 
 ## 🛠 How to Use
 
 ### Audio Trimmer
-1. Select any audio file from storage
-2. File loads and plays via ExoPlayer
-3. Adjust trimming using the **interactive slider**
-4. Enter your desired output filename
-5. Tap **Trim Audio**
-6. Trimmed result is saved instantly 🎉
+1. Select any audio file from storage  
+2. File loads and plays via ExoPlayer  
+3. Adjust trimming using the **interactive slider**  
+4. Enter your desired output filename  
+5. Tap **Trim Audio**  
+6. Trimmed result is saved instantly 🎉  
 
 ### Video Trimmer
-1. Select any video file from storage
-2. Video loads with preview
-3. Adjust start and end time using the **slider**
-4. Enter your desired output filename
-5. Tap **Trim Video**
-6. Trimmed video is saved 🎉
+1. Select any video file from storage  
+2. Video loads with preview  
+3. Adjust start and end time using the **slider**  
+4. Enter your desired output filename  
+5. Tap **Trim Video**  
+6. Trimmed video is saved 🎉  
 
 ### Audio Extractor
-1. Select any video file from storage
-2. Video preview loads
-3. Choose the time range to extract audio
-4. Enter your desired output filename
-5. Tap **Extract Audio**
-6. Audio extracted and saved as M4A 🎉
+1. Select any video file from storage  
+2. Video preview loads  
+3. Choose the time range to extract audio  
+4. Enter your desired output filename  
+5. Tap **Extract Audio**  
+6. Audio extracted and saved as M4A 🎉  
 
 ### Audio Merge
-1. Select **Audio Merge** from main menu
-2. Choose 2 or more songs in desired sequence
-3. Songs show numbered order (1, 2, 3...)
-4. Enter output filename
-5. Tap **Merge Tracks**
-6. Merged audio saved instantly 🎉
+1. Select **Audio Merge** from main menu  
+2. Choose 2 or more songs in desired sequence  
+3. Songs show numbered order (1, 2, 3...)  
+4. Enter output filename  
+5. Tap **Merge Tracks**  
+6. Merged audio saved instantly 🎉  
 
 ---
 
