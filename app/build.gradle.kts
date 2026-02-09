@@ -18,6 +18,8 @@ val admobAppId: String = project.findProperty("ADMOB_APP_ID") as? String
 val interstitialAdId: String = project.findProperty("INTERSTITIAL_AD_ID") as? String
     ?:"ca-app-pub-3940256099942544/1033173712"?: throw GradleException("INTERSTITIAL_AD_ID not set in gradle.properties!")
 
+val feedBackAds: String = project.findProperty("FEEDBACK_EMAIL") as? String ?:"your@email.com"
+
 
 
 android {
@@ -28,6 +30,7 @@ android {
         manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
         buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
         buildConfigField("String", "INTERSTITIAL_AD_ID", "\"$interstitialAdId\"")
+        buildConfigField("String","FEEDBACK_EMAIL","\"$feedBackAds\"")
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 36
@@ -59,6 +62,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -95,11 +99,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("androidx.media3:media3-effect:1.8.0")
     implementation("androidx.core:core-splashscreen:1.0.0")
-
-    //Coil
-    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
-
     //ads
     implementation("com.google.android.gms:play-services-ads:24.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
