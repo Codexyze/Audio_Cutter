@@ -11,12 +11,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.nutrino.audiocutter.presentation.Navigation.MainApp
-import com.nutrino.audiocutter.presentation.Utils.InterstitialAdHelper
 import com.nutrino.audiocutter.ui.theme.AudioCutterTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen before calling super.onCreate()
         installSplashScreen()
@@ -24,8 +24,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Preload interstitial ad for Progress Tracker feature
-        InterstitialAdHelper.loadAd(this)
+        // Ads are automatically preloaded when first screen with AdsViewModel is composed
+        // via hiltViewModel() injection in Composables
+
         setContent {
             AudioCutterTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -36,12 +37,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        InterstitialAdHelper.destroy()
-
     }
 }
 

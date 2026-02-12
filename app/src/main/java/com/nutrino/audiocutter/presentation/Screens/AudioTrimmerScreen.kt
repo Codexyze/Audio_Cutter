@@ -47,7 +47,7 @@ import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERSUCCESSSTATE
-import com.nutrino.audiocutter.presentation.Utils.InterstitialAdHelper
+import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.AudioTrimViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
 import android.util.Log
@@ -62,6 +62,7 @@ fun AudioTrimmerScreen(
     navController: NavController,
     audioTrimViewModel: AudioTrimViewModel = hiltViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = hiltViewModel(),
+    adsViewModel: AdsViewModel = hiltViewModel(),
     uri: String = "",
     songDuration: Long = 0,
 ) {
@@ -145,7 +146,7 @@ fun AudioTrimmerScreen(
                     navController.navigate(AUDIOTRIMMERSUCCESSSTATE)
                 } else {
                     // Unified ad request (show if ready, otherwise load then show) and always navigate after
-                    InterstitialAdHelper.requestAndShow(
+                    adsViewModel.requestAndShowAd(
                         activity = activity,
                         onAdDismissed = { navController.navigate(AUDIOTRIMMERSUCCESSSTATE) },
                         onAdFailed = { navController.navigate(AUDIOTRIMMERSUCCESSSTATE) }

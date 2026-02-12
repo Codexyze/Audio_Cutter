@@ -4,15 +4,19 @@ import android.content.Context
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.nutrino.audiocutter.core.MediaPlayerManager
+import com.nutrino.audiocutter.data.RepoImpl.AdsRepositoryImpl
 import com.nutrino.audiocutter.data.RepoImpl.AudioTimmerRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.GetAllSongsRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoRepImpl
+import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
 import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
 import com.nutrino.audiocutter.domain.UseCases.GetAllSongsForMergeUseCase
 import com.nutrino.audiocutter.domain.UseCases.GetAllVideoUseCase
+import com.nutrino.audiocutter.domain.UseCases.LoadAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.MergeSongsUseCase
+import com.nutrino.audiocutter.domain.UseCases.ShowAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimVideoUseCase
 import dagger.Module
@@ -43,6 +47,7 @@ object DiModule {
 
     }
 
+    @UnstableApi
     @Provides
     fun provideGetAllSongUseCaseObj(@ApplicationContext context: Context): GetAllSongRepository {
         return GetAllSongsRepoImpl(context = context)
@@ -80,7 +85,20 @@ object DiModule {
         return MergeSongsUseCase(repository = repository)
     }
 
+    @Provides
+    @Singleton
+    fun provideAdsRepository(@ApplicationContext context: Context): AdsRepository {
+        return AdsRepositoryImpl(context = context)
+    }
 
+    @Provides
+    fun provideLoadAdUseCase(repository: AdsRepository): LoadAdUseCase {
+        return LoadAdUseCase(repository = repository)
+    }
+
+    @Provides
+    fun provideShowAdUseCase(repository: AdsRepository): ShowAdUseCase {
+        return ShowAdUseCase(repository = repository)
+    }
 
 }
-

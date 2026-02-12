@@ -48,7 +48,7 @@ import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.presentation.Navigation.VIDEOTRIMMERERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.VIDEOTRIMMERSUCCESSSTATE
-import com.nutrino.audiocutter.presentation.Utils.InterstitialAdHelper
+import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.VideoViewModel
 import java.io.File
@@ -62,6 +62,7 @@ fun VideoTrimmerScreen(
     navController: NavController,
     videoViewModel: VideoViewModel = hiltViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = hiltViewModel(),
+    adsViewModel: AdsViewModel = hiltViewModel(),
     uri: String = "",
     videoDuration: Long = 0,
 ) {
@@ -147,7 +148,7 @@ fun VideoTrimmerScreen(
                     navController.navigate(VIDEOTRIMMERSUCCESSSTATE)
                 } else {
                     // Unified ad request (show if ready, otherwise load then show) and always navigate after
-                    InterstitialAdHelper.requestAndShow(
+                    adsViewModel.requestAndShowAd(
                         activity = activity,
                         onAdDismissed = { navController.navigate(VIDEOTRIMMERSUCCESSSTATE) },
                         onAdFailed = { navController.navigate(VIDEOTRIMMERSUCCESSSTATE) }

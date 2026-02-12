@@ -24,6 +24,22 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Create gradle.properties for CI
+        run: |
+          cat > gradle.properties << EOF
+          # Project-wide Gradle settings for CI
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          android.useAndroidX=true
+          android.enableJetifier=true
+          kotlin.code.style=official
+          android.nonTransitiveRClass=true
+          
+          # Test AdMob IDs (Safe for CI)
+          ADMOB_APP_ID=ca-app-pub-3940256099942544~3347511713
+          INTERSTITIAL_AD_ID=ca-app-pub-3940256099942544/1033173712
+          FEEDBACK_EMAIL=feedbacknutrino@gmail.com
+          EOF
+
       - name: Run Tests
         run: ./gradlew test
 
