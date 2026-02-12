@@ -73,7 +73,8 @@ import com.nutrino.audiocutter.presentation.Navigation.ALLAUDIOFORMERGESCREEN
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOFORAUDIOEXTRACTSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
-import com.nutrino.audiocutter.presentation.Utils.InterstitialAdHelper
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 
 data class FeatureItem(
     val title: String,
@@ -85,7 +86,10 @@ data class FeatureItem(
 
 
 @Composable
-fun SelectFeatureScreen(navController: NavController) {
+fun SelectFeatureScreen(
+    navController: NavController,
+    adsViewModel: AdsViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     var showFeedbackDialog by remember { mutableStateOf(false) }
 
@@ -281,7 +285,7 @@ fun SelectFeatureScreen(navController: NavController) {
                                     showFeedbackDialog = false
                                     val activity = context as? Activity
                                     if (activity != null) {
-                                        InterstitialAdHelper.requestAndShow(
+                                        adsViewModel.requestAndShowAd(
                                             activity = activity,
                                             onAdDismissed = {},
                                             onAdFailed = {}

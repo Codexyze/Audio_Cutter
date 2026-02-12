@@ -49,7 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOMERGEERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOMERGESUCCESSSTATE
-import com.nutrino.audiocutter.presentation.Utils.InterstitialAdHelper
+import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.AudioMergeViewModel
 
 
@@ -57,6 +57,7 @@ import com.nutrino.audiocutter.presentation.ViewModel.AudioMergeViewModel
 fun AudioMergeScreen(
     navController: NavController,
     audioMergeViewModel: AudioMergeViewModel = hiltViewModel(),
+    adsViewModel: AdsViewModel = hiltViewModel(),
     uriList: List<String>,
     songNames: List<String>
 ) {
@@ -72,7 +73,7 @@ fun AudioMergeScreen(
             adShown.value = true
             val activity = context as? Activity
             if (activity != null) {
-                InterstitialAdHelper.requestAndShow(
+                adsViewModel.requestAndShowAd(
                     activity = activity,
                     onAdDismissed = {
                         navController.navigate(AUDIOMERGESUCCESSSTATE) {

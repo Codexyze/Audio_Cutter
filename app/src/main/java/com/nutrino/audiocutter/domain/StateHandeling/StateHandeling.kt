@@ -51,3 +51,10 @@ data class AudioMergeState(
     val error: String ? = null
 )
 
+data class AdState(
+    val isLoading: Boolean = false,
+    val isAdReady: Boolean = false,
+    val isAdShowing: Boolean = false,
+    val error: String? = null,
+    val adDismissed: Boolean = false
+)
