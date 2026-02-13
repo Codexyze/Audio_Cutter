@@ -51,6 +51,7 @@ import com.nutrino.audiocutter.presentation.Navigation.AUDIOMERGEERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOMERGESUCCESSSTATE
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.AudioMergeViewModel
+import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 
 @Composable
@@ -103,13 +104,13 @@ fun AudioMergeScreen(
         }
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -289,5 +290,8 @@ fun AudioMergeScreen(
                 }
             }
         }
+
+        // Banner Ad at bottom
+        BannerAdView(modifier = Modifier.fillMaxWidth())
     }
 }

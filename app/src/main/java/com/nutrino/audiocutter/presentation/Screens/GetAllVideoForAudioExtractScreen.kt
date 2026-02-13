@@ -45,6 +45,7 @@ import com.nutrino.audiocutter.data.DataClass.Video
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOEXTRACTORSCREEN
 import com.nutrino.audiocutter.presentation.Utils.formatDuration
 import com.nutrino.audiocutter.presentation.ViewModel.VideoViewModel
+import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 
 @Composable
@@ -71,6 +72,7 @@ fun GetAllVideoForAudioExtractScreen(navController: NavController) {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                 arrayOf(Manifest.permission.READ_MEDIA_VIDEO)
             }
+
             else -> {
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
@@ -89,78 +91,90 @@ fun GetAllVideoForAudioExtractScreen(navController: NavController) {
         }
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        if (!permissionGranted.value) {
-            Text(
-                text = "Permission required to access videos 🎥. Please grant permission.",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-            )
-        } else {
-            when {
-                state.isLoading -> {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
-                state.error != null -> {
-                    Text(
-                        text = "Error: ${state.error}",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
-                state.data.isEmpty() -> {
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "🎥",
-                            fontSize = 72.sp,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        Text(
-                            text = "No Videos Found",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        Text(
-                            text = "No videos available on your device",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            if (!permissionGranted.value) {
+                Text(
+                    text = "Permission required to access videos 🎥. Please grant permission.",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                )
+            } else {
+                when {
+                    state.isLoading -> {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
-                }
 
-                state.data != null -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(state.data) { video ->
-                            VideoItemForAudioExtract(video = video, navController = navController)
+                    state.error != null -> {
+                        Text(
+                            text = "Error: ${state.error}",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+
+                    state.data.isEmpty() -> {
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "🎥",
+                                fontSize = 72.sp,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                            Text(
+                                text = "No Videos Found",
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            Text(
+                                text = "No videos available on your device",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+
+                    state.data != null -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(state.data) { video ->
+                                VideoItemForAudioExtract(
+                                    video = video,
+                                    navController = navController
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+
+        // Banner Ad at bottom
+        BannerAdView(modifier = Modifier.fillMaxWidth())
     }
 }
 

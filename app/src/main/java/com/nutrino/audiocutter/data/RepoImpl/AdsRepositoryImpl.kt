@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
@@ -134,5 +136,48 @@ class AdsRepositoryImpl @Inject constructor(
         Log.d(TAG, "Destroying ad reference")
         interstitialAd = null
         isLoading = false
+    }
+
+    override suspend fun loadBannerAd(adView: AdView): Flow<ResultState<Boolean>> = callbackFlow {
+        trySend(ResultState.Loading)
+        Log.d(TAG, "Starting to load banner ad with ID: ${BuildConfig.BANNER_ADS_ID}")
+
+        adView.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                Log.d(TAG, "Banner ad loaded successfully")
+                trySend(ResultState.Success(true))
+                close()
+            }
+
+            override fun onAdFailedToLoad(error: LoadAdError) {
+                Log.e(TAG, "Banner ad failed to load: ${error.message}")
+                Log.e(TAG, "Error code: ${error.code}, domain: ${error.domain}")
+                trySend(ResultState.Error("Failed to load banner ad: ${error.message}"))
+                close()
+            }
+
+            override fun onAdClicked() {
+                Log.d(TAG, "Banner ad clicked")
+            }
+
+            override fun onAdOpened() {
+                Log.d(TAG, "Banner ad opened")
+            }
+
+            override fun onAdClosed() {
+                Log.d(TAG, "Banner ad closed")
+            }
+
+            override fun onAdImpression() {
+                Log.d(TAG, "Banner ad impression recorded")
+            }
+        }
+
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+
+        awaitClose {
+            Log.d(TAG, "Banner ad flow closed")
+        }
     }
 }

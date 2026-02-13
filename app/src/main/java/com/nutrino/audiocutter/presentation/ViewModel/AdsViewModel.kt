@@ -4,10 +4,12 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.ads.AdView
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.StateHandeling.AdState
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import com.nutrino.audiocutter.domain.UseCases.LoadAdUseCase
+import com.nutrino.audiocutter.domain.UseCases.LoadBannerAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.ShowAdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,11 +22,15 @@ import javax.inject.Inject
 class AdsViewModel @Inject constructor(
     private val loadAdUseCase: LoadAdUseCase,
     private val showAdUseCase: ShowAdUseCase,
+    private val loadBannerAdUseCase: LoadBannerAdUseCase,
     private val adsRepository: AdsRepository
 ) : ViewModel() {
 
     private val _adState = MutableStateFlow(AdState())
     val adState = _adState.asStateFlow()
+
+    private val _bannerAdState = MutableStateFlow<BannerAdState>(BannerAdState.Idle)
+    val bannerAdState = _bannerAdState.asStateFlow()
 
     private val TAG = "AdsViewModel"
 
@@ -142,8 +148,39 @@ class AdsViewModel @Inject constructor(
         _adState.value = _adState.value.copy(adDismissed = false)
     }
 
+    fun loadBannerAd(adView: AdView) {
+        viewModelScope.launch(Dispatchers.Main) {
+            loadBannerAdUseCase(adView).collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                        _bannerAdState.value = BannerAdState.Loading
+                        Log.d(TAG, "Loading banner ad...")
+                    }
+
+                    is ResultState.Success -> {
+                        _bannerAdState.value = BannerAdState.Loaded
+                        Log.d(TAG, "Banner ad loaded successfully")
+                    }
+
+                    is ResultState.Error -> {
+                        _bannerAdState.value = BannerAdState.Failed(result.message)
+                        Log.e(TAG, "Banner ad failed to load: ${result.message}")
+                    }
+                }
+            }
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         adsRepository.destroy()
     }
 }
+
+sealed class BannerAdState {
+    object Idle : BannerAdState()
+    object Loading : BannerAdState()
+    object Loaded : BannerAdState()
+    data class Failed(val message: String) : BannerAdState()
+}
+

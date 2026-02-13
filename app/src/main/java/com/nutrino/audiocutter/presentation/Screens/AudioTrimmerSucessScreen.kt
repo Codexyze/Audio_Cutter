@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
+import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 @Composable
 fun AudioTrimSuccessScreen(
@@ -34,10 +35,15 @@ fun AudioTrimSuccessScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
         Icon(
             imageVector = Icons.Default.CheckCircle,
             contentDescription = "Success",
@@ -80,7 +86,12 @@ fun AudioTrimSuccessScreen(
             Text("Go to Home", style = MaterialTheme.typography.titleMedium)
         }
     }
+
+        // Banner Ad at bottom
+        BannerAdView(modifier = Modifier.fillMaxWidth())
+    }
 }
+
 
 
 

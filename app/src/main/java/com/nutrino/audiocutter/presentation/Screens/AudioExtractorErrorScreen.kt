@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOFORAUDIOEXTRACTSCREEN
+import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 @Composable
 fun AudioExtractorErrorScreen(
@@ -34,55 +35,64 @@ fun AudioExtractorErrorScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.ErrorOutline,
-            contentDescription = "Error Icon",
-            tint = Color(0xFFF44336), // Red for error
-            modifier = Modifier.size(96.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Oops! Something went wrong",
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = "There was an issue while extracting the audio.\nPlease try again.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = {
-                navController.navigate(ALLVIDEOFORAUDIOEXTRACTSCREEN) {
-                    popUpTo(ALLVIDEOFORAUDIOEXTRACTSCREEN) {
-                        inclusive = true
-                    }
-                }
-            },
+        Column(
             modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .height(56.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Try Again",
-                style = MaterialTheme.typography.titleMedium
+            Icon(
+                imageVector = Icons.Default.ErrorOutline,
+                contentDescription = "Error Icon",
+                tint = Color(0xFFF44336), // Red for error
+                modifier = Modifier.size(96.dp)
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Oops! Something went wrong",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "There was an issue while extracting the audio.\nPlease try again.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = {
+                    navController.navigate(ALLVIDEOFORAUDIOEXTRACTSCREEN) {
+                        popUpTo(ALLVIDEOFORAUDIOEXTRACTSCREEN) {
+                            inclusive = true
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(56.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text(
+                    text = "Try Again",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
         }
+
+        // Banner Ad at bottom
+        BannerAdView(modifier = Modifier.fillMaxWidth())
     }
 }

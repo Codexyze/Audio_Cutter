@@ -13,12 +13,15 @@ plugins {
 
 //These are test IDs only if app fails
 val admobAppId: String = project.findProperty("ADMOB_APP_ID") as? String
-    ?:"ca-app-pub-3940256099942544~3347511713"?: throw GradleException("ADMOB_APP_ID not set in gradle.properties!")
+    ?:"ca-app-pub-3940256099942544~3347511713"
 
 val interstitialAdId: String = project.findProperty("INTERSTITIAL_AD_ID") as? String
-    ?:"ca-app-pub-3940256099942544/1033173712"?: throw GradleException("INTERSTITIAL_AD_ID not set in gradle.properties!")
+    ?:"ca-app-pub-3940256099942544/1033173712"
 
 val feedBackAds: String = project.findProperty("FEEDBACK_EMAIL") as? String ?:"your@email.com"
+
+//test banner ad id
+val bannerAdsID: String = project.findProperty("BANNER_ADS_ID")as? String ?:"ca-app-pub-3940256099942544/6300978111"
 
 
 
@@ -31,6 +34,7 @@ android {
         buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
         buildConfigField("String", "INTERSTITIAL_AD_ID", "\"$interstitialAdId\"")
         buildConfigField("String","FEEDBACK_EMAIL","\"$feedBackAds\"")
+        buildConfigField("String","BANNER_ADS_ID","\"$bannerAdsID\"")
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 36

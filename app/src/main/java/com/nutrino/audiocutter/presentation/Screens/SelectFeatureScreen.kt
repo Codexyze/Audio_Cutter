@@ -75,6 +75,7 @@ import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
+import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 data class FeatureItem(
     val title: String,
@@ -107,65 +108,77 @@ fun SelectFeatureScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Select Feature",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp
-            ),
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize()
+        // Main content
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(16.dp)
         ) {
-            items(features) { feature ->
-                FeatureCard(
-                    feature = feature,
-                    onClick = {
-                        when{
-                            feature == features[0] -> {
-                                // Audio Trimmer
-                                navController.navigate(HOMESCREEN)
-                            }
-                            feature == features[1] -> {
-                                // Video Trimmer
-                                navController.navigate(ALLVIDEOSCREEN)
-                            }
-                            feature == features[2] -> {
-                                // Audio Extractor
-                                navController.navigate(ALLVIDEOFORAUDIOEXTRACTSCREEN)
-                            }
-                            feature == features[3] -> {
-                                // Audio Track Merge
-                                navController.navigate(ALLAUDIOFORMERGESCREEN)
-                            }
-                            feature == features[4] -> {
-                                // FeedBack Ads
-                                showFeedbackDialog = true
-                            }
-                            feature == features[5] -> {
-                                // Feature Request
-                                val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                    data = Uri.parse("mailto:${BuildConfig.FEEDBACK_EMAIL}")
-                                    putExtra(Intent.EXTRA_SUBJECT, "Feature Request")
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Select Feature",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 28.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(features) { feature ->
+                    FeatureCard(
+                        feature = feature,
+                        onClick = {
+                            when{
+                                feature == features[0] -> {
+                                    // Audio Trimmer
+                                    navController.navigate(HOMESCREEN)
                                 }
-                                context.startActivity(Intent.createChooser(intent, "Send Email"))
+                                feature == features[1] -> {
+                                    // Video Trimmer
+                                    navController.navigate(ALLVIDEOSCREEN)
+                                }
+                                feature == features[2] -> {
+                                    // Audio Extractor
+                                    navController.navigate(ALLVIDEOFORAUDIOEXTRACTSCREEN)
+                                }
+                                feature == features[3] -> {
+                                    // Audio Track Merge
+                                    navController.navigate(ALLAUDIOFORMERGESCREEN)
+                                }
+                                feature == features[4] -> {
+                                    // FeedBack Ads
+                                    showFeedbackDialog = true
+                                }
+                                feature == features[5] -> {
+                                    // Feature Request
+                                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                        data = Uri.parse("mailto:${BuildConfig.FEEDBACK_EMAIL}")
+                                        putExtra(Intent.EXTRA_SUBJECT, "Feature Request")
+                                    }
+                                    context.startActivity(Intent.createChooser(intent, "Send Email"))
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
+
+        // Banner Ad at the bottom - won't disturb UI, will hide if fails to load
+        BannerAdView(
+            modifier = Modifier.fillMaxWidth(),
+            adsViewModel = adsViewModel
+        )
     }
 
     // FeedBack Ads Dialog - Warm & Appreciative Design

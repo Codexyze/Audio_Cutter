@@ -51,6 +51,7 @@ import com.nutrino.audiocutter.presentation.Navigation.VIDEOTRIMMERSUCCESSSTATE
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.VideoViewModel
+import com.nutrino.audiocutter.presentation.components.BannerAdView
 import java.io.File
 import java.util.Locale
 
@@ -112,22 +113,27 @@ fun VideoTrimmerScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        AndroidView(
-            factory = {
-                PlayerView(it).apply {
-                    player = mediaPlayerViewModel.getPlayer()
-                    useController = true
-                    setShowNextButton(false)
-                    setShowPreviousButton(false)
-                }
-            },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-        )
+                .weight(1f)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            AndroidView(
+                factory = {
+                    PlayerView(it).apply{
+                        player = mediaPlayerViewModel.getPlayer()
+                        useController = true
+                        setShowNextButton(false)
+                        setShowPreviousButton(false)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+            )
 
         when {
             videoTrimState.value.isLoading -> {
@@ -250,5 +256,9 @@ fun VideoTrimmerScreen(
                 }
             }
         }
+        }
+
+        // Banner Ad at bottom
+        BannerAdView(modifier = Modifier.fillMaxWidth())
     }
 }

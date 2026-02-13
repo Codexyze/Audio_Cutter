@@ -48,6 +48,7 @@ import com.nutrino.audiocutter.data.DataClass.Song
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERSCREEN
 import com.nutrino.audiocutter.presentation.Utils.formatDuration
 import com.nutrino.audiocutter.presentation.ViewModel.GetAllSongViewModel
+import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 
 @Composable
@@ -92,51 +93,60 @@ fun AllAudioScreen(navController: NavController) {
         }
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        if (!permissionGranted.value) {
-            Text(
-                text = "Permission required to access songs 🎵. Please grant permission.",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-            )
-        } else {
-            when {
-                state.isLoading -> {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            if (!permissionGranted.value) {
+                Text(
+                    text = "Permission required to access songs 🎵. Please grant permission.",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                )
+            } else {
+                when {
+                    state.isLoading -> {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
 
-                state.error != null -> {
-                    Text(
-                        text = "Error: ${state.error}",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+                    state.error != null -> {
+                        Text(
+                            text = "Error: ${state.error}",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
 
-                state.data != null -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(state.data) { song ->
-                            SongItem(song = song, navController = navController)
+                    state.data != null -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(state.data) { song ->
+                                SongItem(song = song, navController = navController)
+                            }
                         }
                     }
                 }
             }
         }
+
+        // Banner Ad at bottom
+        BannerAdView(modifier = Modifier.fillMaxWidth())
     }
 }
 

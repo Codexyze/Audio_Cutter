@@ -50,6 +50,7 @@ import com.nutrino.audiocutter.presentation.Navigation.AUDIOEXTRACTORSUCCESSSTAT
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.VideoViewModel
+import com.nutrino.audiocutter.presentation.components.BannerAdView
 import java.io.File
 import java.util.Locale
 
@@ -109,143 +110,162 @@ fun AudioExtractorScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        AndroidView(
-            factory = {
-                PlayerView(it).apply {
-                    player = mediaPlayerViewModel.getPlayer()
-                    useController = true
-                    setShowNextButton(false)
-                    setShowPreviousButton(false)
-                }
-            },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-        )
-
-        when {
-            audioExtractorState.value.isLoading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.padding(24.dp)
-                )
-                return@Column
-            }
-            audioExtractorState.value.error != null -> {
-                navController.navigate(AUDIOEXTRACTORERRORSTATE)
-            }
-            audioExtractorState.value.data.isNotBlank() && !adShown.value -> {
-                // Successful extraction; attempt to show interstitial ad once
-                adShown.value = true // prevent re-entry
-                val activity = context as? Activity
-                if (activity == null) {
-                    Log.w("AudioExtractorScreen", "Context is not an Activity; navigating without ad")
-                    navController.navigate(AUDIOEXTRACTORSUCCESSSTATE)
-                } else {
-                    // Unified ad request (show if ready, otherwise load then show) and always navigate after
-                    adsViewModel.requestAndShowAd(
-                        activity = activity,
-                        onAdDismissed = { navController.navigate(AUDIOEXTRACTORSUCCESSSTATE) },
-                        onAdFailed = { navController.navigate(AUDIOEXTRACTORSUCCESSSTATE) }
-                    )
-                }
-            }
-        }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .weight(1f)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            item {
-                OutlinedTextField(
-                    value = filename.value,
-                    onValueChange = { filename.value = it },
-                    label = { Text("Audio File Name", color = MaterialTheme.colorScheme.primary) },
-                    modifier = Modifier.fillMaxWidth(0.85f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    ),
-                    textStyle = TextStyle(color = MaterialTheme.colorScheme.primary),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text)
-                )
-            }
+            AndroidView(
+                factory = {
+                    PlayerView(it).apply {
+                        player = mediaPlayerViewModel.getPlayer()
+                        useController = true
+                        setShowNextButton(false)
+                        setShowPreviousButton(false)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+            )
 
-            // 🎚️ RANGE SLIDER FOR AUDIO EXTRACTION
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    "Select Audio Range to Extract",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                RangeSlider(
-                    value = startValue.value..endValue.value,
-                    onValueChange = {
-                        startValue.value = it.start
-                        endValue.value = it.endInclusive
-                    },
-                    valueRange = 0f..videoDuration.toFloat(),
-                    steps = 0, // Always allow slider to work
-                    modifier = Modifier.fillMaxWidth(0.85f)
-                )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth(0.85f)
-                ) {
-                    Text(
-                        text = "Start: ${formatTime(startTime / 1000)}",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 14.sp
+            when {
+                audioExtractorState.value.isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.padding(24.dp)
                     )
-                    Text(
-                        text = "End: ${formatTime(endTime / 1000)}",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 14.sp
-                    )
+                    return@Column
+                }
+
+                audioExtractorState.value.error != null -> {
+                    navController.navigate(AUDIOEXTRACTORERRORSTATE)
+                }
+
+                audioExtractorState.value.data.isNotBlank() && !adShown.value -> {
+                    // Successful extraction; attempt to show interstitial ad once
+                    adShown.value = true // prevent re-entry
+                    val activity = context as? Activity
+                    if (activity == null) {
+                        Log.w(
+                            "AudioExtractorScreen",
+                            "Context is not an Activity; navigating without ad"
+                        )
+                        navController.navigate(AUDIOEXTRACTORSUCCESSSTATE)
+                    } else {
+                        // Unified ad request (show if ready, otherwise load then show) and always navigate after
+                        adsViewModel.requestAndShowAd(
+                            activity = activity,
+                            onAdDismissed = { navController.navigate(AUDIOEXTRACTORSUCCESSSTATE) },
+                            onAdFailed = { navController.navigate(AUDIOEXTRACTORSUCCESSSTATE) }
+                        )
+                    }
                 }
             }
 
-            item {
-                Button(
-                    onClick = {
-                        val isStartValid = startTime >= 0 // Allow 0
-                        val isEndValid = endTime > 0
-                        val isRangeValid = startTime < endTime && endTime <= videoDuration
-
-                        if (isStartValid && isEndValid && isRangeValid && filename.value.isNotBlank()) {
-                            // IMPORTANT: RangeSlider values already represent milliseconds; do NOT multiply by 1000
-                            // Use Uri.fromFile to handle special characters in filenames like #
-                            val fileUri = android.net.Uri.fromFile(File(uri))
-                            videoViewModel.extractAudioFromVideo(
-                                uri = fileUri,
-                                startTime = startTime,
-                                endTime = endTime,
-                                filename = filename.value.trim()
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    OutlinedTextField(
+                        value = filename.value,
+                        onValueChange = { filename.value = it },
+                        label = {
+                            Text(
+                                "Audio File Name",
+                                color = MaterialTheme.colorScheme.primary
                             )
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Please enter valid start/end time or file name",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .height(60.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("Extract Audio 🎵", style = MaterialTheme.typography.titleMedium)
+                        },
+                        modifier = Modifier.fillMaxWidth(0.85f),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                        ),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.primary),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text)
+                    )
+                }
+
+                // 🎚️ RANGE SLIDER FOR AUDIO EXTRACTION
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        "Select Audio Range to Extract",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    RangeSlider(
+                        value = startValue.value..endValue.value,
+                        onValueChange = {
+                            startValue.value = it.start
+                            endValue.value = it.endInclusive
+                        },
+                        valueRange = 0f..videoDuration.toFloat(),
+                        steps = 0, // Always allow slider to work
+                        modifier = Modifier.fillMaxWidth(0.85f)
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth(0.85f)
+                    ) {
+                        Text(
+                            text = "Start: ${formatTime(startTime / 1000)}",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = "End: ${formatTime(endTime / 1000)}",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+
+                item {
+                    Button(
+                        onClick = {
+                            val isStartValid = startTime >= 0 // Allow 0
+                            val isEndValid = endTime > 0
+                            val isRangeValid = startTime < endTime && endTime <= videoDuration
+
+                            if (isStartValid && isEndValid && isRangeValid && filename.value.isNotBlank()) {
+                                // IMPORTANT: RangeSlider values already represent milliseconds; do NOT multiply by 1000
+                                // Use Uri.fromFile to handle special characters in filenames like #
+                                val fileUri = android.net.Uri.fromFile(File(uri))
+                                videoViewModel.extractAudioFromVideo(
+                                    uri = fileUri,
+                                    startTime = startTime,
+                                    endTime = endTime,
+                                    filename = filename.value.trim()
+                                )
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Please enter valid start/end time or file name",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.75f)
+                            .height(60.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text("Extract Audio 🎵", style = MaterialTheme.typography.titleMedium)
+                    }
                 }
             }
+
+            // Banner Ad at bottom
+            BannerAdView(modifier = Modifier.fillMaxWidth())
         }
     }
 }

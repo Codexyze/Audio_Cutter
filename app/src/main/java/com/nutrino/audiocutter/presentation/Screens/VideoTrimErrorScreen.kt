@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOSCREEN
+import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 @Composable
 fun VideoTrimErrorScreen(
@@ -34,50 +35,59 @@ fun VideoTrimErrorScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.ErrorOutline,
-            contentDescription = "Error Icon",
-            tint = Color(0xFFF44336), // Red for error
-            modifier = Modifier.size(96.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Oops! Something went wrong",
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = "There was an issue while trimming the video.\nPlease try again.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = {
-                navController.navigate(ALLVIDEOSCREEN) {
-                    popUpTo(0) { inclusive = true }
-                }
-            },
-            shape = RoundedCornerShape(12.dp),
+        Column(
             modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("Go to Videos", style = MaterialTheme.typography.titleMedium)
+            Icon(
+                imageVector = Icons.Default.ErrorOutline,
+                contentDescription = "Error Icon",
+                tint = Color(0xFFF44336), // Red for error
+                modifier = Modifier.size(96.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Oops! Something went wrong",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "There was an issue while trimming the video.\nPlease try again.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = {
+                    navController.navigate(ALLVIDEOSCREEN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text("Go to Videos", style = MaterialTheme.typography.titleMedium)
+            }
         }
+
+        // Banner Ad at bottom
+        BannerAdView(modifier = Modifier.fillMaxWidth())
     }
 }
