@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Button
@@ -76,13 +77,15 @@ import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
+import androidx.core.net.toUri
 
 data class FeatureItem(
     val title: String,
     val icon: ImageVector,
     val isComingSoon: Boolean = false,
     val isFeatureRequest: Boolean = false,
-    val isFeedbackAds: Boolean = false
+    val isFeedbackAds: Boolean = false,
+    val isPrivacyPolicy: Boolean = false
 )
 
 
@@ -101,6 +104,7 @@ fun SelectFeatureScreen(
         FeatureItem("Audio Merge", Icons.Default.MusicNote),
         FeatureItem("FeedBack Ads", Icons.Default.CardGiftcard, isFeedbackAds = true),
         FeatureItem("Feature Request", Icons.Default.Email, isFeatureRequest = true),
+        FeatureItem("Privacy Policy", Icons.Default.PrivacyTip, isPrivacyPolicy = true),
         FeatureItem("Coming Soon", Icons.Outlined.Schedule, isComingSoon = true)
     )
 
@@ -162,10 +166,18 @@ fun SelectFeatureScreen(
                                 feature == features[5] -> {
                                     // Feature Request
                                     val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                        data = Uri.parse("mailto:${BuildConfig.FEEDBACK_EMAIL}")
+                                        data = "mailto:${BuildConfig.FEEDBACK_EMAIL}".toUri()
                                         putExtra(Intent.EXTRA_SUBJECT, "Feature Request")
                                     }
                                     context.startActivity(Intent.createChooser(intent, "Send Email"))
+                                }
+                                feature == features[6] -> {
+                                    // Privacy Policy
+                                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                                        data =
+                                            "https://codexyze.github.io/audio_cutter.html".toUri()
+                                    }
+                                    context.startActivity(intent)
                                 }
                             }
                         }
