@@ -16,3 +16,62 @@ local.properties
 gradle.properties
 # gradle.properties is now ignored to avoid committing sensitive values; project-wide settings will rely on defaults if absent
 .idea
+
+# ========================================
+# Build Outputs - DO NOT COMMIT TO GITHUB
+# ========================================
+
+# APK files (compiled app)
+*.apk
+*.apks
+
+# AAB files (Android App Bundle for Play Store)
+*.aab
+
+# Debug and Release builds
+app/release/
+app/debug/
+*/release/
+*/debug/
+
+# Build metadata
+output-metadata.json
+output.json
+
+# Mapping files (ProGuard/R8)
+mapping.txt
+app/build/outputs/mapping/
+
+# Native libraries
+*.so
+*.a
+
+# Baseline profiles
+baselineProfiles/
+app/release/baselineProfiles/
+
+# Intermediate build files
+app/build/
+app/.cxx/
+app/build/intermediates/
+app/build/generated/
+app/build/outputs/
+app/build/tmp/
+
+# Signing keys and keystores - CRITICAL: NEVER COMMIT THESE!
+*.jks
+*.keystore
+keystore.properties
+key.properties
+release.keystore
+debug.keystore
+
+# Google Services (contains sensitive Firebase/AdMob configs)
+google-services.json
+app/google-services.json
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
