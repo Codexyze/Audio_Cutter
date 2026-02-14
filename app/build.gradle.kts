@@ -91,17 +91,20 @@ dependencies {
     val room_version = "2.7.0"
     //  implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation(libs.androidx.navigation)
-    implementation(libs.androidx.media3.transformer)
-    implementation ("androidx.media3:media3-exoplayer:1.8.0")
+
+    // Media3 - Use consistent version 1.5.0 for better compatibility with API 24+
+    implementation ("androidx.media3:media3-transformer:1.5.0")
+    implementation ("androidx.media3:media3-exoplayer:1.5.0")
     implementation ("androidx.media3:media3-ui:1.5.0")
-    implementation ("androidx.media3:media3-common:1.8.0")
-    implementation ("androidx.media3:media3-session:1.6.1")
+    implementation ("androidx.media3:media3-common:1.5.0")
+    implementation ("androidx.media3:media3-session:1.5.0")
+    implementation("androidx.media3:media3-effect:1.5.0")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
     implementation("com.google.dagger:hilt-android:2.57.2")
     kapt("com.google.dagger:hilt-android-compiler:2.57.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation("androidx.media3:media3-effect:1.8.0")
     implementation("androidx.core:core-splashscreen:1.0.0")
     //ads
     implementation("com.google.android.gms:play-services-ads:24.7.0")
