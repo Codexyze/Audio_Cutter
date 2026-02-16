@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.nutrino.audiocutter.presentation.Navigation.SELECTFEATURESCREEN
+import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
 import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 @Composable
@@ -73,7 +73,7 @@ fun AudioMergeSuccessScreen(
 
             Button(
                 onClick = {
-                    navController.navigate(SELECTFEATURESCREEN) {
+                    navController.navigate(HOMESCREEN) {
                         popUpTo(0) { inclusive = true }
                     }
                 },
@@ -83,7 +83,7 @@ fun AudioMergeSuccessScreen(
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Back to Home", style = MaterialTheme.typography.titleMedium)
+                Text("View All Audio", style = MaterialTheme.typography.titleMedium)
             }
         }
 

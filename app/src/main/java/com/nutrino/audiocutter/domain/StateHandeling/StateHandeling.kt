@@ -51,6 +51,12 @@ data class AudioMergeState(
     val error: String ? = null
 )
 
+data class MultiCropAudioState(
+    val isLoading: Boolean = false,
+    val data: String= "",
+    val error: String ? = null
+)
+
 data class AdState(
     val isLoading: Boolean = false,
     val isAdReady: Boolean = false,

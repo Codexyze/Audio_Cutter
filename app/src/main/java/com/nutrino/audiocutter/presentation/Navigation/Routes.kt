@@ -53,3 +53,15 @@ object AUDIOMERGESUCCESSSTATE
 @Serializable
 object AUDIOMERGEERRORSTATE
 
+@Serializable
+object ALLSONGSFORMULTICROPSCREEN
+
+@Serializable
+data class MULTICROPAUDIOSCREEN(val uri: String, val songDuration: Long, val songName: String)
+
+@Serializable
+object MULTICROPAUDIOSUCCESSSTATE
+
+@Serializable
+object MULTICROPAUDIOERRORSTATE
+
