@@ -8,17 +8,20 @@ import com.nutrino.audiocutter.data.RepoImpl.AdsRepositoryImpl
 import com.nutrino.audiocutter.data.RepoImpl.AudioTimmerRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.GetAllSongsRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropAudioRepoImpl
+import com.nutrino.audiocutter.data.RepoImpl.MultiCropVideoRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoRepImpl
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
 import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropAudioRepository
+import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
 import com.nutrino.audiocutter.domain.UseCases.GetAllSongsForMergeUseCase
 import com.nutrino.audiocutter.domain.UseCases.GetAllVideoUseCase
 import com.nutrino.audiocutter.domain.UseCases.LoadAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.MergeSongsUseCase
 import com.nutrino.audiocutter.domain.UseCases.MultiCropAudioUseCase
+import com.nutrino.audiocutter.domain.UseCases.MultiCropVideoUseCase
 import com.nutrino.audiocutter.domain.UseCases.ShowAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimVideoUseCase
@@ -104,6 +107,7 @@ object DiModule {
         return ShowAdUseCase(repository = repository)
     }
 
+    @UnstableApi
     @Provides
     fun provideMultiCropRepo(@ApplicationContext context: Context): MultiCropAudioRepository{
         return MultiCropAudioRepoImpl(context=context)
@@ -113,6 +117,18 @@ object DiModule {
     @Provides
     fun provideMultiCropAudioUseCase(repository: MultiCropAudioRepository): MultiCropAudioUseCase {
         return MultiCropAudioUseCase(repository = repository)
+    }
+
+    @UnstableApi
+    @Provides
+    fun provideMultiCropVideoRepo(@ApplicationContext context: Context): MultiCropVideoRepository{
+        return MultiCropVideoRepoImpl(context = context)
+    }
+
+    @UnstableApi
+    @Provides
+    fun provideMultiCropVideoUseCase(repository: MultiCropVideoRepository): MultiCropVideoUseCase {
+        return MultiCropVideoUseCase(repository = repository)
     }
 
 }

@@ -23,18 +23,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,21 +52,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.data.DataClass.Video
-import com.nutrino.audiocutter.presentation.Navigation.VIDEOTRIMMERSCREEN
+import com.nutrino.audiocutter.presentation.Navigation.MULTICROPVIDEOSCREEN
 import com.nutrino.audiocutter.presentation.Utils.formatDuration
 import com.nutrino.audiocutter.presentation.ViewModel.VideoViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GetAllVideoScreen(navController: NavController) {
+fun GetAllVideosForMultiCropScreen(navController: NavController) {
     val context = LocalContext.current
     val viewModel: VideoViewModel = hiltViewModel()
     val state by viewModel.getAllVideosState.collectAsState()
@@ -75,8 +78,8 @@ fun GetAllVideoScreen(navController: NavController) {
         derivedStateOf {
             state.data.filter { video ->
                 searchQuery.isBlank() ||
-                video.title.contains(searchQuery, ignoreCase = true) ||
-                video.folderName.contains(searchQuery, ignoreCase = true)
+                        video.title.contains(searchQuery, ignoreCase = true) ||
+                        video.folderName.contains(searchQuery, ignoreCase = true)
             }
         }
     }
@@ -91,7 +94,6 @@ fun GetAllVideoScreen(navController: NavController) {
         }
     }
 
-    // Check on load and also update the mutable state
     LaunchedEffect(Unit) {
         val requiredPermissions = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
@@ -120,110 +122,98 @@ fun GetAllVideoScreen(navController: NavController) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        TopAppBar(
+            title = { Text("Select Video for Multi-Crop") },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = MaterialTheme.colorScheme.onBackground
+            )
+        )
+
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            if (!permissionGranted.value) {
-                Text(
-                    text = "Permission required to access videos 🎥. Please grant permission.",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp)
-                )
-            } else {
-                when {
-                    state.isLoading -> {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
-                    state.error != null -> {
+                state.error != null -> {
+                    Text(
+                        text = "Error: ${state.error}",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                state.data.isEmpty() -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Default.VideoLibrary,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+                        )
                         Text(
-                            text = "Error: ${state.error}",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.align(Alignment.Center)
+                            text = "No video files found",
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(top = 16.dp)
                         )
                     }
+                }
 
-                    state.data.isEmpty() -> {
-                        Column(
+                else -> {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Search bar
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
                             modifier = Modifier
-                                .align(Alignment.Center)
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            placeholder = { Text("Search video files...") },
+                            leadingIcon = {
+                                Icon(Icons.Default.Search, "Search")
+                            },
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            )
+                        )
+
+                        // Videos list
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(
-                                text = "🎥",
-                                fontSize = 72.sp,
-                                modifier = Modifier.padding(bottom = 16.dp)
-                            )
-                            Text(
-                                text = "No Videos Found",
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                            Text(
-                                text = "No videos available on your device",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                            )
-                        }
-                    }
-
-                    state.data != null -> {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            // Search Bar
-                            OutlinedTextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp),
-                                placeholder = { Text("Search by title or folder...") },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = "Search",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                },
-                                trailingIcon = {
-                                    if (searchQuery.isNotEmpty()) {
-                                        IconButton(onClick = { searchQuery = "" }) {
-                                            Icon(
-                                                imageVector = Icons.Default.Clear,
-                                                contentDescription = "Clear",
-                                                tint = MaterialTheme.colorScheme.onSurface
+                            items(filteredVideos) { video ->
+                                VideoCard(
+                                    video = video,
+                                    onClick = {
+                                        navController.navigate(
+                                            MULTICROPVIDEOSCREEN(
+                                                uri = video.path,
+                                                videoDuration = video.duration.toLongOrNull() ?: 0L,
+                                                videoName = video.title
                                             )
-                                        }
+                                        )
                                     }
-                                },
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
                                 )
-                            )
-
-                            // Video List
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                items(filteredVideos) { video ->
-                                    VideoItem(video = video, navController = navController)
-                                }
                             }
                         }
                     }
@@ -231,36 +221,32 @@ fun GetAllVideoScreen(navController: NavController) {
             }
         }
 
-        // Banner Ad at bottom
+        // Banner Ad
         BannerAdView(modifier = Modifier.fillMaxWidth())
     }
 }
 
 @Composable
-fun VideoItem(video: Video, navController: NavController) {
+private fun VideoCard(video: Video, onClick: () -> Unit) {
     val context = LocalContext.current
 
     Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier.fillMaxWidth().clickable {
-            val durationLong = video.duration.toLongOrNull() ?: 0L
-            navController.navigate(
-                VIDEOTRIMMERSCREEN(
-                    uri = video.path,
-                    videoDuration = durationLong,
-                    videoName = video.title
-                )
-            )
-        }
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(12.dp)
                 .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Video Thumbnail
+            // Thumbnail
             val thumbnail = remember(video.thumbnail) {
                 try {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -288,15 +274,15 @@ fun VideoItem(video: Video, navController: NavController) {
                 Image(
                     bitmap = thumbnail.asImageBitmap(),
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                     modifier = Modifier
-                        .size(80.dp, 64.dp)
+                        .size(64.dp)
                         .clip(RoundedCornerShape(8.dp))
                 )
             } else {
                 Box(
                     modifier = Modifier
-                        .size(80.dp, 64.dp)
+                        .size(64.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
@@ -312,27 +298,27 @@ fun VideoItem(video: Video, navController: NavController) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column {
+            // Video info
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = video.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1
                 )
-
                 Text(
-                    text = "Folder: ${video.folderName}",
+                    text = video.folderName,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     maxLines = 1
                 )
-
                 Text(
-                    text = "Duration: ${formatDuration(video.duration)}",
+                    text = formatDuration(video.duration),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
     }
 }
+

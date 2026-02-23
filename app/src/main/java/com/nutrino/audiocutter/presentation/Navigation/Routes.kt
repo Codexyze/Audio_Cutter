@@ -65,3 +65,15 @@ object MULTICROPAUDIOSUCCESSSTATE
 @Serializable
 object MULTICROPAUDIOERRORSTATE
 
+@Serializable
+object ALLVIDEOSFORMULTICROPSCREEN
+
+@Serializable
+data class MULTICROPVIDEOSCREEN(val uri: String, val videoDuration: Long, val videoName: String)
+
+@Serializable
+object MULTICROPVIDEOSUCCESSSTATE
+
+@Serializable
+object MULTICROPVIDEOERRORSTATE
+
