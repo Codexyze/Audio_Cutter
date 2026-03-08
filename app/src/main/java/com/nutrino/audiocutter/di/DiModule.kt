@@ -6,16 +6,19 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.nutrino.audiocutter.core.MediaPlayerManager
 import com.nutrino.audiocutter.data.RepoImpl.AdsRepositoryImpl
 import com.nutrino.audiocutter.data.RepoImpl.AudioTimmerRepoImpl
+import com.nutrino.audiocutter.data.RepoImpl.ConvertAudioFormatRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.GetAllSongsRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropAudioRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropVideoRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoRepImpl
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
+import com.nutrino.audiocutter.domain.Repository.ConvertAudioFormatRepository
 import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropAudioRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
+import com.nutrino.audiocutter.domain.UseCases.ConvertAudioFormatUseCase
 import com.nutrino.audiocutter.domain.UseCases.GetAllSongsForMergeUseCase
 import com.nutrino.audiocutter.domain.UseCases.GetAllVideoUseCase
 import com.nutrino.audiocutter.domain.UseCases.LoadAdUseCase
@@ -129,6 +132,18 @@ object DiModule {
     @Provides
     fun provideMultiCropVideoUseCase(repository: MultiCropVideoRepository): MultiCropVideoUseCase {
         return MultiCropVideoUseCase(repository = repository)
+    }
+
+    @UnstableApi
+    @Provides
+    fun provideConvertAudioFormatRepo(@ApplicationContext context: Context): ConvertAudioFormatRepository {
+        return ConvertAudioFormatRepoImpl(context = context)
+    }
+
+    @UnstableApi
+    @Provides
+    fun provideConvertAudioFormatUseCase(repository: ConvertAudioFormatRepository): ConvertAudioFormatUseCase {
+        return ConvertAudioFormatUseCase(repository = repository)
     }
 
 }

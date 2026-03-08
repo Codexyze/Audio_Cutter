@@ -17,7 +17,11 @@ import com.nutrino.audiocutter.presentation.Screens.AudioMergeSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimmerScreen
+import com.nutrino.audiocutter.presentation.Screens.ConvertAudioFormatErrorScreen
+import com.nutrino.audiocutter.presentation.Screens.ConvertAudioFormatScreen
+import com.nutrino.audiocutter.presentation.Screens.ConvertAudioFormatSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllAudioForMergeScreen
+import com.nutrino.audiocutter.presentation.Screens.GetAllSongsForConvertAudioFormatScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllSongsForMultiCropScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllVideoForAudioExtractScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllVideoScreen
@@ -162,6 +166,28 @@ fun MainApp() {
 
         composable<MULTICROPVIDEOERRORSTATE> {
             MultiCropVideoErrorScreen(navController = navcontroller)
+        }
+
+        composable<ALLSONGSFORCONVERTAUDIOFORMATSCREEN> {
+            GetAllSongsForConvertAudioFormatScreen(navController = navcontroller)
+        }
+
+        composable<CONVERTAUDIOFORMATSCREEN> { backstackEntry ->
+            val data: CONVERTAUDIOFORMATSCREEN = backstackEntry.toRoute()
+            ConvertAudioFormatScreen(
+                navController = navcontroller,
+                uri = data.uri,
+                songDuration = data.songDuration,
+                songName = data.songName
+            )
+        }
+
+        composable<CONVERTAUDIOFORMATSUCCESSSTATE> {
+            ConvertAudioFormatSuccessScreen(navController = navcontroller)
+        }
+
+        composable<CONVERTAUDIOFORMATERRORSTATE> {
+            ConvertAudioFormatErrorScreen(navController = navcontroller)
         }
 
     }

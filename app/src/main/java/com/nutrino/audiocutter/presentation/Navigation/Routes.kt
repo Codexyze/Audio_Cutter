@@ -77,3 +77,15 @@ object MULTICROPVIDEOSUCCESSSTATE
 @Serializable
 object MULTICROPVIDEOERRORSTATE
 
+@Serializable
+object ALLSONGSFORCONVERTAUDIOFORMATSCREEN
+
+@Serializable
+data class CONVERTAUDIOFORMATSCREEN(val uri: String, val songDuration: Long, val songName: String)
+
+@Serializable
+object CONVERTAUDIOFORMATSUCCESSSTATE
+
+@Serializable
+object CONVERTAUDIOFORMATERRORSTATE
+
