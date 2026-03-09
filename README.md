@@ -3,8 +3,8 @@
 [![Release](https://img.shields.io/github/v/release/Codexyze/Audio_Cutter?style=for-the-badge&color=blue)](https://github.com/Codexyze/Audio_Cutter/releases)
 [![License](https://img.shields.io/github/license/Codexyze/Audio_Cutter?style=for-the-badge&color=lightgray)](LICENSE)
 
-A smooth, modern and powerful **audio & video editing app** built with Jetpack Compose and ExoPlayer.  
-It lets users **trim audio & video files, extract audio from videos, merge multiple audio tracks**, and save custom clips instantly.  
+A smooth, modern and powerful **audio & video editing app** built with Jetpack Compose, ExoPlayer, and Media3 Transformer.  
+It lets users **trim audio & video, extract audio from videos, merge audio tracks, multi-crop audio & video, convert audio formats, and record audio from the microphone** — all locally on device.  
 This project follows **Clean Architecture + MVVM + Hilt**, making it modular, testable, and scalable.
 
 > 📦 **Latest Stable Release:**  
@@ -39,7 +39,7 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
 ### Audio Trimmer
 - 🎧 **Play any audio file**  
 - ✂️ **Trim audio easily using a slider-based editor**  
-- 🔊 **Real-time waveform preview & playback**  
+- 🔊 **Real-time playback preview**  
 - 💾 **Save trimmed files with your custom filename**  
 - 🎵 **Create ringtones, alarms, and notification sounds**  
 
@@ -61,10 +61,41 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
 - ➕ **Combine 2 or more audio files**  
 - 💾 **Save merged audio with custom filename**  
 
+### Multi Crop Audio
+- ✂️ **Define multiple crop segments on a single audio file**  
+- 🔢 **Add as many segments as you need**  
+- ▶️ **Play each segment individually before cropping**  
+- 🔗 **Crop and merge all segments into one output file**  
+- 💾 **Save with custom filename to Music/AudioCutter**  
+
+### Multi Crop Video
+- 🎬 **Define multiple crop segments on a single video file**  
+- 🔢 **Add as many segments as you need**  
+- ▶️ **Preview each segment individually before cropping**  
+- 🔗 **Crop and merge all segments into one output file**  
+- ⚠️ **Beta feature — works best with MP4 format**  
+
+### Convert Audio Format
+- 🔄 **Convert audio files to different formats**  
+- 🎧 **Preview audio before conversion**  
+- 📋 **Dropdown selector for output format**  
+- 💾 **Save converted audio to Music/AudioCutter**  
+
+### Record Audio
+- 🎙️ **Record audio from device microphone**  
+- ⏯️ **Start, pause, resume, and stop recording**  
+- ⏱️ **Live timer display while recording**  
+- 🎵 **Animated mic indicator during recording**  
+- 💾 **Save recordings as M4A to Music/AudioCutter**  
+
 ### General
 - ⚡ **Fast performance with clean UI**  
 - 🔐 **Local processing — your files stay on device**  
-- 🧪 Built using modern Android stack + clean architecture
+- 🧪 Built using modern Android stack + clean architecture  
+- 📢 **AdMob integration** — Banner ads & Interstitial ads  
+- 💛 **Support the developer** — optional ad-watching via FeedBack Ads  
+- 🔒 **Privacy Policy** accessible from the app  
+- 📩 **Feature Request** — email the developer directly from the app
 
 ---
 ## 👨‍💻 Developer Take
@@ -94,23 +125,24 @@ com.nutrino.audiocutter
 │   └── MediaPlayerManager          # ExoPlayer setup & control
 │
 ├── data
-│   ├── DataClass                   # Data models
-│   ├── RepoImpl                    # Implementation of domain repo
-│
+│   ├── DataClass                   # Data models (Song, Video, CropSegment)
+│   └── RepoImpl                    # Implementation of domain repositories
 │
 ├── di
-│   └── (Hilt Modules)              # Dependency injection setup
+│   ├── BaseApplication             # Hilt Application class
+│   └── DiModule                    # Dependency injection setup
 │
 ├── domain
-│   ├── Repository                  # Interface for data source
-│   ├── StateHandeling             # Sealed classes for UI states
-│   └── UseCases                   # Business logic use-cases
+│   ├── Repository                  # Interfaces for data sources
+│   ├── StateHandeling              # Sealed classes & data classes for UI states
+│   └── UseCases                    # Business logic use-cases
 │
 ├── presentation
-│   ├── Navigation                  # App navigation (NavHost)
-│   ├── Screens                     # All composables (Trimmer, Success, Error)
-│   ├── Utils                       # Helpers / formatters / converters
-│   ├── ViewModel                   # ViewModels (Trimmer, Player)
+│   ├── Navigation                  # App navigation (NavHost, Routes)
+│   ├── Screens                     # All composables (Trimmer, MultiCrop, Record, Success, Error)
+│   ├── Utils                       # Helpers / formatters (TimeFormat, AdsHelper)
+│   ├── ViewModel                   # ViewModels (Trim, Merge, MultiCrop, Record, Ads, etc.)
+│   └── components                  # Reusable composables (BannerAdView)
 │  
 ```
 
@@ -120,10 +152,14 @@ com.nutrino.audiocutter
 
 - 💚 Jetpack Compose  
 - 🔥 Kotlin  
-- 🎞️ ExoPlayer  
+- 🎞️ ExoPlayer (Media3)  
+- 🎛️ Media3 Transformer  
 - 🧩 Hilt (DI)  
 - 🎯 Clean Architecture + MVVM  
-- 📂 Scoped Storage + File I/O  
+- 📂 Scoped Storage + MediaStore  
+- 📢 AdMob (Banner + Interstitial)  
+- 🎨 Material 3 + Material Icons Extended  
+- 🚀 Splash Screen API  
 
 ---
 
@@ -161,6 +197,42 @@ com.nutrino.audiocutter
 5. Tap **Merge Tracks**  
 6. Merged audio saved instantly 🎉  
 
+### Multi Crop Audio
+1. Select **Multi Crop Audio** from main menu  
+2. Choose an audio file from storage  
+3. Add multiple crop segments using start/end sliders  
+4. Play each segment individually to preview  
+5. Enter output filename  
+6. Tap **Crop and Merge**  
+7. All segments merged into one file 🎉  
+
+### Multi Crop Video
+1. Select **Multi Crop Video** from main menu  
+2. Choose a video file from storage  
+3. Add multiple crop segments using start/end sliders  
+4. Preview each segment individually  
+5. Enter output filename  
+6. Tap **Crop and Merge**  
+7. All segments merged into one video 🎉  
+
+### Convert Audio Format
+1. Select **Convert Audio** from main menu  
+2. Choose an audio file from storage  
+3. Preview the audio via player  
+4. Select the desired output format from dropdown  
+5. Enter output filename  
+6. Tap **Convert Audio**  
+7. Converted file saved to Music/AudioCutter 🎉  
+
+### Record Audio
+1. Select **Record Audio** from main menu  
+2. Grant microphone permission when prompted  
+3. Enter your desired filename  
+4. Tap the **record button** to start recording  
+5. Use **pause/resume** to control the recording  
+6. Tap **stop** when finished  
+7. Recording saved as M4A to Music/AudioCutter 🎉  
+
 ---
 
 ## 📦 Versions
@@ -178,11 +250,14 @@ com.nutrino.audiocutter
 ```xml
 <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
 
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
     android:maxSdkVersion="32" />
 
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 ```
 
 ---

@@ -69,6 +69,14 @@ data class ConvertAudioFormatState(
     val error: String ? = null
 )
 
+data class RecordAudioState(
+    val isLoading: Boolean = false,
+    val data: String = "",
+    val error: String? = null,
+    val isRecording: Boolean = false,
+    val isPaused: Boolean = false
+)
+
 data class AdState(
     val isLoading: Boolean = false,
     val isAdReady: Boolean = false,

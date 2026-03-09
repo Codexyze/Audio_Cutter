@@ -10,6 +10,7 @@ import com.nutrino.audiocutter.data.RepoImpl.ConvertAudioFormatRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.GetAllSongsRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropAudioRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropVideoRepoImpl
+import com.nutrino.audiocutter.data.RepoImpl.RecordAudioRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoRepImpl
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
@@ -17,6 +18,7 @@ import com.nutrino.audiocutter.domain.Repository.ConvertAudioFormatRepository
 import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropAudioRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
+import com.nutrino.audiocutter.domain.Repository.RecordAudioRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
 import com.nutrino.audiocutter.domain.UseCases.ConvertAudioFormatUseCase
 import com.nutrino.audiocutter.domain.UseCases.GetAllSongsForMergeUseCase
@@ -25,6 +27,7 @@ import com.nutrino.audiocutter.domain.UseCases.LoadAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.MergeSongsUseCase
 import com.nutrino.audiocutter.domain.UseCases.MultiCropAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.MultiCropVideoUseCase
+import com.nutrino.audiocutter.domain.UseCases.RecordAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.ShowAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimVideoUseCase
@@ -144,6 +147,18 @@ object DiModule {
     @Provides
     fun provideConvertAudioFormatUseCase(repository: ConvertAudioFormatRepository): ConvertAudioFormatUseCase {
         return ConvertAudioFormatUseCase(repository = repository)
+    }
+
+    @UnstableApi
+    @Provides
+    @Singleton
+    fun provideRecordAudioRepo(@ApplicationContext context: Context): RecordAudioRepository {
+        return RecordAudioRepoImpl(context = context)
+    }
+
+    @Provides
+    fun provideRecordAudioUseCase(repository: RecordAudioRepository): RecordAudioUseCase {
+        return RecordAudioUseCase(repository = repository)
     }
 
 }

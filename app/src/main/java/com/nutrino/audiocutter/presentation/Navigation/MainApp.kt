@@ -32,6 +32,9 @@ import com.nutrino.audiocutter.presentation.Screens.MultiCropAudioSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.MultiCropVideoErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.MultiCropVideoScreen
 import com.nutrino.audiocutter.presentation.Screens.MultiCropVideoSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.RecordAudioErrorScreen
+import com.nutrino.audiocutter.presentation.Screens.RecordAudioScreen
+import com.nutrino.audiocutter.presentation.Screens.RecordAudioSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.SelectFeatureScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimSuccessScreen
@@ -188,6 +191,18 @@ fun MainApp() {
 
         composable<CONVERTAUDIOFORMATERRORSTATE> {
             ConvertAudioFormatErrorScreen(navController = navcontroller)
+        }
+
+        composable<RECORDAUDIOSCREEN> {
+            RecordAudioScreen(navController = navcontroller)
+        }
+
+        composable<RECORDAUDIOSUCCESSSTATE> {
+            RecordAudioSuccessScreen(navController = navcontroller)
+        }
+
+        composable<RECORDAUDIOERRORSTATE> {
+            RecordAudioErrorScreen(navController = navcontroller)
         }
 
     }
