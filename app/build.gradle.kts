@@ -8,9 +8,6 @@ plugins {
     id("kotlin-kapt")
 }
 
-//val admobAppId: String = project.findProperty("ADMOB_APP_ID") as? String ?: ""
-//val interstitialAdId: String = project.findProperty("INTERSTITIAL_AD_ID") as? String ?: ""
-
 //These are test IDs only if app fails
 val admobAppId: String = project.findProperty("ADMOB_APP_ID") as? String
     ?:"ca-app-pub-3940256099942544~3347511713"
@@ -38,7 +35,7 @@ android {
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 36
-        versionCode = 15
+        versionCode = 16
         versionName = "audio-recording"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
