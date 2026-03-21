@@ -20,5 +20,6 @@ interface RecentRepository {
 	suspend fun upsertCropSegment(cropSegmentTable: CropSegmentTable): Flow<ResultState<String>>
 	suspend fun getRecentCroppedSegmentFiles(): Flow<ResultState<List<String>>>
 	suspend fun getRecentCropByFileType(fileType: String): Flow<ResultState<List<CropSegmentTable>>>
+	suspend fun getCropSegmentsByFileName(fileName: String): Flow<ResultState<List<CropSegmentTable>>>
 	suspend fun deleteRecentCroppedSegment(cropSegmentTable: CropSegmentTable): Flow<ResultState<String>>
 }

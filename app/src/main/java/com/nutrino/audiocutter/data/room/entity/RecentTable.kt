@@ -9,7 +9,7 @@ import com.nutrino.audiocutter.Constants.RoomConstants
 @Entity(tableName = RoomConstants.RECENT_TABLE_NAME)
 data class RecentTable(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Int = 0,
     @ColumnInfo(name = "featureType")
     val featureType: String,
     @ColumnInfo(name = "inputUri")

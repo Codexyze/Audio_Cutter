@@ -2,7 +2,6 @@ package com.nutrino.audiocutter.presentation.Screens
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -80,6 +79,7 @@ import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOFORAUDIOEXTRACTSC
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
 import com.nutrino.audiocutter.presentation.Navigation.RECORDAUDIOSCREEN
+import com.nutrino.audiocutter.presentation.Navigation.RECENTSCREEN
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
@@ -112,6 +112,7 @@ fun SelectFeatureScreen(
         FeatureItem("Multi Crop Video", Icons.Default.VideoLibrary),
         FeatureItem("Convert Audio", Icons.Default.SwapHoriz),
         FeatureItem("Record Audio", Icons.Default.Mic),
+        FeatureItem("Recent", Icons.Outlined.Schedule),
         FeatureItem("FeedBack Ads", Icons.Default.CardGiftcard, isFeedbackAds = true),
         FeatureItem("Feature Request", Icons.Default.Email, isFeatureRequest = true),
         FeatureItem("Privacy Policy", Icons.Default.PrivacyTip, isPrivacyPolicy = true),
@@ -186,10 +187,14 @@ fun SelectFeatureScreen(
                                     navController.navigate(RECORDAUDIOSCREEN)
                                 }
                                 feature == features[8] -> {
+                                    // Recent
+                                    navController.navigate(RECENTSCREEN)
+                                }
+                                feature == features[9] -> {
                                     // FeedBack Ads
                                     showFeedbackDialog = true
                                 }
-                                feature == features[9] -> {
+                                feature == features[10] -> {
                                     // Feature Request
                                     val intent = Intent(Intent.ACTION_SENDTO).apply {
                                         data = "mailto:${BuildConfig.FEEDBACK_EMAIL}".toUri()
@@ -197,7 +202,7 @@ fun SelectFeatureScreen(
                                     }
                                     context.startActivity(Intent.createChooser(intent, "Send Email"))
                                 }
-                                feature == features[10] -> {
+                                feature == features[11] -> {
                                     // Privacy Policy
                                     val intent = Intent(Intent.ACTION_VIEW).apply {
                                         data =

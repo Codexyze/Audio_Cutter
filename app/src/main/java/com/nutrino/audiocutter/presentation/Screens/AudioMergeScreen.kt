@@ -47,10 +47,13 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.nutrino.audiocutter.Constants.FileTypes
+import com.nutrino.audiocutter.data.room.entity.RecentTable
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOMERGEERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOMERGESUCCESSSTATE
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.AudioMergeViewModel
+import com.nutrino.audiocutter.presentation.ViewModel.RecentViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 
@@ -58,6 +61,7 @@ import com.nutrino.audiocutter.presentation.components.BannerAdView
 fun AudioMergeScreen(
     navController: NavController,
     audioMergeViewModel: AudioMergeViewModel = hiltViewModel(),
+    recentViewModel: RecentViewModel = hiltViewModel(),
     adsViewModel: AdsViewModel = hiltViewModel(),
     uriList: List<String>,
     songNames: List<String>
@@ -68,12 +72,51 @@ fun AudioMergeScreen(
     val adShown = rememberSaveable { mutableStateOf(false) }
 
     val audioMergeState = audioMergeViewModel.audioMergeState.collectAsState()
+    val upsertRecentState = recentViewModel.upsertRecentEntryState.collectAsState()
 
+    // Handle successful merge - upsert recent entry with all details like audio trimmer
+    LaunchedEffect(audioMergeState.value.data) {
+        if (audioMergeState.value.data.isNotBlank()) {
+            recentViewModel.resetUpsertRecentEntryState()
+            recentViewModel.upsertRecentEntry(
+                recentTable = RecentTable(
+                    featureType = "Audio Merge",
+                    inputUri = uriList.joinToString(","),
+                    outputUri = audioMergeState.value.data,
+                    date_modified = System.currentTimeMillis().toString(),
+                    input_duration = "",
+                    output_duration = "",
+                    input_name = songNames.joinToString(", "),
+                    output_name = filename.value.trim(),
+                    input_size = "",
+                    output_size = "",
+                    fileType = FileTypes.AUDIO_FILE
+                )
+            )
+        }
+    }
+
+    // Handle navigation with ad display like audio trimmer
     LaunchedEffect(audioMergeState.value) {
         if (audioMergeState.value.isLoading.not() && audioMergeState.value.data.isNotEmpty() && !adShown.value) {
-            adShown.value = true
+            // Wait for recent entry to be saved
+            if (upsertRecentState.value.isLoading ||
+                (upsertRecentState.value.data.isBlank() && upsertRecentState.value.error == null)
+            ) {
+                return@LaunchedEffect
+            }
+
+            // Successful merge; attempt to show interstitial ad once
+            adShown.value = true // prevent re-entry
             val activity = context as? Activity
-            if (activity != null) {
+            if (activity == null) {
+                navController.navigate(AUDIOMERGESUCCESSSTATE) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = false
+                    }
+                }
+            } else {
+                // Unified ad request (show if ready, otherwise load then show) and always navigate after
                 adsViewModel.requestAndShowAd(
                     activity = activity,
                     onAdDismissed = {
@@ -218,6 +261,7 @@ fun AudioMergeScreen(
                 Button(
                     onClick = {
                         if (filename.value.isNotEmpty()) {
+                            recentViewModel.resetUpsertRecentEntryState()
                             val uris = uriList.map { it.toUri() }
                             audioMergeViewModel.mergeSongs(
                                 uriList = uris,

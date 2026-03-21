@@ -19,6 +19,9 @@ interface CropSegmentDao {
     @Query("SELECT * FROM ${RoomConstants.CROP_SEGMENT_TABLE_NAME} WHERE fileType = :fileType")
     fun getRecentCropByFileType(fileType: String): Flow<List<CropSegmentTable>>
 
+    @Query("SELECT * FROM ${RoomConstants.CROP_SEGMENT_TABLE_NAME} WHERE fileName = :fileName")
+    fun getCropSegmentsByFileName(fileName: String): Flow<List<CropSegmentTable>>
+
     @Delete
     fun deleteRecentCroppedSegment(cropSegmentTable: CropSegmentTable)
 

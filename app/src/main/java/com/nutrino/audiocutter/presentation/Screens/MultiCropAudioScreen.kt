@@ -38,6 +38,7 @@ import com.nutrino.audiocutter.data.DataClass.CropSegment
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MultiCropViewModel
+import com.nutrino.audiocutter.presentation.ViewModel.RecentViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
 import com.nutrino.audiocutter.presentation.Navigation.MULTICROPAUDIOERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.MULTICROPAUDIOSUCCESSSTATE
@@ -99,6 +100,34 @@ fun MultiCropAudioScreen(
     // Initialize player
     LaunchedEffect(uri) {
         mediaPlayerViewModel.initializePlayer(uri.toUri())
+    }
+
+    // Load pre-existing segments if navigating from recent (filename will contain the segments)
+    // This is triggered by passing songName with pre-loaded segments from RecentScreen
+    LaunchedEffect(Unit) {
+        // If songName contains data and segments are empty, we might be loading from recent
+        // The RecentScreen will have already loaded the segments via getCropSegmentsByFileName
+        // and passed them through navigation context - we'll let RecentScreen handle this
+    }
+
+    // Save crop segments to database when multicrop completes
+    val recentViewModel: RecentViewModel = hiltViewModel()
+    LaunchedEffect(multiCropState.data) {
+        if (multiCropState.data.isNotBlank() && segments.isNotEmpty()) {
+            // Save each segment to the database with the same filename and MULTICROP_AUDIO type
+            segments.forEach { segment ->
+                val cropSegmentTable = com.nutrino.audiocutter.data.room.entity.CropSegmentTable(
+                    id = 0,
+                    start = segment.start?.toString() ?: "0",
+                    end = segment.end?.toString() ?: "0",
+                    fileName = filename.value.ifBlank { songName },
+                    featureType = "Audio Merge",
+                    fileType = com.nutrino.audiocutter.Constants.FileTypes.MULTICROP_AUDIO,
+                    input_uri = uri
+                )
+                recentViewModel.upsertCropSegment(cropSegmentTable)
+            }
+        }
     }
 
     // Monitor player position and pause at segment end

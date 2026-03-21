@@ -30,6 +30,23 @@ object VIDEOTRIMMERERRORSTATE
 object SELECTFEATURESCREEN
 
 @Serializable
+object RECENTSCREEN
+
+@Serializable
+data class RECENTAUDIOPLAYERSCREEN(
+	val outputUri: String,
+	val outputName: String,
+	val inputName: String
+)
+
+@Serializable
+data class RECENTVIDEOPLAYERSCREEN(
+	val outputUri: String,
+	val outputName: String,
+	val inputName: String
+)
+
+@Serializable
 object ALLVIDEOFORAUDIOEXTRACTSCREEN
 
 @Serializable

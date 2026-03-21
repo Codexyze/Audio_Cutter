@@ -8,7 +8,7 @@ import com.nutrino.audiocutter.Constants.RoomConstants
 @Entity(tableName = RoomConstants.CROP_SEGMENT_TABLE_NAME)
 data class CropSegmentTable(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Int=0,
     @ColumnInfo(name = "start")
     val start: String,
     @ColumnInfo(name = "end")

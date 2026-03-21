@@ -35,6 +35,9 @@ import com.nutrino.audiocutter.presentation.Screens.MultiCropVideoSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.RecordAudioErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.RecordAudioScreen
 import com.nutrino.audiocutter.presentation.Screens.RecordAudioSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.RecentAudioPlayerScreen
+import com.nutrino.audiocutter.presentation.Screens.RecentScreen
+import com.nutrino.audiocutter.presentation.Screens.RecentVideoPlayerScreen
 import com.nutrino.audiocutter.presentation.Screens.SelectFeatureScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimSuccessScreen
@@ -50,6 +53,27 @@ fun MainApp() {
         composable <SELECTFEATURESCREEN>{
             SelectFeatureScreen(navController = navcontroller)
         }
+        composable<RECENTSCREEN> {
+            RecentScreen(navController = navcontroller)
+        }
+        composable<RECENTAUDIOPLAYERSCREEN> { backstackEntry ->
+            val data: RECENTAUDIOPLAYERSCREEN = backstackEntry.toRoute()
+            RecentAudioPlayerScreen(
+                navController = navcontroller,
+                outputUri = data.outputUri,
+                outputName = data.outputName,
+                inputName = data.inputName
+            )
+        }
+        composable<RECENTVIDEOPLAYERSCREEN> { backstackEntry ->
+            val data: RECENTVIDEOPLAYERSCREEN = backstackEntry.toRoute()
+            RecentVideoPlayerScreen(
+                navController = navcontroller,
+                outputUri = data.outputUri,
+                outputName = data.outputName,
+                inputName = data.inputName
+            )
+        }
         composable<HOMESCREEN> {
             AllAudioScreen(navController = navcontroller)
 
@@ -63,7 +87,8 @@ fun MainApp() {
             AudioTrimmerScreen(
                 navController = navcontroller,
                 uri = data.uri,
-                songDuration = data.songDuration
+                songDuration = data.songDuration,
+                songName = data.songName
             )
         }
         composable<VIDEOTRIMMERSCREEN> { backstackEntry ->
@@ -71,7 +96,8 @@ fun MainApp() {
             VideoTrimmerScreen(
                 navController = navcontroller,
                 uri = data.uri,
-                videoDuration = data.videoDuration
+                videoDuration = data.videoDuration,
+                videoName = data.videoName
             )
         }
         composable<AUDIOTRIMMERSUCCESSSTATE> {
@@ -97,7 +123,8 @@ fun MainApp() {
             AudioExtractorScreen(
                 navController = navcontroller,
                 uri = data.uri,
-                videoDuration = data.videoDuration
+                videoDuration = data.videoDuration,
+                videoName = data.videoName
             )
         }
         composable<AUDIOEXTRACTORSUCCESSSTATE> {

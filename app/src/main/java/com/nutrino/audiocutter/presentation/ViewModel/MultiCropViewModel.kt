@@ -42,6 +42,11 @@ class MultiCropViewModel @Inject constructor(
         _segments.value = emptyList()
     }
 
+    // Function to load pre-existing segments (for editing from recent)
+    fun loadSegments(segments: List<CropSegment>) {
+        _segments.value = segments
+    }
+
     // Function to perform multi-crop audio operation
     fun multiCropAudio(
         context: Context,

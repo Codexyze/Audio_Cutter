@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
+import com.nutrino.audiocutter.presentation.Navigation.SELECTFEATURESCREEN
 
 @Composable
 fun MultiCropAudioSuccessScreen(navController: NavController) {
@@ -63,8 +63,8 @@ fun MultiCropAudioSuccessScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    navController.navigate(HOMESCREEN) {
-                        popUpTo(HOMESCREEN) { inclusive = false }
+                    navController.navigate(SELECTFEATURESCREEN) {
+                        popUpTo(0) { inclusive = true }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
@@ -75,7 +75,7 @@ fun MultiCropAudioSuccessScreen(navController: NavController) {
                     .height(50.dp)
             ) {
                 Text(
-                    text = "View All Audio",
+                    text = "Go Home",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )

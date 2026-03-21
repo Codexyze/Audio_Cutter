@@ -170,6 +170,18 @@ class RecentRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getCropSegmentsByFileName(fileName: String): Flow<ResultState<List<CropSegmentTable>>> = flow {
+        emit(ResultState.Loading)
+        try {
+            appDataBase.recentcropSegmentDao().getCropSegmentsByFileName(fileName).collect { data ->
+                emit(ResultState.Success(data))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getCropSegmentsByFileName failed: ${e.message}", e)
+            emit(ResultState.Error("[getCropSegmentsByFileName] ${e.message ?: "Something went wrong"}"))
+        }
+    }
+
     override suspend fun deleteRecentCroppedSegment(cropSegmentTable: CropSegmentTable): Flow<ResultState<String>> = flow {
         emit(ResultState.Loading)
         try {

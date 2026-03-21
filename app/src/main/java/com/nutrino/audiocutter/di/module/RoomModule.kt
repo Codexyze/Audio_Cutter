@@ -10,6 +10,7 @@ import com.nutrino.audiocutter.domain.Repository.RecentRepository
 import com.nutrino.audiocutter.domain.UseCases.recent.DeleteRecentCroppedSegmentUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.DeleteRecentEntryUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.GetAllRecentEntriesUseCase
+import com.nutrino.audiocutter.domain.UseCases.recent.GetCropSegmentsByFileNameUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.GetRecentCropByFileTypeUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.GetRecentCroppedSegmentFilesUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.GetRecentEntriesByDateModifiedAscUseCase
@@ -117,6 +118,11 @@ object RoomModule {
     @Provides
     fun provideGetRecentCropByFileTypeUseCase(repository: RecentRepository): GetRecentCropByFileTypeUseCase {
         return GetRecentCropByFileTypeUseCase(repository = repository)
+    }
+
+    @Provides
+    fun provideGetCropSegmentsByFileNameUseCase(repository: RecentRepository): GetCropSegmentsByFileNameUseCase {
+        return GetCropSegmentsByFileNameUseCase(repository = repository)
     }
 
     @Provides

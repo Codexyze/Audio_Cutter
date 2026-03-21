@@ -26,12 +26,16 @@ import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
+import com.nutrino.audiocutter.Constants.FileTypes
+import com.nutrino.audiocutter.data.room.entity.RecentTable
 import com.nutrino.audiocutter.presentation.Navigation.CONVERTAUDIOFORMATERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.CONVERTAUDIOFORMATSUCCESSSTATE
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.ConvertAudioFormatViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
+import com.nutrino.audiocutter.presentation.ViewModel.RecentViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
+import java.io.File
 
 // Data class representing an output audio format supported by Transformer
 data class AudioFormatOption(
@@ -48,6 +52,7 @@ fun ConvertAudioFormatScreen(
     navController: NavController,
     convertAudioFormatViewModel: ConvertAudioFormatViewModel = hiltViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = hiltViewModel(),
+    recentViewModel: RecentViewModel = hiltViewModel(),
     adsViewModel: AdsViewModel = hiltViewModel(),
     uri: String = "",
     songDuration: Long = 0,
@@ -72,10 +77,45 @@ fun ConvertAudioFormatScreen(
     val adShown = rememberSaveable { mutableStateOf(false) }
 
     val convertState by convertAudioFormatViewModel.convertAudioFormatState.collectAsState()
+    val upsertRecentState = recentViewModel.upsertRecentEntryState.collectAsState()
 
     // Initialize player
     LaunchedEffect(uri) {
         mediaPlayerViewModel.initializePlayer(uri.toUri())
+    }
+
+    // Save conversion to recent table when operation completes
+    LaunchedEffect(convertState.data) {
+        if (convertState.data.isNotBlank()) {
+            recentViewModel.resetUpsertRecentEntryState()
+            
+            // Get output file size
+            val outputSize = runCatching {
+                val outputUri = convertState.data.toUri()
+                if (outputUri.scheme == "content") {
+                    context.contentResolver.openAssetFileDescriptor(outputUri, "r")?.use { it.length.toString() } ?: ""
+                } else {
+                    val path = outputUri.path ?: convertState.data
+                    File(path).length().toString()
+                }
+            }.getOrDefault("")
+            
+            recentViewModel.upsertRecentEntry(
+                recentTable = RecentTable(
+                    featureType = "Audio Converter",
+                    inputUri = uri,
+                    outputUri = convertState.data,
+                    date_modified = System.currentTimeMillis().toString(),
+                    input_duration = songDuration.toString(),
+                    output_duration = songDuration.toString(),  // Same duration as input
+                    input_name = songName,
+                    output_name = filename.value.trim(),
+                    input_size = "",
+                    output_size = outputSize,
+                    fileType = FileTypes.AUDIO_FILE
+                )
+            )
+        }
     }
 
     // Cleanup on dispose
@@ -123,12 +163,21 @@ fun ConvertAudioFormatScreen(
                     navController.navigate(CONVERTAUDIOFORMATERRORSTATE)
                 }
                 convertState.data.isNotBlank() && !adShown.value -> {
-                    adShown.value = true
+                    // Wait for recent entry to be saved
+                    if (upsertRecentState.value.isLoading ||
+                        (upsertRecentState.value.data.isBlank() && upsertRecentState.value.error == null)
+                    ) {
+                        return@Column
+                    }
+
+                    // Successful conversion; attempt to show interstitial ad once
+                    adShown.value = true // prevent re-entry
                     val activity = context as? Activity
                     if (activity == null) {
-                        Log.w("ConvertAudioFormatScreen", "Context is not an Activity")
+                        Log.w("ConvertAudioFormatScreen", "Context is not an Activity; navigating without ad")
                         navController.navigate(CONVERTAUDIOFORMATSUCCESSSTATE)
                     } else {
+                        // Unified ad request (show if ready, otherwise load then show) and always navigate after
                         adsViewModel.requestAndShowAd(
                             activity = activity,
                             onAdDismissed = { navController.navigate(CONVERTAUDIOFORMATSUCCESSSTATE) },

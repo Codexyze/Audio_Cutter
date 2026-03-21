@@ -165,6 +165,12 @@ data class GetRecentCropByFileTypeState(
     val error: String? = null
 )
 
+data class GetCropSegmentsByFileNameState(
+    val isLoading: Boolean = false,
+    val data: List<CropSegmentTable> = emptyList(),
+    val error: String? = null
+)
+
 data class DeleteRecentCroppedSegmentState(
     val isLoading: Boolean = false,
     val data: String = "",

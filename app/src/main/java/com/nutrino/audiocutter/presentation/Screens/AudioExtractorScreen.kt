@@ -45,10 +45,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
+import com.nutrino.audiocutter.Constants.FileTypes
+import com.nutrino.audiocutter.data.room.entity.RecentTable
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOEXTRACTORERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOEXTRACTORSUCCESSSTATE
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
+import com.nutrino.audiocutter.presentation.ViewModel.RecentViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.VideoViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
 import java.io.File
@@ -62,9 +65,11 @@ fun AudioExtractorScreen(
     navController: NavController,
     videoViewModel: VideoViewModel = hiltViewModel(),
     mediaPlayerViewModel: MediaPlayerViewModel = hiltViewModel(),
+    recentViewModel: RecentViewModel = hiltViewModel(),
     adsViewModel: AdsViewModel = hiltViewModel(),
     uri: String = "",
     videoDuration: Long = 0,
+    videoName: String = "",
 ) {
     val context = LocalContext.current
 
@@ -82,6 +87,7 @@ fun AudioExtractorScreen(
     val endTime = endValue.value.toLong()
 
     val audioExtractorState = videoViewModel.audioExtractorState.collectAsState()
+    val upsertRecentState = recentViewModel.upsertRecentEntryState.collectAsState()
 
     // Helper function to format time from seconds to MM:SS or HH:MM:SS
     fun formatTime(seconds: Long): String {
@@ -99,6 +105,27 @@ fun AudioExtractorScreen(
         // Convert file path to proper URI using File to avoid issues with special characters like # in filename
         val fileUri = android.net.Uri.fromFile(File(uri))
         mediaPlayerViewModel.initializePlayer(fileUri)
+    }
+
+    LaunchedEffect(audioExtractorState.value.data) {
+        if (audioExtractorState.value.data.isNotBlank()) {
+            recentViewModel.resetUpsertRecentEntryState()
+            recentViewModel.upsertRecentEntry(
+                recentTable = RecentTable(
+                    featureType = "Audio Extractor",
+                    inputUri = uri,
+                    outputUri = audioExtractorState.value.data,
+                    date_modified = System.currentTimeMillis().toString(),
+                    input_duration = videoDuration.toString(),
+                    output_duration = (endTime - startTime).toString(),
+                    input_name = videoName,
+                    output_name = filename.value.trim(),
+                    input_size = "",
+                    output_size = "",
+                    fileType = FileTypes.AUDIO_FILE
+                )
+            )
+        }
     }
 
     DisposableEffect(Unit) {
@@ -145,6 +172,15 @@ fun AudioExtractorScreen(
                 }
 
                 audioExtractorState.value.data.isNotBlank() && !adShown.value -> {
+                    if (upsertRecentState.value.isLoading ||
+                        (upsertRecentState.value.data.isBlank() && upsertRecentState.value.error == null)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.padding(24.dp)
+                        )
+                        return@Column
+                    }
+
                     // Successful extraction; attempt to show interstitial ad once
                     adShown.value = true // prevent re-entry
                     val activity = context as? Activity
@@ -236,6 +272,8 @@ fun AudioExtractorScreen(
                             val isRangeValid = startTime < endTime && endTime <= videoDuration
 
                             if (isStartValid && isEndValid && isRangeValid && filename.value.isNotBlank()) {
+                                recentViewModel.resetUpsertRecentEntryState()
+
                                 // IMPORTANT: RangeSlider values already represent milliseconds; do NOT multiply by 1000
                                 // Use Uri.fromFile to handle special characters in filenames like #
                                 val fileUri = android.net.Uri.fromFile(File(uri))

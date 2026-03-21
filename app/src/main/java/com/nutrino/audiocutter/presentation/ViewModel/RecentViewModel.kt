@@ -8,6 +8,7 @@ import com.nutrino.audiocutter.domain.StateHandeling.DeleteRecentCroppedSegmentS
 import com.nutrino.audiocutter.domain.StateHandeling.DeleteRecentEntryState
 import com.nutrino.audiocutter.domain.StateHandeling.GetAllRecentEntriesState
 import com.nutrino.audiocutter.domain.StateHandeling.GetRecentCropByFileTypeState
+import com.nutrino.audiocutter.domain.StateHandeling.GetCropSegmentsByFileNameState
 import com.nutrino.audiocutter.domain.StateHandeling.GetRecentCroppedSegmentFilesState
 import com.nutrino.audiocutter.domain.StateHandeling.GetRecentEntriesByDateModifiedAscState
 import com.nutrino.audiocutter.domain.StateHandeling.GetRecentEntriesByDateModifiedDescState
@@ -22,6 +23,7 @@ import com.nutrino.audiocutter.domain.StateHandeling.UpsertRecentEntryState
 import com.nutrino.audiocutter.domain.UseCases.recent.DeleteRecentCroppedSegmentUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.DeleteRecentEntryUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.GetAllRecentEntriesUseCase
+import com.nutrino.audiocutter.domain.UseCases.recent.GetCropSegmentsByFileNameUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.GetRecentCropByFileTypeUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.GetRecentCroppedSegmentFilesUseCase
 import com.nutrino.audiocutter.domain.UseCases.recent.GetRecentEntriesByDateModifiedAscUseCase
@@ -55,6 +57,7 @@ class RecentViewModel @Inject constructor(
     private val upsertCropSegmentUseCase: UpsertCropSegmentUseCase,
     private val getRecentCroppedSegmentFilesUseCase: GetRecentCroppedSegmentFilesUseCase,
     private val getRecentCropByFileTypeUseCase: GetRecentCropByFileTypeUseCase,
+    private val getCropSegmentsByFileNameUseCase: GetCropSegmentsByFileNameUseCase,
     private val deleteRecentCroppedSegmentUseCase: DeleteRecentCroppedSegmentUseCase
 ) : ViewModel() {
 
@@ -63,6 +66,10 @@ class RecentViewModel @Inject constructor(
 
     private val _upsertRecentEntryState = MutableStateFlow(UpsertRecentEntryState())
     val upsertRecentEntryState = _upsertRecentEntryState.asStateFlow()
+
+    fun resetUpsertRecentEntryState() {
+        _upsertRecentEntryState.value = UpsertRecentEntryState()
+    }
 
     private val _deleteRecentEntryState = MutableStateFlow(DeleteRecentEntryState())
     val deleteRecentEntryState = _deleteRecentEntryState.asStateFlow()
@@ -97,8 +104,37 @@ class RecentViewModel @Inject constructor(
     private val _getRecentCropByFileTypeState = MutableStateFlow(GetRecentCropByFileTypeState())
     val getRecentCropByFileTypeState = _getRecentCropByFileTypeState.asStateFlow()
 
+    private val _getCropSegmentsByFileNameState = MutableStateFlow(GetCropSegmentsByFileNameState())
+    val getCropSegmentsByFileNameState = _getCropSegmentsByFileNameState.asStateFlow()
+
     private val _deleteRecentCroppedSegmentState = MutableStateFlow(DeleteRecentCroppedSegmentState())
     val deleteRecentCroppedSegmentState = _deleteRecentCroppedSegmentState.asStateFlow()
+
+    private val _searchQueryState = MutableStateFlow("")
+    val searchQueryState = _searchQueryState.asStateFlow()
+
+    private val _filteredEntriesState = MutableStateFlow<List<RecentTable>>(emptyList())
+    val filteredEntriesState = _filteredEntriesState.asStateFlow()
+
+    fun setSearchQuery(query: String) {
+        _searchQueryState.value = query
+        updateFilteredEntries()
+    }
+
+    private fun updateFilteredEntries() {
+        val query = _searchQueryState.value.trim().lowercase()
+        val allEntries = _getAllRecentEntriesState.value.data
+
+        _filteredEntriesState.value = if (query.isEmpty()) {
+            allEntries
+        } else {
+            allEntries.filter { entry ->
+                entry.output_name.lowercase().contains(query) ||
+                entry.input_name.lowercase().contains(query) ||
+                entry.featureType.lowercase().contains(query)
+            }
+        }
+    }
 
     fun getAllRecentEntries() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -112,6 +148,7 @@ class RecentViewModel @Inject constructor(
                             isLoading = false,
                             data = result.data
                         )
+                        updateFilteredEntries()
                     }
                     is ResultState.Error -> {
                         _getAllRecentEntriesState.value = GetAllRecentEntriesState(
@@ -412,6 +449,30 @@ class RecentViewModel @Inject constructor(
         }
     }
 
+    fun getCropSegmentsByFileName(fileName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            getCropSegmentsByFileNameUseCase.invoke(fileName = fileName).collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                        _getCropSegmentsByFileNameState.value = GetCropSegmentsByFileNameState(isLoading = true)
+                    }
+                    is ResultState.Success -> {
+                        _getCropSegmentsByFileNameState.value = GetCropSegmentsByFileNameState(
+                            isLoading = false,
+                            data = result.data
+                        )
+                    }
+                    is ResultState.Error -> {
+                        _getCropSegmentsByFileNameState.value = GetCropSegmentsByFileNameState(
+                            isLoading = false,
+                            error = result.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun deleteRecentCroppedSegment(cropSegmentTable: CropSegmentTable) {
         viewModelScope.launch(Dispatchers.IO) {
             deleteRecentCroppedSegmentUseCase.invoke(cropSegmentTable = cropSegmentTable).collect { result ->
@@ -436,4 +497,3 @@ class RecentViewModel @Inject constructor(
         }
     }
 }
-

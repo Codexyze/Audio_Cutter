@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
+import com.nutrino.audiocutter.presentation.Navigation.SELECTFEATURESCREEN
 import com.nutrino.audiocutter.presentation.components.BannerAdView
 
 @Composable
@@ -73,7 +73,7 @@ fun AudioTrimSuccessScreen(
 
         Button(
             onClick = {
-                navController.navigate(HOMESCREEN) {
+                navController.navigate(SELECTFEATURESCREEN) {
                     popUpTo(0) { inclusive = true } // 🔙 Clears back stack
                 }
             },
