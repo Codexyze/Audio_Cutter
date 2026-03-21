@@ -85,7 +85,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    val room_version = "2.7.0"
     //  implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation(libs.androidx.navigation)
 
@@ -106,4 +105,10 @@ dependencies {
     //ads
     implementation("com.google.android.gms:play-services-ads:24.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
+
+    //Room
+    val room_version = "2.8.4"
+    implementation("androidx.room:room-runtime:$room_version")
+    kapt("androidx.room:room-compiler:$room_version") // Use kapt for Kotlin.
+    implementation("androidx.room:room-ktx:$room_version")
 }
