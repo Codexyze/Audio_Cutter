@@ -2,6 +2,8 @@ package com.nutrino.audiocutter.domain.StateHandeling
 
 import com.nutrino.audiocutter.data.DataClass.Song
 import com.nutrino.audiocutter.data.DataClass.Video
+import com.nutrino.audiocutter.data.room.entity.CropSegmentTable
+import com.nutrino.audiocutter.data.room.entity.RecentTable
 
 sealed class ResultState<out T>{
     object Loading: ResultState<Nothing>()
@@ -83,4 +85,88 @@ data class AdState(
     val isAdShowing: Boolean = false,
     val error: String? = null,
     val adDismissed: Boolean = false
+)
+
+data class GetAllRecentEntriesState(
+    val isLoading: Boolean = false,
+    val data: List<RecentTable> = emptyList(),
+    val error: String? = null
+)
+
+data class UpsertRecentEntryState(
+    val isLoading: Boolean = false,
+    val data: String = "",
+    val error: String? = null
+)
+
+data class DeleteRecentEntryState(
+    val isLoading: Boolean = false,
+    val data: String = "",
+    val error: String? = null
+)
+
+data class GetRecentEntriesByFeatureTypeState(
+    val isLoading: Boolean = false,
+    val data: List<RecentTable> = emptyList(),
+    val error: String? = null
+)
+
+data class GetRecentEntriesByDateModifiedAscState(
+    val isLoading: Boolean = false,
+    val data: List<RecentTable> = emptyList(),
+    val error: String? = null
+)
+
+data class GetRecentEntriesByDateModifiedDescState(
+    val isLoading: Boolean = false,
+    val data: List<RecentTable> = emptyList(),
+    val error: String? = null
+)
+
+data class GetRecentEntriesByOutputNameAscState(
+    val isLoading: Boolean = false,
+    val data: List<RecentTable> = emptyList(),
+    val error: String? = null
+)
+
+data class GetRecentEntriesByOutputNameDescState(
+    val isLoading: Boolean = false,
+    val data: List<RecentTable> = emptyList(),
+    val error: String? = null
+)
+
+data class GetRecentEntriesByInputNameAscState(
+    val isLoading: Boolean = false,
+    val data: List<RecentTable> = emptyList(),
+    val error: String? = null
+)
+
+data class GetRecentEntriesByInputNameDescState(
+    val isLoading: Boolean = false,
+    val data: List<RecentTable> = emptyList(),
+    val error: String? = null
+)
+
+data class UpsertCropSegmentState(
+    val isLoading: Boolean = false,
+    val data: String = "",
+    val error: String? = null
+)
+
+data class GetRecentCroppedSegmentFilesState(
+    val isLoading: Boolean = false,
+    val data: List<String> = emptyList(),
+    val error: String? = null
+)
+
+data class GetRecentCropByFileTypeState(
+    val isLoading: Boolean = false,
+    val data: List<CropSegmentTable> = emptyList(),
+    val error: String? = null
+)
+
+data class DeleteRecentCroppedSegmentState(
+    val isLoading: Boolean = false,
+    val data: String = "",
+    val error: String? = null
 )
