@@ -20,6 +20,9 @@ val feedBackAds: String = project.findProperty("FEEDBACK_EMAIL") as? String ?:"y
 //test banner ad id
 val bannerAdsID: String = project.findProperty("BANNER_ADS_ID")as? String ?:"ca-app-pub-3940256099942544/6300978111"
 
+//revenue cat Test api key
+val revenueCatApiKey: String = project.findProperty("REVENUE_CAT_API_KEY") as String?:"replace-with-api-key"
+
 
 
 android {
@@ -32,10 +35,11 @@ android {
         buildConfigField("String", "INTERSTITIAL_AD_ID", "\"$interstitialAdId\"")
         buildConfigField("String","FEEDBACK_EMAIL","\"$feedBackAds\"")
         buildConfigField("String","BANNER_ADS_ID","\"$bannerAdsID\"")
+        buildConfigField("String","REVENUE_CAT_API_KEY","\"$revenueCatApiKey\"")
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 36
-        versionCode = 18
+        versionCode = 21
         versionName = "recent-feature"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -111,4 +115,9 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version") // Use kapt for Kotlin.
     implementation("androidx.room:room-ktx:$room_version")
+
+    //RevenueCat
+    implementation("com.revenuecat.purchases:purchases:9.27.0")
+    implementation("com.revenuecat.purchases:purchases-ui:9.27.0")
+
 }

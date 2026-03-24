@@ -1,6 +1,7 @@
 package com.nutrino.audiocutter
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,14 +12,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.nutrino.audiocutter.presentation.Navigation.MainApp
+import com.nutrino.audiocutter.presentation.TestScreens.RevenueCatTestScreen
 import com.nutrino.audiocutter.ui.theme.AudioCutterTheme
 import dagger.hilt.android.AndroidEntryPoint
+import com.revenuecat.purchases.Purchases
+import com.revenuecat.purchases.getCustomerInfoWith
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen before calling super.onCreate()
+
         installSplashScreen()
 
         super.onCreate(savedInstanceState)
@@ -31,7 +36,8 @@ class MainActivity : ComponentActivity() {
             AudioCutterTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        MainApp()
+                         MainApp()
+                        //RevenueCatTestScreen(activity = this@MainActivity)
                     }
 
                 }
@@ -39,4 +45,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
