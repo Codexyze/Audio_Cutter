@@ -4,6 +4,7 @@ import com.nutrino.audiocutter.data.DataClass.Song
 import com.nutrino.audiocutter.data.DataClass.Video
 import com.nutrino.audiocutter.data.room.entity.CropSegmentTable
 import com.nutrino.audiocutter.data.room.entity.RecentTable
+import com.revenuecat.purchases.Package
 
 sealed class ResultState<out T>{
     object Loading: ResultState<Nothing>()
@@ -175,4 +176,10 @@ data class DeleteRecentCroppedSegmentState(
     val isLoading: Boolean = false,
     val data: String = "",
     val error: String? = null
+)
+
+data class GetAllPackageState(
+    val isLoading: Boolean = false ,
+    val data: List<Package> = emptyList(),
+    val error : String? = null
 )

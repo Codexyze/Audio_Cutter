@@ -2,6 +2,7 @@ package com.nutrino.audiocutter.presentation.Screens
 
 import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -116,7 +117,8 @@ fun SelectFeatureScreen(
         FeatureItem("FeedBack Ads", Icons.Default.CardGiftcard, isFeedbackAds = true),
         FeatureItem("Feature Request", Icons.Default.Email, isFeatureRequest = true),
         FeatureItem("Privacy Policy", Icons.Default.PrivacyTip, isPrivacyPolicy = true),
-        FeatureItem("Coming Soon", Icons.Outlined.Schedule, isComingSoon = true)
+        FeatureItem("Coming Soon", Icons.Outlined.Schedule, isComingSoon = true),
+        FeatureItem("Pro", Icons.Default.Favorite)
     )
 
     Column(
@@ -209,6 +211,9 @@ fun SelectFeatureScreen(
                                             "https://codexyze.github.io/audio_cutter.html".toUri()
                                     }
                                     context.startActivity(intent)
+                                }
+                                feature == features[13] -> {
+                                    Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
