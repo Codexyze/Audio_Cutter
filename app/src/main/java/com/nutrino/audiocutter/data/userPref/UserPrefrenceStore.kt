@@ -19,7 +19,7 @@ class UserPrefrenceStore @Inject constructor(private val context: Context) {
     }
 
     val themeSelection: Flow<String> = context.dataStore.data.map {
-        it[THEME_SELECTION] ?: Colors.REDTHEME
+        it[THEME_SELECTION] ?: Colors.ORANGETHEME
     }
 
     suspend fun updateThemeSelection(theme: String){

@@ -16,7 +16,7 @@ class UserPrefViewModel @Inject constructor(
 	private val userPrefUseCase: UserPrefUseCase
 ) : ViewModel() {
 
-	private val _themeSelection = MutableStateFlow(Colors.REDTHEME)
+	private val _themeSelection = MutableStateFlow(Colors.ORANGETHEME)
 	val themeSelection = _themeSelection.asStateFlow()
 
 	init {

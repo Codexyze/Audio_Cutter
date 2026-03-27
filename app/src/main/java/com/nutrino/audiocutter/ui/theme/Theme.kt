@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nutrino.audiocutter.Constants.Colors as AppColors
 import com.nutrino.audiocutter.presentation.ViewModel.UserPrefViewModel
 
@@ -63,7 +64,7 @@ fun AudioCutterTheme(
     themeViewModel: UserPrefViewModel = hiltViewModel(),
     content: @Composable () -> Unit
 ) {
-    val selectedTheme = themeViewModel.themeSelection.collectAsState().value
+    val selectedTheme = themeViewModel.themeSelection.collectAsStateWithLifecycle().value
 
     val colorScheme = when (selectedTheme) {
         AppColors.REDTHEME -> redColorPallete
@@ -73,7 +74,7 @@ fun AudioCutterTheme(
         AppColors.PURPLETHEME -> purpleColorPallete
         AppColors.PINKTHEME -> pinkColorPallete
         AppColors.ORANGETHEME -> orangeColorPallete
-        else -> redColorPallete
+        else -> orangeColorPallete
     }
 
     MaterialTheme(

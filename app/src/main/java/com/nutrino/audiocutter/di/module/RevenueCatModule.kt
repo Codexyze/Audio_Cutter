@@ -3,6 +3,7 @@ package com.nutrino.audiocutter.di.module
 import com.nutrino.audiocutter.data.RepoImpl.RevenueCatRepoImpl
 import com.nutrino.audiocutter.domain.Repository.RevenueCatRepository
 import com.nutrino.audiocutter.domain.UseCases.revenueCat.GetAllPackagesUseCase
+import com.nutrino.audiocutter.domain.UseCases.revenueCat.IsUserProUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,5 +20,10 @@ object RevenueCatModule {
     @Provides
     fun provideGetPackageUseCase(revenueCatRepository: RevenueCatRepository): GetAllPackagesUseCase{
         return GetAllPackagesUseCase(revenueCatRepository = revenueCatRepository)
+    }
+
+    @Provides
+    fun provideIsUserProUseCase(revenueCatRepository: RevenueCatRepository): IsUserProUseCase {
+        return IsUserProUseCase(revenueCatRepository = revenueCatRepository)
     }
 }

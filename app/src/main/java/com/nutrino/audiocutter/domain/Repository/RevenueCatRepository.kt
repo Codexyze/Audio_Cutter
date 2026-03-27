@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface RevenueCatRepository {
     suspend fun getPackages(): Flow<ResultState<List<Package>>>
+
+    suspend fun isUserPro(): Flow<ResultState<Boolean>>
 }

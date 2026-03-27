@@ -183,3 +183,10 @@ data class GetAllPackageState(
     val data: List<Package> = emptyList(),
     val error : String? = null
 )
+
+data class IsUserProState(
+    val isLoading: Boolean = false,
+    val data: Boolean = false,
+    val error: String? = null
+)
+

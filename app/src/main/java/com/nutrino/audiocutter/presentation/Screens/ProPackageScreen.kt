@@ -3,6 +3,7 @@ package com.nutrino.audiocutter.presentation.Screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,10 +15,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,9 +42,12 @@ fun ProPackageScreen(
     revenueCatViewmodel: RevenueCatViewmodel = hiltViewModel()
 ) {
     val getAllPackageState = revenueCatViewmodel.getAllPackageState.collectAsStateWithLifecycle()
+    val isUserProState = revenueCatViewmodel.isUserProState.collectAsStateWithLifecycle()
+    val isProUser = isUserProState.value.data
 
     LaunchedEffect(Unit) {
         revenueCatViewmodel.getAllPackageRevenueCat()
+        revenueCatViewmodel.checkIsUserPro()
     }
 
     Box(
@@ -49,7 +56,7 @@ fun ProPackageScreen(
             .padding(16.dp)
     ) {
         when {
-            getAllPackageState.value.isLoading -> {
+            getAllPackageState.value.isLoading || isUserProState.value.isLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
 
@@ -105,6 +112,35 @@ fun ProPackageScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                     )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (isProUser) {
+                            Icon(
+                                imageVector = Icons.Default.EmojiEvents,
+                                contentDescription = "Pro user",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "Status: Pro",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        } else {
+                            Text(
+                                text = "Status: Not Pro",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(14.dp))
 
                     LazyColumn(
@@ -116,17 +152,20 @@ fun ProPackageScreen(
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .padding(vertical = 2.dp)
                                     .clickable {
-                                        navController.navigate(
-                                            BUYPROPACKAGESCREEN(
-                                                packageIdentifier = pkg.identifier,
-                                                productId = pkg.product.id,
-                                                title = pkg.product.title,
-                                                description = pkg.product.description,
-                                                priceFormatted = pkg.product.price.formatted,
-                                                packageType = pkg.packageType.name
+                                        if (!isProUser) {
+                                            navController.navigate(
+                                                BUYPROPACKAGESCREEN(
+                                                    packageIdentifier = pkg.identifier,
+                                                    productId = pkg.product.id,
+                                                    title = pkg.product.title,
+                                                    description = pkg.product.description,
+                                                    priceFormatted = pkg.product.price.formatted,
+                                                    packageType = pkg.packageType.name
+                                                )
                                             )
-                                        )
+                                        }
                                     },
                                 shape = RoundedCornerShape(16.dp),
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
@@ -160,6 +199,24 @@ fun ProPackageScreen(
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary
                                     )
+                                    Button(
+                                        onClick = {
+                                            navController.navigate(
+                                                BUYPROPACKAGESCREEN(
+                                                    packageIdentifier = pkg.identifier,
+                                                    productId = pkg.product.id,
+                                                    title = pkg.product.title,
+                                                    description = pkg.product.description,
+                                                    priceFormatted = pkg.product.price.formatted,
+                                                    packageType = pkg.packageType.name
+                                                )
+                                            )
+                                        },
+                                        enabled = !isProUser,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(if (isProUser) "Already Pro" else "Buy")
+                                    }
                                 }
                             }
                         }
