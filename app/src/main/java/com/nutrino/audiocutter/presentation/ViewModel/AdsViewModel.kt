@@ -7,10 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.ads.AdView
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.StateHandeling.AdState
+import com.nutrino.audiocutter.domain.StateHandeling.IsUserProState
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import com.nutrino.audiocutter.domain.UseCases.LoadAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.LoadBannerAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.ShowAdUseCase
+import com.nutrino.audiocutter.domain.UseCases.revenueCat.IsUserProUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +25,8 @@ class AdsViewModel @Inject constructor(
     private val loadAdUseCase: LoadAdUseCase,
     private val showAdUseCase: ShowAdUseCase,
     private val loadBannerAdUseCase: LoadBannerAdUseCase,
-    private val adsRepository: AdsRepository
+    private val adsRepository: AdsRepository,
+    private val isUserProUseCase: IsUserProUseCase
 ) : ViewModel() {
 
     private val _adState = MutableStateFlow(AdState())
@@ -32,14 +35,57 @@ class AdsViewModel @Inject constructor(
     private val _bannerAdState = MutableStateFlow<BannerAdState>(BannerAdState.Idle)
     val bannerAdState = _bannerAdState.asStateFlow()
 
+    private val _isUserProState = MutableStateFlow(IsUserProState())
+    val isUserProState = _isUserProState.asStateFlow()
+
     private val TAG = "AdsViewModel"
 
     init {
-        // Preload ad when ViewModel is created
-        loadAd()
+        refreshIsUserProStatusForAds()
+    }
+
+    fun refreshIsUserProStatusForAds() {
+        viewModelScope.launch(Dispatchers.Main) {
+            isUserProUseCase.invoke().collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                        _isUserProState.value = IsUserProState(
+                            isLoading = true
+                        )
+                    }
+
+                    is ResultState.Error -> {
+                        _isUserProState.value = IsUserProState(
+                            isLoading = false,
+                            error = result.message
+                        )
+                        // Fallback to ad loading when pro status check fails.
+                        loadAd()
+                    }
+
+                    is ResultState.Success -> {
+                        _isUserProState.value = IsUserProState(
+                            isLoading = false,
+                            data = result.data
+                        )
+
+                        if (!result.data) {
+                            loadAd()
+                        } else {
+                            Log.d(TAG, "User is Pro, skipping interstitial preload")
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun loadAd() {
+        if (_isUserProState.value.isLoading || _isUserProState.value.data) {
+            Log.d(TAG, "Skipping interstitial load because user is Pro or pro check is loading")
+            return
+        }
+
         viewModelScope.launch(Dispatchers.Main) {
             loadAdUseCase().collect { result ->
                 when (result) {
@@ -74,6 +120,12 @@ class AdsViewModel @Inject constructor(
     }
 
     fun showAd(activity: Activity, onAdDismissed: () -> Unit = {}, onAdFailed: () -> Unit = {}) {
+        if (_isUserProState.value.data) {
+            Log.d(TAG, "User is Pro, skipping interstitial show")
+            onAdDismissed()
+            return
+        }
+
         if (!adsRepository.isAdReady()) {
             Log.w(TAG, "Ad not ready, calling onAdFailed")
             onAdFailed()
@@ -120,6 +172,46 @@ class AdsViewModel @Inject constructor(
     }
 
     fun requestAndShowAd(activity: Activity, onAdDismissed: () -> Unit = {}, onAdFailed: () -> Unit = {}) {
+        viewModelScope.launch(Dispatchers.Main) {
+            isUserProUseCase.invoke().collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                        _isUserProState.value = IsUserProState(
+                            isLoading = true
+                        )
+                    }
+
+                    is ResultState.Error -> {
+                        _isUserProState.value = IsUserProState(
+                            isLoading = false,
+                            error = result.message
+                        )
+                        requestAndShowAdForNonPro(activity, onAdDismissed, onAdFailed)
+                    }
+
+                    is ResultState.Success -> {
+                        _isUserProState.value = IsUserProState(
+                            isLoading = false,
+                            data = result.data
+                        )
+
+                        if (result.data) {
+                            Log.d(TAG, "User is Pro, bypassing interstitial in requestAndShowAd")
+                            onAdDismissed()
+                        } else {
+                            requestAndShowAdForNonPro(activity, onAdDismissed, onAdFailed)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun requestAndShowAdForNonPro(
+        activity: Activity,
+        onAdDismissed: () -> Unit,
+        onAdFailed: () -> Unit
+    ) {
         if (adsRepository.isAdReady()) {
             showAd(activity, onAdDismissed, onAdFailed)
         } else {
@@ -134,10 +226,14 @@ class AdsViewModel @Inject constructor(
                                 onAdFailed()
                             }
                         }
+
                         is ResultState.Error -> {
                             onAdFailed()
                         }
-                        else -> { /* Loading state, do nothing */ }
+
+                        else -> {
+                            // Loading state, do nothing
+                        }
                     }
                 }
             }

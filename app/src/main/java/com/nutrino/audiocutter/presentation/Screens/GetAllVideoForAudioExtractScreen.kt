@@ -3,6 +3,7 @@ package com.nutrino.audiocutter.presentation.Screens
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.compose.foundation.Image
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,10 +47,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.data.DataClass.Video
@@ -238,6 +243,8 @@ fun GetAllVideoForAudioExtractScreen(navController: NavController) {
 
 @Composable
 fun VideoItemForAudioExtract(video: Video, navController: NavController) {
+    val context = LocalContext.current
+
     Card(
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
@@ -259,15 +266,51 @@ fun VideoItemForAudioExtract(video: Video, navController: NavController) {
                 .padding(12.dp)
                 .fillMaxWidth()
         ) {
-            // Video Thumbnail placeholder
-            Box(
-                modifier = Modifier
-                    .size(80.dp, 64.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("🎵", fontSize = 28.sp)
+            val thumbnail = remember(video.thumbnail) {
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        video.thumbnail.toUri().let { uri ->
+                            context.contentResolver.loadThumbnail(
+                                uri,
+                                android.util.Size(128, 128),
+                                null
+                            )
+                        }
+                    } else {
+                        android.media.ThumbnailUtils.createVideoThumbnail(
+                            video.path,
+                            android.provider.MediaStore.Video.Thumbnails.MINI_KIND
+                        )
+                    }
+                } catch (_: Exception) {
+                    null
+                }
+            }
+
+            if (thumbnail != null) {
+                Image(
+                    bitmap = thumbnail.asImageBitmap(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(80.dp, 64.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(80.dp, 64.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.VideoLibrary,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(12.dp))
