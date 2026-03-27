@@ -9,6 +9,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -32,6 +33,58 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
+
+
+//My color Scheme
+private val darkColorPallete =darkColorScheme(
+    background = Color(0xFF000000),
+    primary = Color(0xFFFF0B55),
+    secondary = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0x13000000),
+)
+
+private val lightColorPallete = lightColorScheme(
+    background = Color(0xFF000000),
+    primary = Color(0xFFFF0B55),
+    secondary = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0x13000000)
+)
+private val greenColorPallete = lightColorScheme(
+    background = Color(0xFF000000),
+    primary = Color(0xFF8BC34A),
+    secondary = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0x13000000)
+)
+private val blueColorPallete = lightColorScheme(
+    background = Color(0xFF000000),
+    primary = Color(0xFF03A9F4),
+    secondary = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0x13000000)
+)
+private val yellowColorPallete = lightColorScheme(
+    background = Color(0xFF000000),
+    primary = Color(0xFFFFEB3B),
+    secondary = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0x13000000)
+)
+private val purpleColorPallete = lightColorScheme(
+    background = Color(0xFF000000),
+    primary = Color(0xFFDF77EE),
+    secondary = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0x13000000)
+)
+private val pinkColorPallete = lightColorScheme(
+    background = Color(0xFF000000),
+    primary = Color(0xFFF35389),
+    secondary = Color(0xFFFFFFFF)
+)
+private val orangeColorPallete = lightColorScheme(
+    background = Color(0xFF000000),
+    primary = Color(0xFFF54E1B),
+    secondary = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0x13000000)
+)
+
 
 @Composable
 fun AudioCutterTheme(

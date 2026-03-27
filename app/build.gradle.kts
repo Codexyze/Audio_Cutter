@@ -120,4 +120,7 @@ dependencies {
     implementation("com.revenuecat.purchases:purchases:9.27.0")
     implementation("com.revenuecat.purchases:purchases-ui:9.27.0")
 
+    //DataPrefStore
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
+
 }
