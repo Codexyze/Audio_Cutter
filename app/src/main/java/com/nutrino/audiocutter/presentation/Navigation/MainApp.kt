@@ -41,6 +41,7 @@ import com.nutrino.audiocutter.presentation.Screens.RecentAudioPlayerScreen
 import com.nutrino.audiocutter.presentation.Screens.RecentScreen
 import com.nutrino.audiocutter.presentation.Screens.RecentVideoPlayerScreen
 import com.nutrino.audiocutter.presentation.Screens.SelectFeatureScreen
+import com.nutrino.audiocutter.presentation.Screens.ThemeSelectionScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimmerScreen
@@ -60,6 +61,9 @@ fun MainApp() {
         }
         composable<PROPACKAGESCREEN> {
             ProPackageScreen(navController = navcontroller)
+        }
+        composable<THEMESELECTIONSCREEN> {
+            ThemeSelectionScreen(navController = navcontroller)
         }
         composable<BUYPROPACKAGESCREEN> { backstackEntry ->
             val data: BUYPROPACKAGESCREEN = backstackEntry.toRoute()

@@ -3,6 +3,7 @@ package com.nutrino.audiocutter.presentation.Screens
 import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -169,6 +170,7 @@ fun AudioMergeScreen(
             item {
                 Card(
                     shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                     ),
@@ -303,6 +305,7 @@ fun AudioMergeScreen(
                 item {
                     Card(
                         shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
                         ),

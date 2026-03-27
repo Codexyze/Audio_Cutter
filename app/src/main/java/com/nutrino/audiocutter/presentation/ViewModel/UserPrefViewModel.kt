@@ -32,6 +32,7 @@ class UserPrefViewModel @Inject constructor(
 	}
 
 	fun updateThemeSelection(theme: String) {
+		_themeSelection.value = theme
 		viewModelScope.launch(Dispatchers.IO) {
 			userPrefUseCase.updateThemeSelection(theme = theme)
 		}

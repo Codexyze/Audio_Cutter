@@ -3,6 +3,7 @@ package com.nutrino.audiocutter.presentation.Screens
 import android.app.Activity
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -302,6 +303,7 @@ fun MultiCropVideoScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .padding(8.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
                     ),
@@ -392,6 +394,7 @@ fun MultiCropVideoScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(0.9f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                         ),
@@ -546,6 +549,7 @@ fun MultiCropVideoScreen(
                     item {
                         Card(
                             modifier = Modifier.fillMaxWidth(0.9f),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                             ),
@@ -736,7 +740,7 @@ fun VideoSegmentCard(
             .fillMaxWidth(0.9f)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                color = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(12.dp)
             ),
         colors = CardDefaults.cardColors(

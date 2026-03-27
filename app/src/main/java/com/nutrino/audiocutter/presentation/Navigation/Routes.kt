@@ -36,6 +36,9 @@ object RECENTSCREEN
 object PROPACKAGESCREEN
 
 @Serializable
+object THEMESELECTIONSCREEN
+
+@Serializable
 data class BUYPROPACKAGESCREEN(
 	val packageIdentifier: String,
 	val productId: String,

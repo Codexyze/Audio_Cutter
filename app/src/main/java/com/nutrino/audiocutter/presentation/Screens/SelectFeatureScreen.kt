@@ -13,6 +13,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Button
@@ -82,6 +84,7 @@ import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
 import com.nutrino.audiocutter.presentation.Navigation.PROPACKAGESCREEN
 import com.nutrino.audiocutter.presentation.Navigation.RECORDAUDIOSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.RECENTSCREEN
+import com.nutrino.audiocutter.presentation.Navigation.THEMESELECTIONSCREEN
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
@@ -119,7 +122,8 @@ fun SelectFeatureScreen(
         FeatureItem("Feature Request", Icons.Default.Email, isFeatureRequest = true),
         FeatureItem("Privacy Policy", Icons.Default.PrivacyTip, isPrivacyPolicy = true),
         FeatureItem("Coming Soon", Icons.Outlined.Schedule, isComingSoon = true),
-        FeatureItem("Pro", Icons.Default.Favorite)
+        FeatureItem("Pro", Icons.Default.Favorite),
+        FeatureItem("Theme", Icons.Default.ColorLens)
     )
 
     Column(
@@ -141,7 +145,7 @@ fun SelectFeatureScreen(
                     fontWeight = FontWeight.Bold,
                     fontSize = 28.sp
                 ),
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
@@ -158,7 +162,6 @@ fun SelectFeatureScreen(
                         onClick = {
                             when{
                                 feature == features[0] -> {
-                                    navController.navigate(PROPACKAGESCREEN)
                                     navController.navigate(HOMESCREEN)
                                 }
                                 feature == features[1] -> {
@@ -215,6 +218,9 @@ fun SelectFeatureScreen(
                                 }
                                 feature == features[13] -> {
                                    navController.navigate(PROPACKAGESCREEN)
+                                }
+                                feature == features[14] -> {
+                                    navController.navigate(THEMESELECTIONSCREEN)
                                 }
                             }
                         }
@@ -287,7 +293,7 @@ fun SelectFeatureScreen(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 22.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = Color.White,
                             textAlign = TextAlign.Center
                         )
 
@@ -300,7 +306,7 @@ fun SelectFeatureScreen(
                                 fontSize = 15.sp,
                                 lineHeight = 22.sp
                             ),
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            color = Color.White.copy(alpha = 0.85f),
                             textAlign = TextAlign.Center
                         )
 
@@ -312,7 +318,7 @@ fun SelectFeatureScreen(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             ),
-                            color = Color(0xFFFF6B9D), // Soft pink
+                            color = Color.White,
                             textAlign = TextAlign.Center
                         )
 
@@ -334,7 +340,7 @@ fun SelectFeatureScreen(
                                     style = MaterialTheme.typography.labelLarge.copy(
                                         fontWeight = FontWeight.SemiBold
                                     ),
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    color = Color.White.copy(alpha = 0.85f)
                                 )
                             }
 
@@ -408,6 +414,10 @@ fun FeatureCard(
             .aspectRatio(1f)
             .clickable(enabled = !feature.isComingSoon) { onClick() },
         shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary
+        ),
         colors = CardDefaults.cardColors(
             containerColor = if (feature.isComingSoon)
                 MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
@@ -460,10 +470,7 @@ fun FeatureCard(
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 15.sp
                     ),
-                    color = if (feature.isComingSoon)
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-                    else
-                        MaterialTheme.colorScheme.onSurface,
+                    color = if (feature.isComingSoon) Color.White.copy(alpha = 0.65f) else Color.White,
                     textAlign = TextAlign.Center,
                     maxLines = 2
                 )
@@ -475,7 +482,7 @@ fun FeatureCard(
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Medium
                         ),
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                        color = Color.White,
                         fontSize = 12.sp
                     )
                 }

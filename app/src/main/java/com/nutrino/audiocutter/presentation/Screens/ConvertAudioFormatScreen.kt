@@ -3,6 +3,7 @@ package com.nutrino.audiocutter.presentation.Screens
 import android.app.Activity
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -225,6 +226,7 @@ fun ConvertAudioFormatScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(0.9f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                         ),
@@ -312,6 +314,7 @@ fun ConvertAudioFormatScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(0.9f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                         ),

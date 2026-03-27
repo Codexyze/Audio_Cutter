@@ -14,6 +14,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -300,6 +301,7 @@ fun RecordAudioScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(0.9f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                         ),
@@ -393,6 +395,7 @@ fun RecordAudioScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(0.9f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                         ),

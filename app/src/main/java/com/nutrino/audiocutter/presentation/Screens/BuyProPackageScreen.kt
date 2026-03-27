@@ -1,6 +1,7 @@
 package com.nutrino.audiocutter.presentation.Screens
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -41,12 +42,13 @@ fun BuyProPackageScreen(
             text = "Buy Pro",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.primary
         )
 
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             ),

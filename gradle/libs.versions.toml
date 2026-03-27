@@ -10,6 +10,7 @@ activityCompose = "1.11.0"
 composeBom = "2025.11.00"
 nav_version = "2.9.7"
 media3Transformer = "1.5.0"
+foundation = "1.10.6"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +29,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation={group="androidx.navigation",name="navigation-compose",version.ref="nav_version"}
 androidx-media3-transformer = { group = "androidx.media3", name = "media3-transformer", version.ref = "media3Transformer" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

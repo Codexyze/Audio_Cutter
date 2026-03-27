@@ -4,6 +4,7 @@ import android.app.Activity
 import android.util.Log
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -250,6 +251,7 @@ fun MultiCropAudioScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(0.9f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                         ),
@@ -404,6 +406,7 @@ fun MultiCropAudioScreen(
                     item {
                         Card(
                             modifier = Modifier.fillMaxWidth(0.9f),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                             ),
@@ -594,7 +597,7 @@ fun SegmentCard(
             .fillMaxWidth(0.9f)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                color = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(12.dp)
             ),
         colors = CardDefaults.cardColors(
