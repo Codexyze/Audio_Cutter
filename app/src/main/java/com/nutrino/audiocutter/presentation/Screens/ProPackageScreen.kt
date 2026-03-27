@@ -1,5 +1,8 @@
 package com.nutrino.audiocutter.presentation.Screens
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,26 +31,51 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.nutrino.audiocutter.presentation.Navigation.BUYPROPACKAGESCREEN
+import com.nutrino.audiocutter.Constants.Colors
 import com.nutrino.audiocutter.presentation.ViewModel.RevenueCatViewmodel
+import com.nutrino.audiocutter.presentation.ViewModel.UserPrefViewModel
 
+
+@SuppressLint("ContextCastToActivity")
 @Composable
 fun ProPackageScreen(
     navController: NavController,
-    revenueCatViewmodel: RevenueCatViewmodel = hiltViewModel()
+    revenueCatViewmodel: RevenueCatViewmodel = hiltViewModel(),
+    userPrefViewModel: UserPrefViewModel = hiltViewModel()
+
 ) {
     val getAllPackageState = revenueCatViewmodel.getAllPackageState.collectAsStateWithLifecycle()
     val isUserProState = revenueCatViewmodel.isUserProState.collectAsStateWithLifecycle()
+    val buyPremiumPackageState = revenueCatViewmodel.buyPremiumPackageState.collectAsStateWithLifecycle()
     val isProUser = isUserProState.value.data
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val isBuyingPackage = buyPremiumPackageState.value.isLoading
 
     LaunchedEffect(Unit) {
         revenueCatViewmodel.getAllPackageRevenueCat()
         revenueCatViewmodel.checkIsUserPro()
+    }
+
+    LaunchedEffect(
+        buyPremiumPackageState.value.data,
+        buyPremiumPackageState.value.error,
+        buyPremiumPackageState.value.isLoading
+    ) {
+        if (buyPremiumPackageState.value.isLoading) return@LaunchedEffect
+
+        if (buyPremiumPackageState.value.error != null) {
+            Toast.makeText(context, buyPremiumPackageState.value.error, Toast.LENGTH_SHORT).show()
+        } else if (buyPremiumPackageState.value.data) {
+            userPrefViewModel.updateThemeSelection(theme = Colors.REDTHEME )
+            Toast.makeText(context, "Purchase successful", Toast.LENGTH_SHORT).show()
+        }
     }
 
     Box(
@@ -56,7 +84,7 @@ fun ProPackageScreen(
             .padding(16.dp)
     ) {
         when {
-            getAllPackageState.value.isLoading || isUserProState.value.isLoading -> {
+            getAllPackageState.value.isLoading || isUserProState.value.isLoading || isBuyingPackage -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
 
@@ -153,18 +181,18 @@ fun ProPackageScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 2.dp)
-                                    .clickable {
+                                    .clickable(enabled = !isProUser) {
                                         if (!isProUser) {
-                                            navController.navigate(
-                                                BUYPROPACKAGESCREEN(
-                                                    packageIdentifier = pkg.identifier,
-                                                    productId = pkg.product.id,
-                                                    title = pkg.product.title,
-                                                    description = pkg.product.description,
-                                                    priceFormatted = pkg.product.price.formatted,
-                                                    packageType = pkg.packageType.name
+                                            if (activity == null) {
+                                                Toast.makeText(context, "Issue with payment system", Toast.LENGTH_SHORT).show()
+                                            }else{
+                                                revenueCatViewmodel.buyPremiumPackage(
+                                                    activity = activity,
+                                                    selectedPackage = pkg
                                                 )
-                                            )
+
+                                            }
+
                                         }
                                     },
                                 shape = RoundedCornerShape(16.dp),
@@ -201,16 +229,15 @@ fun ProPackageScreen(
                                     )
                                     Button(
                                         onClick = {
-                                            navController.navigate(
-                                                BUYPROPACKAGESCREEN(
-                                                    packageIdentifier = pkg.identifier,
-                                                    productId = pkg.product.id,
-                                                    title = pkg.product.title,
-                                                    description = pkg.product.description,
-                                                    priceFormatted = pkg.product.price.formatted,
-                                                    packageType = pkg.packageType.name
+                                            if (activity == null) {
+                                                Toast.makeText(context, "Issue with payment system", Toast.LENGTH_SHORT).show()
+                                            }else{
+                                                revenueCatViewmodel.buyPremiumPackage(
+                                                    activity = activity,
+                                                    selectedPackage = pkg
                                                 )
-                                            )
+
+                                            }
                                         },
                                         enabled = !isProUser,
                                         modifier = Modifier.fillMaxWidth()

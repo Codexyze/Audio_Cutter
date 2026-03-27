@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.revenuecat.purchases.Package
 
 @Composable
 fun BuyProPackageScreen(
@@ -104,7 +105,7 @@ fun BuyProPackageScreen(
 
         Button(
             onClick = {
-                Toast.makeText(context, "TODO", Toast.LENGTH_SHORT).show()
+
             },
             modifier = Modifier.fillMaxWidth()
         ) {

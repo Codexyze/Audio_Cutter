@@ -190,3 +190,9 @@ data class IsUserProState(
     val error: String? = null
 )
 
+data class BuyPremiumPackageState(
+    val isLoading: Boolean = false,
+    val data: Boolean = false,
+    val error: String? = null
+)
+

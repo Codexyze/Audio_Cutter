@@ -7,6 +7,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nutrino.audiocutter.presentation.ViewModel.RevenueCatViewmodel
+// be careful here
 import com.nutrino.audiocutter.Constants.Colors as AppColors
 import com.nutrino.audiocutter.presentation.ViewModel.UserPrefViewModel
 
@@ -62,6 +64,7 @@ private val orangeColorPallete = appColorPalette(accent = Color(0xFFF54E1B))
 @Composable
 fun AudioCutterTheme(
     themeViewModel: UserPrefViewModel = hiltViewModel(),
+    revenueCatViewmodel: RevenueCatViewmodel = hiltViewModel(),
     content: @Composable () -> Unit
 ) {
     val selectedTheme = themeViewModel.themeSelection.collectAsStateWithLifecycle().value

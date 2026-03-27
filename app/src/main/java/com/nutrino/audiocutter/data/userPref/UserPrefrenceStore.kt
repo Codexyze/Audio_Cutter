@@ -7,13 +7,15 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.nutrino.audiocutter.Constants.Colors
 import com.nutrino.audiocutter.Constants.UserPrefStore
+import com.nutrino.audiocutter.domain.UseCases.revenueCat.IsUserProUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private val Context.dataStore by preferencesDataStore(UserPrefStore.userPrefrenceStoreName)
 
-class UserPrefrenceStore @Inject constructor(private val context: Context) {
+class UserPrefrenceStore @Inject constructor(private val context: Context
+    ) {
     companion object{
         val THEME_SELECTION = stringPreferencesKey(UserPrefStore.THEME_SELECTION)
     }

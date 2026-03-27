@@ -24,7 +24,7 @@ class UserPrefViewModel @Inject constructor(
 	}
 
 	private fun observeThemeSelection() {
-		viewModelScope.launch {
+		viewModelScope.launch(Dispatchers.IO) {
 			userPrefUseCase.getThemeSelection().collect { currentTheme ->
 				_themeSelection.value = currentTheme
 			}
