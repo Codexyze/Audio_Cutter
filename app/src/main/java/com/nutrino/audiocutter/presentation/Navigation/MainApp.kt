@@ -17,6 +17,7 @@ import com.nutrino.audiocutter.presentation.Screens.AudioMergeSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioTrimmerScreen
+import com.nutrino.audiocutter.presentation.Screens.BuyProPackageScreen
 import com.nutrino.audiocutter.presentation.Screens.ConvertAudioFormatErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.ConvertAudioFormatScreen
 import com.nutrino.audiocutter.presentation.Screens.ConvertAudioFormatSuccessScreen
@@ -32,6 +33,7 @@ import com.nutrino.audiocutter.presentation.Screens.MultiCropAudioSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.MultiCropVideoErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.MultiCropVideoScreen
 import com.nutrino.audiocutter.presentation.Screens.MultiCropVideoSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.ProPackageScreen
 import com.nutrino.audiocutter.presentation.Screens.RecordAudioErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.RecordAudioScreen
 import com.nutrino.audiocutter.presentation.Screens.RecordAudioSuccessScreen
@@ -55,6 +57,20 @@ fun MainApp() {
         }
         composable<RECENTSCREEN> {
             RecentScreen(navController = navcontroller)
+        }
+        composable<PROPACKAGESCREEN> {
+            ProPackageScreen(navController = navcontroller)
+        }
+        composable<BUYPROPACKAGESCREEN> { backstackEntry ->
+            val data: BUYPROPACKAGESCREEN = backstackEntry.toRoute()
+            BuyProPackageScreen(
+                packageIdentifier = data.packageIdentifier,
+                productId = data.productId,
+                title = data.title,
+                description = data.description,
+                priceFormatted = data.priceFormatted,
+                packageType = data.packageType
+            )
         }
         composable<RECENTAUDIOPLAYERSCREEN> { backstackEntry ->
             val data: RECENTAUDIOPLAYERSCREEN = backstackEntry.toRoute()

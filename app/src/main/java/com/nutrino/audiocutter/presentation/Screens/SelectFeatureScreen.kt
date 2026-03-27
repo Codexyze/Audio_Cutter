@@ -79,6 +79,7 @@ import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOSFORMULTICROPSCRE
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOFORAUDIOEXTRACTSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.ALLVIDEOSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.HOMESCREEN
+import com.nutrino.audiocutter.presentation.Navigation.PROPACKAGESCREEN
 import com.nutrino.audiocutter.presentation.Navigation.RECORDAUDIOSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.RECENTSCREEN
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -157,7 +158,7 @@ fun SelectFeatureScreen(
                         onClick = {
                             when{
                                 feature == features[0] -> {
-                                    // Audio Trimmer
+                                    navController.navigate(PROPACKAGESCREEN)
                                     navController.navigate(HOMESCREEN)
                                 }
                                 feature == features[1] -> {
@@ -213,7 +214,7 @@ fun SelectFeatureScreen(
                                     context.startActivity(intent)
                                 }
                                 feature == features[13] -> {
-                                    Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show()
+                                   navController.navigate(PROPACKAGESCREEN)
                                 }
                             }
                         }

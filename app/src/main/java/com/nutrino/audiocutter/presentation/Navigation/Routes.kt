@@ -33,6 +33,19 @@ object SELECTFEATURESCREEN
 object RECENTSCREEN
 
 @Serializable
+object PROPACKAGESCREEN
+
+@Serializable
+data class BUYPROPACKAGESCREEN(
+	val packageIdentifier: String,
+	val productId: String,
+	val title: String,
+	val description: String,
+	val priceFormatted: String,
+	val packageType: String
+)
+
+@Serializable
 data class RECENTAUDIOPLAYERSCREEN(
 	val outputUri: String,
 	val outputName: String,
