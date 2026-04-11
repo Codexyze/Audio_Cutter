@@ -26,6 +26,7 @@ import com.nutrino.audiocutter.presentation.Screens.GetAllSongsForConvertAudioFo
 import com.nutrino.audiocutter.presentation.Screens.GetAllSongsForMultiCropScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllVideoForAudioExtractScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllVideoScreen
+import com.nutrino.audiocutter.presentation.Screens.GetAllVideoForSpeedScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllVideosForMultiCropScreen
 import com.nutrino.audiocutter.presentation.Screens.MultiCropAudioErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.MultiCropAudioScreen
@@ -45,6 +46,9 @@ import com.nutrino.audiocutter.presentation.Screens.ThemeSelectionScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoTrimmerScreen
+import com.nutrino.audiocutter.presentation.Screens.VideoSpeedScreen
+import com.nutrino.audiocutter.presentation.Screens.VideoSpeedSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.VideoSpeedErrorScreen
 
 
 @OptIn(UnstableApi::class)
@@ -252,8 +256,29 @@ fun MainApp() {
             RecordAudioErrorScreen(navController = navcontroller)
         }
 
+        composable<ALLVIDEOSFORSPEEDSCREEN> {
+            GetAllVideoForSpeedScreen(navController = navcontroller)
+        }
+
+        composable<VIDEOSPEEDSCREEN> { backstackEntry ->
+            val data: VIDEOSPEEDSCREEN = backstackEntry.toRoute()
+            VideoSpeedScreen(
+                navController = navcontroller,
+                uri = data.uri,
+                videoDuration = data.videoDuration,
+                videoName = data.videoName
+            )
+        }
+
+        composable<VIDEOSPEEDSUCCESSSTATE> {
+            VideoSpeedSuccessScreen(navController = navcontroller)
+        }
+
+        composable<VIDEOSPEEDERRORSTATE> {
+            VideoSpeedErrorScreen(navController = navcontroller)
+        }
+
     }
 
 
 }
-

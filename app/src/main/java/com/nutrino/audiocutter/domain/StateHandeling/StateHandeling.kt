@@ -30,6 +30,12 @@ data class AudioExtractorState(
     val error: String ? = null
 )
 
+data class VideoSpeedState(
+    val isLoading: Boolean = false,
+    val data: String = "",
+    val error: String? = null
+)
+
 data class GetAllSongState(
     val isLoading: Boolean = false,
     val data: List<Song> = emptyList(),

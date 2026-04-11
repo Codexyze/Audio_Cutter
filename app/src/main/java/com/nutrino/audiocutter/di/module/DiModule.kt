@@ -12,6 +12,7 @@ import com.nutrino.audiocutter.data.RepoImpl.MultiCropAudioRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropVideoRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.RecordAudioRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoRepImpl
+import com.nutrino.audiocutter.data.RepoImpl.VideoSpeedRepoImpl
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
 import com.nutrino.audiocutter.domain.Repository.ConvertAudioFormatRepository
@@ -20,6 +21,8 @@ import com.nutrino.audiocutter.domain.Repository.MultiCropAudioRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
 import com.nutrino.audiocutter.domain.Repository.RecordAudioRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
+import com.nutrino.audiocutter.domain.Repository.VideoSpeedRepository
+import com.nutrino.audiocutter.domain.UseCases.ChangeVideoSpeedUseCase
 import com.nutrino.audiocutter.domain.UseCases.ConvertAudioFormatUseCase
 import com.nutrino.audiocutter.domain.UseCases.GetAllSongsForMergeUseCase
 import com.nutrino.audiocutter.domain.UseCases.GetAllVideoUseCase
@@ -75,6 +78,17 @@ object DiModule {
     @Provides
     fun provideVideoRepo(@ApplicationContext context: Context): VideoRepository {
         return VideoRepImpl(context = context)
+    }
+
+    @UnstableApi
+    @Provides
+    fun provideVideoSpeedRepo(@ApplicationContext context: Context): VideoSpeedRepository {
+        return VideoSpeedRepoImpl(context = context)
+    }
+
+    @Provides
+    fun provideChangeVideoSpeedUseCase(repository: VideoSpeedRepository): ChangeVideoSpeedUseCase {
+        return ChangeVideoSpeedUseCase(repository = repository)
     }
 
     @Provides
