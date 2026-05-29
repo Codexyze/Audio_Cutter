@@ -3,6 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/Codexyze/Audio_Cutter?style=for-the-badge&color=blue)](https://github.com/Codexyze/Audio_Cutter/releases)
 [![License](https://img.shields.io/github/license/Codexyze/Audio_Cutter?style=for-the-badge&color=lightgray)](LICENSE)
 
+
 A smooth, modern and powerful **audio & video editing app** built with Jetpack Compose, ExoPlayer, and Media3 Transformer.  
 It lets users **trim audio & video, extract audio from videos, merge audio tracks, multi-crop audio & video, convert audio formats, and record audio from the microphone** — all locally on device.  
 This project follows **Clean Architecture + MVVM + Hilt**, making it modular, testable, and scalable.
@@ -15,6 +16,8 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
 >  
 > 🎶 This project is a **sub-feature** of my main music app **LHYTHM**:  
 > 👉 https://github.com/Codexyze/Lhythm
+> 🎶 Offical Website for this product :  
+> 👉 https://codexyze.github.io/audiocutterwebpage.html
 
 ---
 
