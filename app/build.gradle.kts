@@ -40,8 +40,8 @@ android {
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 37
-        versionCode = 24
-        versionName = "speed-feature"
+        versionCode = 26
+        versionName = "lib-update"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
