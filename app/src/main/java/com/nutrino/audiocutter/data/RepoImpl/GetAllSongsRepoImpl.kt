@@ -161,7 +161,7 @@ class GetAllSongsRepoImpl @Inject constructor(private val context: Context): Get
             }
 
             // Create sequence of edited media items
-            val sequence = EditedMediaItemSequence(editedMediaItems)
+            val sequence = EditedMediaItemSequence.Builder(editedMediaItems).build()
 
             // Create composition from sequence
             val composition = Composition.Builder(listOf(sequence)).build()

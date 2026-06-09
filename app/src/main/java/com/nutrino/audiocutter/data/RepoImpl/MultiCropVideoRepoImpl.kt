@@ -94,8 +94,6 @@ class MultiCropVideoRepoImpl @Inject constructor(
             val transformer = Transformer.Builder(context)
                 .setVideoMimeType(MimeTypes.VIDEO_H264) // Output format: H264 video
                 .setAudioMimeType(MimeTypes.AUDIO_AAC) // Output format: AAC audio (ensures compatibility with non-AAC input like Vorbis, Opus, AMR)
-                .setRemoveAudio(false) // Keep audio track
-                .setRemoveVideo(false) // Keep video track
                 .addListener(object : Transformer.Listener {
                     //  On successful completion
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
