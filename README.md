@@ -11,11 +11,14 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
 > 📦 **Latest Stable Release:**  
 > 👉 [Version 2.0.0](https://github.com/Codexyze/Audio_Cutter/releases)  
 >  
+---
 > 🚀 Audio Cutter is now **live on the Play Store**:  
 > 👉 https://play.google.com/store/apps/details?id=com.nutrino.audiocutter  
->  
+> 
+---
 > 🎶 This project is a **sub-feature** of my main music app **LHYTHM**:  
 > 👉 https://github.com/Codexyze/Lhythm
+---
 > 🎶 Offical Website for this product :  
 > 👉 https://codexyze.github.io/audiocutterwebpage.html
 
