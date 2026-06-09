@@ -79,7 +79,7 @@ fun VideoSpeedScreen(
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
 
-    val outputName = rememberSaveable { mutableStateOf("") }
+    val outputName = rememberSaveable { mutableStateOf("file-name") }
     val adShown = rememberSaveable { mutableStateOf(false) }
 
     var speedValue by rememberSaveable { mutableStateOf(1f) }

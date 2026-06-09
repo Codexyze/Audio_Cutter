@@ -72,7 +72,7 @@ fun ConvertAudioFormatScreen(
     )
 
     // State
-    val filename = rememberSaveable { mutableStateOf("") }
+    val filename = rememberSaveable { mutableStateOf("file-name") }
     var selectedFormatIndex by rememberSaveable { mutableStateOf(0) }
     var dropdownExpanded by remember { mutableStateOf(false) }
     val adShown = rememberSaveable { mutableStateOf(false) }

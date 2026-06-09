@@ -85,7 +85,7 @@ fun RecordAudioScreen(
     val context = LocalContext.current
     val recordState by recordAudioViewModel.recordAudioState.collectAsState()
 
-    val filename = rememberSaveable { mutableStateOf("") }
+    val filename = rememberSaveable { mutableStateOf("file-name") }
     val adShown = rememberSaveable { mutableStateOf(false) }
     var hasPermission by rememberSaveable { mutableStateOf(false) }
 

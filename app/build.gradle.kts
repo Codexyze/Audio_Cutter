@@ -28,7 +28,7 @@ val revenueCatApiKey: String = project.findProperty("REVENUE_CAT_API_KEY") as St
 
 android {
     namespace = "com.nutrino.audiocutter"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
@@ -39,7 +39,7 @@ android {
         buildConfigField("String","REVENUE_CAT_API_KEY","\"$revenueCatApiKey\"")
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 24
         versionName = "speed-feature"
 
@@ -108,9 +108,9 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.57.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation("androidx.core:core-splashscreen:1.2.0")
     //ads
-    implementation("com.google.android.gms:play-services-ads:24.7.0")
+    implementation("com.google.android.gms:play-services-ads:25.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
 
     //Room
@@ -120,8 +120,8 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
 
     //RevenueCat
-    implementation("com.revenuecat.purchases:purchases:9.27.0")
-    implementation("com.revenuecat.purchases:purchases-ui:9.27.0")
+    implementation("com.revenuecat.purchases:purchases:10.7.0")
+    implementation("com.revenuecat.purchases:purchases-ui:10.7.0")
 
     //DataPrefStore
     implementation("androidx.datastore:datastore-preferences:1.2.1")

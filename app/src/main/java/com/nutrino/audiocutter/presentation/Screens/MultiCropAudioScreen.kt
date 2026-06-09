@@ -64,7 +64,7 @@ fun MultiCropAudioScreen(
     val endValue = rememberSaveable { mutableStateOf(songDuration.toFloat()) }
 
     // Filename state
-    val filename = rememberSaveable { mutableStateOf("") }
+    val filename = rememberSaveable { mutableStateOf("file-name") }
 
     // Collected segments from ViewModel
     val segments by multiCropViewModel.segments.collectAsState()

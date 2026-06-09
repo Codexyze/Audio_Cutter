@@ -74,22 +74,6 @@ fun AudioTrimmerScreen(
 ) {
     val context = LocalContext.current
 
-    // 🎚️ Range slider for start and end time selection
-    val startValue = rememberSaveable { mutableStateOf(0f) }
-    val endValue = rememberSaveable { mutableStateOf(songDuration.toFloat()) }
-
-    val filename = rememberSaveable { mutableStateOf("") }
-
-    // Flag to ensure ad only attempts once per successful trim
-    val adShown = rememberSaveable { mutableStateOf(false) }
-
-    // ✅ Convert slider values to seconds
-    val startTime = startValue.value.toLong()
-    val endTime = endValue.value.toLong()
-
-    val audioTrimState = audioTrimViewModel.audioTrimmerState.collectAsState()
-    val upsertRecentState = recentViewModel.upsertRecentEntryState.collectAsState()
-
     // Helper function to format time from seconds to MM:SS or HH:MM:SS
     fun formatTime(seconds: Long): String {
         val hours = seconds / 3600
@@ -101,6 +85,41 @@ fun AudioTrimmerScreen(
             String.format(Locale.getDefault(), "%d:%02d", minutes, secs)
         }
     }
+
+    // Helper function to parse time string (HH:MM:SS or MM:SS or SS) to milliseconds
+    fun parseTimeToMillis(timeStr: String): Long? {
+        return try {
+            val parts = timeStr.split(":").map { it.trim().toLong() }
+            when (parts.size) {
+                1 -> parts[0] * 1000L // SS
+                2 -> (parts[0] * 60 + parts[1]) * 1000L // MM:SS
+                3 -> (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000L // HH:MM:SS
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    // 🎚️ Range slider for start and end time selection
+    val startValue = rememberSaveable { mutableStateOf(0f) }
+    val endValue = rememberSaveable { mutableStateOf(songDuration.toFloat()) }
+
+    // Manual time entry states (HH:MM:SS or MM:SS)
+    val startText = rememberSaveable { mutableStateOf(formatTime(0)) }
+    val endText = rememberSaveable { mutableStateOf(formatTime(songDuration / 1000)) }
+
+    val filename = rememberSaveable { mutableStateOf("file-name") }
+
+    // Flag to ensure ad only attempts once per successful trim
+    val adShown = rememberSaveable { mutableStateOf(false) }
+
+    // ✅ Convert slider values to seconds
+    val startTime = startValue.value.toLong()
+    val endTime = endValue.value.toLong()
+
+    val audioTrimState = audioTrimViewModel.audioTrimmerState.collectAsState()
+    val upsertRecentState = recentViewModel.upsertRecentEntryState.collectAsState()
 
     LaunchedEffect(uri) {
         mediaPlayerViewModel.initializePlayer(uri.toUri())
@@ -233,11 +252,57 @@ fun AudioTrimmerScreen(
                     onValueChange = {
                         startValue.value = it.start
                         endValue.value = it.endInclusive
+                        // Update text fields when slider moves
+                        startText.value = formatTime(it.start.toLong() / 1000)
+                        endText.value = formatTime(it.endInclusive.toLong() / 1000)
                     },
                     valueRange = 0f..songDuration.toFloat(),
                     steps = 0, // Always allow slider to work, even for songDuration = 0
                     modifier = Modifier.fillMaxWidth(0.85f)
                 )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                ) {
+                    OutlinedTextField(
+                        value = startText.value,
+                        onValueChange = { newValue ->
+                            startText.value = newValue
+                            val parsed = parseTimeToMillis(newValue)
+                            if (parsed != null) {
+                                val milli = parsed.toFloat()
+                                if (milli >= 0 && milli < endValue.value) {
+                                    startValue.value = milli
+                                }
+                            }
+                        },
+                        label = { Text("Start (HH:MM:SS)", fontSize = 12.sp) },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
+                    )
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    OutlinedTextField(
+                        value = endText.value,
+                        onValueChange = { newValue ->
+                            endText.value = newValue
+                            val parsed = parseTimeToMillis(newValue)
+                            if (parsed != null) {
+                                val milli = parsed.toFloat()
+                                if (milli > startValue.value && milli <= songDuration) {
+                                    endValue.value = milli
+                                }
+                            }
+                        },
+                        label = { Text("End (HH:MM:SS)", fontSize = 12.sp) },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(0.85f)
