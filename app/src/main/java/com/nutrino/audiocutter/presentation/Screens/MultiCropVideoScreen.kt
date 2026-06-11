@@ -62,7 +62,7 @@ fun MultiCropVideoScreen(
     val endValue = rememberSaveable { mutableStateOf(videoDuration.toFloat()) }
 
     // Filename state
-    val filename = rememberSaveable { mutableStateOf("file-name") }
+    val filename = rememberSaveable { mutableStateOf("MultiCrop $videoName") }
 
     // Collected segments from ViewModel
     val segments by multiCropViewModel.segments.collectAsState()

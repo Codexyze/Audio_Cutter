@@ -108,7 +108,7 @@ fun VideoTrimmerScreen(
     val startText = rememberSaveable { mutableStateOf(formatTime(0)) }
     val endText = rememberSaveable { mutableStateOf(formatTime(videoDuration / 1000)) }
 
-    val filename = rememberSaveable { mutableStateOf("file-name") }
+    val filename = rememberSaveable { mutableStateOf("Trimmed $videoName") }
 
     // Flag to ensure ad only attempts once per successful trim
     val adShown = rememberSaveable { mutableStateOf(false) }

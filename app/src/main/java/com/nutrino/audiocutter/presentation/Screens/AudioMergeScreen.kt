@@ -69,7 +69,7 @@ fun AudioMergeScreen(
 ) {
     val context = LocalContext.current
 
-    val filename = rememberSaveable { mutableStateOf("file-name") }
+    val filename = rememberSaveable { mutableStateOf("Merged ${songNames.getOrNull(0) ?: ""}") }
     val adShown = rememberSaveable { mutableStateOf(false) }
 
     val audioMergeState = audioMergeViewModel.audioMergeState.collectAsState()

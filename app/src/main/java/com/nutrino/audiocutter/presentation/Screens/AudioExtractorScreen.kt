@@ -77,7 +77,7 @@ fun AudioExtractorScreen(
     val startValue = rememberSaveable { mutableStateOf(0f) }
     val endValue = rememberSaveable { mutableStateOf(videoDuration.toFloat()) }
 
-    val filename = rememberSaveable { mutableStateOf("file-name") }
+    val filename = rememberSaveable { mutableStateOf("Extracted $videoName") }
 
     // Flag to ensure ad only attempts once per successful extraction
     val adShown = rememberSaveable { mutableStateOf(false) }

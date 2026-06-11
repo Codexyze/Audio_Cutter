@@ -109,12 +109,12 @@ fun AudioTrimmerScreen(
     val startText = rememberSaveable { mutableStateOf(formatTime(0)) }
     val endText = rememberSaveable { mutableStateOf(formatTime(songDuration / 1000)) }
 
-    val filename = rememberSaveable { mutableStateOf("file-name") }
+    val filename = rememberSaveable { mutableStateOf("Trimmed $songName") }
 
     // Flag to ensure ad only attempts once per successful trim
     val adShown = rememberSaveable { mutableStateOf(false) }
 
-    // ✅ Convert slider values to seconds
+    //  Convert slider values to seconds
     val startTime = startValue.value.toLong()
     val endTime = endValue.value.toLong()
 
@@ -237,7 +237,7 @@ fun AudioTrimmerScreen(
                 )
             }
 
-            // 🎚️ RANGE SLIDER FOR TRIMMING
+            //  RANGE SLIDER FOR TRIMMING
             item {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
