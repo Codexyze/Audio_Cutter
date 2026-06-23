@@ -146,3 +146,19 @@ object VIDEOSPEEDSUCCESSSTATE
 
 @Serializable
 object VIDEOSPEEDERRORSTATE
+
+@Serializable
+object ALLAUDIOFORSPEEDSCREEN
+
+@Serializable
+data class AUDIOSPEEDSCREEN(
+    val uri: String,
+    val songDuration: Long,
+    val songName: String
+)
+
+@Serializable
+object AUDIOSPEEDSUCCESSSTATE
+
+@Serializable
+object AUDIOSPEEDERRORSTATE

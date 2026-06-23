@@ -5,6 +5,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.nutrino.audiocutter.core.MediaPlayerManager
 import com.nutrino.audiocutter.data.RepoImpl.AdsRepositoryImpl
+import com.nutrino.audiocutter.data.RepoImpl.AudioSpeedRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.AudioTimmerRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.ConvertAudioFormatRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.GetAllSongsRepoImpl
@@ -14,6 +15,7 @@ import com.nutrino.audiocutter.data.RepoImpl.RecordAudioRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoRepImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoSpeedRepoImpl
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
+import com.nutrino.audiocutter.domain.Repository.AudioSpeedRepository
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
 import com.nutrino.audiocutter.domain.Repository.ConvertAudioFormatRepository
 import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
@@ -22,6 +24,7 @@ import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
 import com.nutrino.audiocutter.domain.Repository.RecordAudioRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
 import com.nutrino.audiocutter.domain.Repository.VideoSpeedRepository
+import com.nutrino.audiocutter.domain.UseCases.ChangeAudioSpeedUseCase
 import com.nutrino.audiocutter.domain.UseCases.ChangeVideoSpeedUseCase
 import com.nutrino.audiocutter.domain.UseCases.ConvertAudioFormatUseCase
 import com.nutrino.audiocutter.domain.UseCases.GetAllSongsForMergeUseCase
@@ -173,6 +176,17 @@ object DiModule {
     @Provides
     fun provideRecordAudioUseCase(repository: RecordAudioRepository): RecordAudioUseCase {
         return RecordAudioUseCase(repository = repository)
+    }
+
+    @UnstableApi
+    @Provides
+    fun provideAudioSpeedRepo(@ApplicationContext context: Context): AudioSpeedRepository {
+        return AudioSpeedRepoImpl(context = context)
+    }
+
+    @Provides
+    fun provideChangeAudioSpeedUseCase(repository: AudioSpeedRepository): ChangeAudioSpeedUseCase {
+        return ChangeAudioSpeedUseCase(repository = repository)
     }
 
 }

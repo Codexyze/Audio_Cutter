@@ -18,7 +18,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
-import com.nutrino.audiocutter.domain.Repository.VideoSpeedRepository
+import com.nutrino.audiocutter.domain.Repository.AudioSpeedRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -27,11 +27,11 @@ import java.io.File
 import javax.inject.Inject
 
 @UnstableApi
-class VideoSpeedRepoImpl @Inject constructor(
+class AudioSpeedRepoImpl @Inject constructor(
     private val context: Context
-) : VideoSpeedRepository {
+) : AudioSpeedRepository {
 
-    override suspend fun ChangeVideoSpeed(
+    override suspend fun ChangeAudioSpeed(
         uri: Uri,
         speed: Float,
         filename: String
@@ -64,14 +64,13 @@ class VideoSpeedRepoImpl @Inject constructor(
                 .setSpeed(speedProvider)
                 .build()
 
-            val outputFile = File(context.cacheDir, "$filename.mp4")
+            val outputFile = File(context.cacheDir, "$filename.m4a")
 
             val transformer = Transformer.Builder(context)
-                .setVideoMimeType(MimeTypes.VIDEO_H264)
                 .setAudioMimeType(MimeTypes.AUDIO_AAC)
                 .addListener(object : Transformer.Listener {
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
-                        val savedUri = saveVideoFile(
+                        val savedUri = saveAudioFile(
                             sourceFile = outputFile,
                             displayName = "${filename}_${System.currentTimeMillis()}"
                         )
@@ -79,7 +78,7 @@ class VideoSpeedRepoImpl @Inject constructor(
                         if (savedUri != null) {
                             resultChannel.trySend(ResultState.Success(savedUri.toString()))
                         } else {
-                            resultChannel.trySend(ResultState.Error("Failed to save output video"))
+                            resultChannel.trySend(ResultState.Error("Failed to save output audio"))
                         }
                     }
 
@@ -89,7 +88,7 @@ class VideoSpeedRepoImpl @Inject constructor(
                         exportException: ExportException
                     ) {
                         resultChannel.trySend(
-                            ResultState.Error(exportException.message ?: "Failed to change video speed")
+                            ResultState.Error(exportException.message ?: "Failed to change audio speed")
                         )
                     }
                 })
@@ -104,7 +103,7 @@ class VideoSpeedRepoImpl @Inject constructor(
         }
     }
 
-    private fun saveVideoFile(sourceFile: File, displayName: String): Uri? {
+    private fun saveAudioFile(sourceFile: File, displayName: String): Uri? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             saveToDownloads(sourceFile, displayName)
         } else {
@@ -116,8 +115,8 @@ class VideoSpeedRepoImpl @Inject constructor(
     private fun saveToDownloads(sourceFile: File, displayName: String): Uri? {
         val resolver = context.contentResolver
         val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, "$displayName.mp4")
-            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+            put(MediaStore.MediaColumns.DISPLAY_NAME, "$displayName.m4a")
+            put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp4")
             put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
             put(MediaStore.MediaColumns.IS_PENDING, 1)
         }
@@ -153,7 +152,7 @@ class VideoSpeedRepoImpl @Inject constructor(
             downloadsDir.mkdirs()
         }
 
-        val targetFile = File(downloadsDir, "$displayName.mp4")
+        val targetFile = File(downloadsDir, "$displayName.m4a")
 
         return try {
             sourceFile.inputStream().use { input ->
@@ -169,9 +168,8 @@ class VideoSpeedRepoImpl @Inject constructor(
     }
 
     companion object {
-        private const val TAG = "VideoSpeedRepoImpl"
+        private const val TAG = "AudioSpeedRepoImpl"
         private const val MIN_SPEED = 0.25f
         private const val MAX_SPEED = 3.0f
     }
 }
-

@@ -72,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.BuildConfig
+import com.nutrino.audiocutter.presentation.Navigation.ALLAUDIOFORSPEEDSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.ALLAUDIOFORMERGESCREEN
 import com.nutrino.audiocutter.presentation.Navigation.ALLSONGSFORCONVERTAUDIOFORMATSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.ALLSONGSFORMULTICROPSCREEN
@@ -119,6 +120,7 @@ fun SelectFeatureScreen(
         FeatureItem("Audio Trimmer", Icons.Default.ContentCut),
         FeatureItem("Video Trimmer", Icons.Default.VideoLibrary),
         FeatureItem("Video Speed", Icons.Default.VideoLibrary),
+        FeatureItem("Audio Speed", Icons.Default.MusicNote),
         FeatureItem("Audio Extractor", Icons.Default.GraphicEq),
         FeatureItem("Audio Merge", Icons.Default.MusicNote),
         FeatureItem("Multi Crop Audio", Icons.Default.ContentCut),
@@ -181,44 +183,50 @@ fun SelectFeatureScreen(
                                     navController.navigate(ALLVIDEOSFORSPEEDSCREEN)
                                 }
                                 feature == features[3] -> {
+                                    // Audio Speed
+                                    navController.navigate(ALLAUDIOFORSPEEDSCREEN)
+                                }
+                                feature == features[4] -> {
                                     // Audio Extractor
                                     navController.navigate(ALLVIDEOFORAUDIOEXTRACTSCREEN)
                                 }
-                                feature == features[4] -> {
+                                feature == features[5] -> {
                                     // Audio Track Merge
                                     navController.navigate(ALLAUDIOFORMERGESCREEN)
                                 }
-                                feature == features[5] -> {
+                                feature == features[6] -> {
                                     // Multi Crop Audio
                                     navController.navigate(ALLSONGSFORMULTICROPSCREEN)
                                 }
-                                feature == features[6] -> {
+                                feature == features[7] -> {
                                     // Multi Crop Video
                                     navController.navigate(ALLVIDEOSFORMULTICROPSCREEN)
                                 }
-                                feature == features[7] -> {
+                                feature == features[8] -> {
                                     // Convert Audio Format
                                     navController.navigate(ALLSONGSFORCONVERTAUDIOFORMATSCREEN)
                                 }
-                                feature == features[8] -> {
+                                feature == features[9] -> {
                                     // Record Audio
                                     navController.navigate(RECORDAUDIOSCREEN)
                                 }
-                                feature == features[9] -> {
+                                feature == features[10] -> {
                                     // Recent
                                     navController.navigate(RECENTSCREEN)
                                 }
-                                feature == features[10] -> {
+                                feature == features[11] -> {
+                                    // Pro
                                    navController.navigate(PROPACKAGESCREEN)
                                 }
-                                feature == features[11] -> {
+                                feature == features[12] -> {
+                                    // Theme
                                     navController.navigate(THEMESELECTIONSCREEN)
                                 }
-                                feature == features[12] -> {
+                                feature == features[13] -> {
                                     // FeedBack Ads
                                     showFeedbackDialog = true
                                 }
-                                feature == features[13] -> {
+                                feature == features[14] -> {
                                     // Privacy Policy
                                     val intent = Intent(Intent.ACTION_VIEW).apply {
                                         data =
@@ -226,7 +234,7 @@ fun SelectFeatureScreen(
                                     }
                                     context.startActivity(intent)
                                 }
-                                feature == features[14] -> {
+                                feature == features[15] -> {
                                     // Feature Request
                                     val intent = Intent(Intent.ACTION_SENDTO).apply {
                                         data = "mailto:${BuildConfig.FEEDBACK_EMAIL}".toUri()

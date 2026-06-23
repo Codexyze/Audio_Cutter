@@ -21,7 +21,11 @@ import com.nutrino.audiocutter.presentation.Screens.BuyProPackageScreen
 import com.nutrino.audiocutter.presentation.Screens.ConvertAudioFormatErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.ConvertAudioFormatScreen
 import com.nutrino.audiocutter.presentation.Screens.ConvertAudioFormatSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioSpeedScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioSpeedSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioSpeedErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllAudioForMergeScreen
+import com.nutrino.audiocutter.presentation.Screens.GetAllAudioForSpeedScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllSongsForConvertAudioFormatScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllSongsForMultiCropScreen
 import com.nutrino.audiocutter.presentation.Screens.GetAllVideoForAudioExtractScreen
@@ -276,6 +280,28 @@ fun MainApp() {
 
         composable<VIDEOSPEEDERRORSTATE> {
             VideoSpeedErrorScreen(navController = navcontroller)
+        }
+
+        composable<ALLAUDIOFORSPEEDSCREEN> {
+            GetAllAudioForSpeedScreen(navController = navcontroller)
+        }
+
+        composable<AUDIOSPEEDSCREEN> { backstackEntry ->
+            val data: AUDIOSPEEDSCREEN = backstackEntry.toRoute()
+            AudioSpeedScreen(
+                navController = navcontroller,
+                uri = data.uri,
+                songDuration = data.songDuration,
+                songName = data.songName
+            )
+        }
+
+        composable<AUDIOSPEEDSUCCESSSTATE> {
+            AudioSpeedSuccessScreen(navController = navcontroller)
+        }
+
+        composable<AUDIOSPEEDERRORSTATE> {
+            AudioSpeedErrorScreen(navController = navcontroller)
         }
 
     }
