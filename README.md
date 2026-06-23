@@ -55,6 +55,18 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
 - ⏱️ **Slider-based start and end time selection**  
 - 💾 **Save trimmed videos with custom filename**  
 
+### Audio Speed
+- ⏩ **Change playback speed of audio files**
+- 🎧 **Preview audio at different speeds**
+- 📋 **Select from presets (0.25x to 3.0x) or enter custom speed**
+- 💾 **Save speed-adjusted audio with custom filename**
+
+### Video Speed
+- ⏩ **Change playback speed of video files**
+- 📹 **Real-time video preview at different speeds**
+- 📋 **Select from presets (0.25x to 3.0x) or enter custom speed**
+- 💾 **Save speed-adjusted video with custom filename**
+
 ### Audio Extractor
 - 🎵 **Extract audio from video files**  
 - 🎧 **Select specific time range to extract**  
@@ -94,10 +106,23 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
 - 🎵 **Animated mic indicator during recording**  
 - 💾 **Save recordings as M4A to Music/AudioCutter**  
 
+### Recent Works
+- 📂 **Access all your previously edited audio and video files**
+- 🔍 **Search through your history by filename or feature type**
+- 🎵 **Set any edited audio as your Ringtone or Notification sound**
+- 🗑️ **Manage storage by deleting old processed files**
+- ◀️ **Re-edit multi-crop segments easily**
+
+### Theme Selection (Pro)
+- 🎨 **Personalize the app with multiple color themes**
+- ✨ **Choose from Red, Green, Blue, Yellow, Purple, Pink, and Orange**
+- 🚀 **Updates the entire app UI instantly**
+
 ### General
 - ⚡ **Fast performance with clean UI**  
 - 🔐 **Local processing — your files stay on device**  
 - 🧪 Built using modern Android stack + clean architecture  
+- 💎 **Pro Version** — Unlock premium features like Theme Selection and ad-free experience
 - 📢 **AdMob integration** — Banner ads & Interstitial ads  
 - 💛 **Support the developer** — optional ad-watching via FeedBack Ads  
 - 🔒 **Privacy Policy** accessible from the app  
@@ -187,6 +212,22 @@ com.nutrino.audiocutter
 5. Tap **Trim Video**  
 6. Trimmed video is saved 🎉  
 
+### Audio Speed
+1. Select **Audio Speed** from main menu
+2. Choose an audio file from storage
+3. Use the **slider** or **dropdown** to adjust speed
+4. Enter output filename
+5. Tap **Apply Speed**
+6. Speed-adjusted audio is saved 🎉
+
+### Video Speed
+1. Select **Video Speed** from main menu
+2. Choose a video file from storage
+3. Use the **slider** or **dropdown** to adjust speed
+4. Enter output filename
+5. Tap **Apply Speed**
+6. Speed-adjusted video is saved 🎉
+
 ### Audio Extractor
 1. Select any video file from storage  
 2. Video preview loads  
@@ -238,6 +279,18 @@ com.nutrino.audiocutter
 5. Use **pause/resume** to control the recording  
 6. Tap **stop** when finished  
 7. Recording saved as M4A to Music/AudioCutter 🎉  
+
+### Theme Selection
+1. Tap **Theme** from main menu
+2. Choose your favorite color from the grid (Requires Pro)
+3. App theme updates immediately 🎉
+
+### Recent Works
+1. Select **Recent** from main menu
+2. View all your saved creations
+3. Tap a card to **play** the file
+4. Use the **Notifications icon** to set as Ringtone
+5. Use the **Search bar** to find specific files
 
 ---
 
