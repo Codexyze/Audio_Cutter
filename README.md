@@ -67,6 +67,11 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
 - 📋 **Select from presets (0.25x to 3.0x) or enter custom speed**
 - 💾 **Save speed-adjusted video with custom filename**
 
+### Mute Video
+- 🔇 **Remove audio from any video file**
+- 📹 **Preview video before muting**
+- 💾 **Save muted video with custom filename**
+
 ### Audio Extractor
 - 🎵 **Extract audio from video files**  
 - 🎧 **Select specific time range to extract**  
@@ -227,6 +232,14 @@ com.nutrino.audiocutter
 4. Enter output filename
 5. Tap **Apply Speed**
 6. Speed-adjusted video is saved 🎉
+
+### Mute Video
+1. Select **Mute Video** from main menu
+2. Choose a video file from storage
+3. Preview the video
+4. Enter output filename
+5. Tap **Mute Video**
+6. Muted video is saved 🎉
 
 ### Audio Extractor
 1. Select any video file from storage  

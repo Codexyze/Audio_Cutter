@@ -53,6 +53,10 @@ import com.nutrino.audiocutter.presentation.Screens.VideoTrimmerScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoSpeedScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoSpeedSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.VideoSpeedErrorScreen
+import com.nutrino.audiocutter.presentation.Screens.GetAllVideosForMuteScreen
+import com.nutrino.audiocutter.presentation.Screens.MuteVideoScreen
+import com.nutrino.audiocutter.presentation.Screens.MuteVideoSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.MuteVideoErrorScreen
 
 
 @OptIn(UnstableApi::class)
@@ -302,6 +306,28 @@ fun MainApp() {
 
         composable<AUDIOSPEEDERRORSTATE> {
             AudioSpeedErrorScreen(navController = navcontroller)
+        }
+
+        composable<ALLVIDEOSFORMUTESCREEN> {
+            GetAllVideosForMuteScreen(navController = navcontroller)
+        }
+
+        composable<MUTEVIDEOSCREEN> { backstackEntry ->
+            val data: MUTEVIDEOSCREEN = backstackEntry.toRoute()
+            MuteVideoScreen(
+                navController = navcontroller,
+                uri = data.uri,
+                videoDuration = data.videoDuration,
+                videoName = data.videoName
+            )
+        }
+
+        composable<MUTEVIDEOSUCCESSSTATE> {
+            MuteVideoSuccessScreen(navController = navcontroller)
+        }
+
+        composable<MUTEVIDEOERRORSTATE> {
+            MuteVideoErrorScreen(navController = navcontroller)
         }
 
     }

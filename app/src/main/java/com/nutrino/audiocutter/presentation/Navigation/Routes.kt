@@ -135,7 +135,17 @@ object RECORDAUDIOERRORSTATE
 object ALLVIDEOSFORSPEEDSCREEN
 
 @Serializable
+object ALLVIDEOSFORMUTESCREEN
+
+@Serializable
 data class VIDEOSPEEDSCREEN(
+    val uri: String,
+    val videoDuration: Long,
+    val videoName: String
+)
+
+@Serializable
+data class MUTEVIDEOSCREEN(
     val uri: String,
     val videoDuration: Long,
     val videoName: String
@@ -146,6 +156,12 @@ object VIDEOSPEEDSUCCESSSTATE
 
 @Serializable
 object VIDEOSPEEDERRORSTATE
+
+@Serializable
+object MUTEVIDEOSUCCESSSTATE
+
+@Serializable
+object MUTEVIDEOERRORSTATE
 
 @Serializable
 object ALLAUDIOFORSPEEDSCREEN

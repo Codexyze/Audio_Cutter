@@ -12,6 +12,7 @@ import com.nutrino.audiocutter.data.RepoImpl.GetAllSongsRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropAudioRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropVideoRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.RecordAudioRepoImpl
+import com.nutrino.audiocutter.data.RepoImpl.MuteVideoRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoRepImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoSpeedRepoImpl
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
@@ -21,6 +22,7 @@ import com.nutrino.audiocutter.domain.Repository.ConvertAudioFormatRepository
 import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropAudioRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
+import com.nutrino.audiocutter.domain.Repository.MuteVideoRepository
 import com.nutrino.audiocutter.domain.Repository.RecordAudioRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
 import com.nutrino.audiocutter.domain.Repository.VideoSpeedRepository
@@ -33,6 +35,7 @@ import com.nutrino.audiocutter.domain.UseCases.LoadAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.MergeSongsUseCase
 import com.nutrino.audiocutter.domain.UseCases.MultiCropAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.MultiCropVideoUseCase
+import com.nutrino.audiocutter.domain.UseCases.MuteVideoUseCase
 import com.nutrino.audiocutter.domain.UseCases.RecordAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.ShowAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimAudioUseCase
@@ -187,6 +190,17 @@ object DiModule {
     @Provides
     fun provideChangeAudioSpeedUseCase(repository: AudioSpeedRepository): ChangeAudioSpeedUseCase {
         return ChangeAudioSpeedUseCase(repository = repository)
+    }
+
+    @UnstableApi
+    @Provides
+    fun provideMuteVideoRepo(@ApplicationContext context: Context): MuteVideoRepository {
+        return MuteVideoRepoImpl(context = context)
+    }
+
+    @Provides
+    fun provideMuteVideoUseCase(repository: MuteVideoRepository): MuteVideoUseCase {
+        return MuteVideoUseCase(repository = repository)
     }
 
 }
