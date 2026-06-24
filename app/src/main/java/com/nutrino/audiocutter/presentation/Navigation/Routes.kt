@@ -167,6 +167,9 @@ object MUTEVIDEOERRORSTATE
 object ALLAUDIOFORSPEEDSCREEN
 
 @Serializable
+object ALLAUDIOFORVOLUMEBOOSTERSCREEN
+
+@Serializable
 data class AUDIOSPEEDSCREEN(
     val uri: String,
     val songDuration: Long,
@@ -178,3 +181,16 @@ object AUDIOSPEEDSUCCESSSTATE
 
 @Serializable
 object AUDIOSPEEDERRORSTATE
+
+@Serializable
+data class AUDIOVOLUMEBOOSTERSCREEN(
+    val uri: String,
+    val songDuration: Long,
+    val songName: String
+)
+
+@Serializable
+object AUDIOVOLUMEBOOSTERSUCCESSSTATE
+
+@Serializable
+object AUDIOVOLUMEBOOSTERRORSTATE

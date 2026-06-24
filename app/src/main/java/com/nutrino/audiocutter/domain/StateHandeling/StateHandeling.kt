@@ -214,3 +214,9 @@ data class BuyPremiumPackageState(
     val error: String? = null
 )
 
+data class AudioVolumeBoosterState(
+    val isLoading: Boolean = false,
+    val data: String = "",
+    val error: String? = null
+)
+

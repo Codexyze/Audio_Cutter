@@ -57,6 +57,10 @@ import com.nutrino.audiocutter.presentation.Screens.GetAllVideosForMuteScreen
 import com.nutrino.audiocutter.presentation.Screens.MuteVideoScreen
 import com.nutrino.audiocutter.presentation.Screens.MuteVideoSuccessScreen
 import com.nutrino.audiocutter.presentation.Screens.MuteVideoErrorScreen
+import com.nutrino.audiocutter.presentation.Screens.GetAllAudioForVolumeBoosterScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioVolumeBoosterScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioVolumeBoosterSuccessScreen
+import com.nutrino.audiocutter.presentation.Screens.AudioVolumeBoosterErrorScreen
 
 
 @OptIn(UnstableApi::class)
@@ -328,6 +332,28 @@ fun MainApp() {
 
         composable<MUTEVIDEOERRORSTATE> {
             MuteVideoErrorScreen(navController = navcontroller)
+        }
+
+        composable<ALLAUDIOFORVOLUMEBOOSTERSCREEN> {
+            GetAllAudioForVolumeBoosterScreen(navController = navcontroller)
+        }
+
+        composable<AUDIOVOLUMEBOOSTERSCREEN> { backstackEntry ->
+            val data: AUDIOVOLUMEBOOSTERSCREEN = backstackEntry.toRoute()
+            AudioVolumeBoosterScreen(
+                navController = navcontroller,
+                uri = data.uri,
+                songDuration = data.songDuration,
+                songName = data.songName
+            )
+        }
+
+        composable<AUDIOVOLUMEBOOSTERSUCCESSSTATE> {
+            AudioVolumeBoosterSuccessScreen(navController = navcontroller)
+        }
+
+        composable<AUDIOVOLUMEBOOSTERRORSTATE> {
+            AudioVolumeBoosterErrorScreen(navController = navcontroller)
         }
 
     }

@@ -12,6 +12,7 @@ import com.nutrino.audiocutter.data.RepoImpl.GetAllSongsRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropAudioRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MultiCropVideoRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.RecordAudioRepoImpl
+import com.nutrino.audiocutter.data.RepoImpl.AudioVolumeBoosterRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.MuteVideoRepoImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoRepImpl
 import com.nutrino.audiocutter.data.RepoImpl.VideoSpeedRepoImpl
@@ -24,6 +25,7 @@ import com.nutrino.audiocutter.domain.Repository.MultiCropAudioRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
 import com.nutrino.audiocutter.domain.Repository.MuteVideoRepository
 import com.nutrino.audiocutter.domain.Repository.RecordAudioRepository
+import com.nutrino.audiocutter.domain.Repository.AudioVolumeBoosterRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
 import com.nutrino.audiocutter.domain.Repository.VideoSpeedRepository
 import com.nutrino.audiocutter.domain.UseCases.ChangeAudioSpeedUseCase
@@ -37,6 +39,7 @@ import com.nutrino.audiocutter.domain.UseCases.MultiCropAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.MultiCropVideoUseCase
 import com.nutrino.audiocutter.domain.UseCases.MuteVideoUseCase
 import com.nutrino.audiocutter.domain.UseCases.RecordAudioUseCase
+import com.nutrino.audiocutter.domain.UseCases.BoostAudioVolumeUseCase
 import com.nutrino.audiocutter.domain.UseCases.ShowAdUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimAudioUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimVideoUseCase
@@ -201,6 +204,17 @@ object DiModule {
     @Provides
     fun provideMuteVideoUseCase(repository: MuteVideoRepository): MuteVideoUseCase {
         return MuteVideoUseCase(repository = repository)
+    }
+
+    @UnstableApi
+    @Provides
+    fun provideAudioVolumeBoosterRepo(@ApplicationContext context: Context): AudioVolumeBoosterRepository {
+        return AudioVolumeBoosterRepoImpl(context = context)
+    }
+
+    @Provides
+    fun provideBoostAudioVolumeUseCase(repository: AudioVolumeBoosterRepository): BoostAudioVolumeUseCase {
+        return BoostAudioVolumeUseCase(repository = repository)
     }
 
 }
