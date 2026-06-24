@@ -9,8 +9,13 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.nutrino.audiocutter.BuildConfig
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
@@ -26,7 +31,9 @@ class AdsRepositoryImpl @Inject constructor(
 ) : AdsRepository {
 
     private var interstitialAd: InterstitialAd? = null
+    private var rewardedAd: RewardedAd? = null
     private var isLoading = false
+    private var isRewardedLoading = false
     private val TAG = "AdsRepository"
 
     override suspend fun loadInterstitialAd(): Flow<ResultState<Boolean>> = callbackFlow {
@@ -107,7 +114,6 @@ class AdsRepositoryImpl @Inject constructor(
 
             override fun onAdShowedFullScreenContent() {
                 Log.d(TAG, "Ad showed fullscreen content")
-                interstitialAd = null
             }
 
             override fun onAdClicked() {
@@ -132,10 +138,107 @@ class AdsRepositoryImpl @Inject constructor(
         return ready
     }
 
+    override suspend fun loadRewardedAd(): Flow<ResultState<Boolean>> = callbackFlow {
+        if (isRewardedLoading) {
+            Log.d(TAG, "Rewarded ad is already loading")
+            trySend(ResultState.Error("Rewarded ad is already loading"))
+            close()
+            return@callbackFlow
+        }
+
+        if (rewardedAd != null) {
+            Log.d(TAG, "Rewarded ad already loaded")
+            trySend(ResultState.Success(true))
+            close()
+            return@callbackFlow
+        }
+
+        trySend(ResultState.Loading)
+        isRewardedLoading = true
+
+        val adRequest = AdRequest.Builder().build()
+        Log.d(TAG, "Starting to load rewarded ad with ID: ${BuildConfig.REWARDED_AD_ID}")
+
+        RewardedAd.load(
+            context,
+            BuildConfig.REWARDED_AD_ID,
+            adRequest,
+            object : RewardedAdLoadCallback() {
+                override fun onAdLoaded(ad: RewardedAd) {
+                    Log.d(TAG, "Rewarded ad loaded successfully")
+                    rewardedAd = ad
+                    isRewardedLoading = false
+                    trySend(ResultState.Success(true))
+                    close()
+                }
+
+                override fun onAdFailedToLoad(error: LoadAdError) {
+                    Log.e(TAG, "Failed to load rewarded ad: ${error.message}")
+                    rewardedAd = null
+                    isRewardedLoading = false
+                    trySend(ResultState.Error("Failed to load rewarded ad: ${error.message}"))
+                    close()
+                }
+            }
+        )
+
+        awaitClose {
+            isRewardedLoading = false
+        }
+    }
+
+    override suspend fun showRewardedAd(activity: Activity): Flow<ResultState<Boolean>> = callbackFlow {
+        if (rewardedAd == null) {
+            Log.w(TAG, "Rewarded ad not ready")
+            trySend(ResultState.Error("Rewarded ad not ready"))
+            close()
+            return@callbackFlow
+        }
+
+        trySend(ResultState.Loading)
+        Log.d(TAG, "Showing rewarded ad")
+
+        rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                Log.d(TAG, "Rewarded ad was dismissed by user")
+                rewardedAd = null
+                trySend(ResultState.Success(true))
+                close()
+            }
+
+            override fun onAdFailedToShowFullScreenContent(error: AdError) {
+                Log.e(TAG, "Rewarded ad failed to show: ${error.message}")
+                rewardedAd = null
+                trySend(ResultState.Error("Failed to show rewarded ad: ${error.message}"))
+                close()
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                Log.d(TAG, "Rewarded ad showed fullscreen content")
+            }
+        }
+
+        rewardedAd?.show(activity) { rewardItem ->
+            val rewardAmount = rewardItem.amount
+            val rewardType = rewardItem.type
+            Log.d(TAG, "User earned reward: $rewardAmount $rewardType")
+        }
+
+        awaitClose { }
+    }
+
+    override fun isRewardedAdReady(): Boolean {
+        val ready = rewardedAd != null
+        Log.d(TAG, "Rewarded ad ready status: $ready")
+        return ready
+    }
+
     override fun destroy() {
         Log.d(TAG, "Destroying ad reference")
         interstitialAd = null
+        rewardedAd = null
         isLoading = false
+        isRewardedLoading = false
     }
 
     override suspend fun loadBannerAd(adView: AdView): Flow<ResultState<Boolean>> = callbackFlow {

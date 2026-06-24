@@ -16,6 +16,9 @@ val admobAppId: String = project.findProperty("ADMOB_APP_ID") as? String
 val interstitialAdId: String = project.findProperty("INTERSTITIAL_AD_ID") as? String
     ?:"ca-app-pub-3940256099942544/1033173712"
 
+val rewardedAdId: String = project.findProperty("REWARDED_AD_ID") as? String
+    ?:"ca-app-pub-3940256099942544/5224354917"
+
 val feedBackAds: String = project.findProperty("FEEDBACK_EMAIL") as? String ?:"your@email.com"
 
 //test banner ad id
@@ -34,6 +37,7 @@ android {
         manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
         buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
         buildConfigField("String", "INTERSTITIAL_AD_ID", "\"$interstitialAdId\"")
+        buildConfigField("String", "REWARDED_AD_ID", "\"$rewardedAdId\"")
         buildConfigField("String","FEEDBACK_EMAIL","\"$feedBackAds\"")
         buildConfigField("String","BANNER_ADS_ID","\"$bannerAdsID\"")
         buildConfigField("String","REVENUE_CAT_API_KEY","\"$revenueCatApiKey\"")

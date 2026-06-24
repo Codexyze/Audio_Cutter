@@ -2,6 +2,7 @@ package com.nutrino.audiocutter.presentation.Screens
 
 import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -402,10 +403,14 @@ fun SelectFeatureScreen(
                                             showFeedbackDialog = false
                                             val activity = context as? Activity
                                             if (activity != null) {
-                                                adsViewModel.requestAndShowAd(
+                                                adsViewModel.requestAndShowRewardedAd(
                                                     activity = activity,
-                                                    onAdDismissed = {},
-                                                    onAdFailed = {}
+                                                    onAdDismissed = {
+                                                        Toast.makeText(context, "Thank you!", Toast.LENGTH_SHORT).show()
+                                                    },
+                                                    onAdFailed = {
+                                                        Toast.makeText(context, "Failed Loading Add..", Toast.LENGTH_SHORT).show()
+                                                    }
                                                 )
                                             }
                                         },

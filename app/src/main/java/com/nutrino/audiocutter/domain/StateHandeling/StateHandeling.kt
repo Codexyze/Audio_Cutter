@@ -106,6 +106,15 @@ data class AdState(
     val adDismissed: Boolean = false
 )
 
+data class RewardedAdState(
+    val isLoading: Boolean = false,
+    val isAdReady: Boolean = false,
+    val isAdShowing: Boolean = false,
+    val error: String? = null,
+    val adDismissed: Boolean = false,
+    val userEarnedReward: Boolean = false
+)
+
 data class GetAllRecentEntriesState(
     val isLoading: Boolean = false,
     val data: List<RecentTable> = emptyList(),

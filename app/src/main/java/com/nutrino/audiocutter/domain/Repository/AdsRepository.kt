@@ -9,6 +9,12 @@ interface AdsRepository {
     suspend fun loadInterstitialAd(): Flow<ResultState<Boolean>>
     suspend fun showInterstitialAd(activity: Activity): Flow<ResultState<Boolean>>
     fun isAdReady(): Boolean
+
+    // Rewarded Ads
+    suspend fun loadRewardedAd(): Flow<ResultState<Boolean>>
+    suspend fun showRewardedAd(activity: Activity): Flow<ResultState<Boolean>>
+    fun isRewardedAdReady(): Boolean
+
     fun destroy()
 
     // Banner Ads
