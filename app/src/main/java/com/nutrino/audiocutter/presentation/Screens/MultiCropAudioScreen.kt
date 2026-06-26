@@ -203,7 +203,7 @@ fun MultiCropAudioScreen(
                         Log.w("MultiCropAudioScreen", "Context is not an Activity")
                         navController.navigate(MULTICROPAUDIOSUCCESSSTATE)
                     } else {
-                        adsViewModel.requestAndShowAd(
+                        adsViewModel.requestAndShowRewardedAd(
                             activity = activity,
                             onAdDismissed = { navController.navigate(MULTICROPAUDIOSUCCESSSTATE) },
                             onAdFailed = { navController.navigate(MULTICROPAUDIOSUCCESSSTATE) }

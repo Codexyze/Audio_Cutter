@@ -207,7 +207,7 @@ fun AudioTrimmerScreen(
                     navController.navigate(AUDIOTRIMMERSUCCESSSTATE)
                 } else {
                     // Unified ad request (show if ready, otherwise load then show) and always navigate after
-                    adsViewModel.requestAndShowAd(
+                    adsViewModel.requestAndShowRewardedAd(
                         activity = activity,
                         onAdDismissed = { navController.navigate(AUDIOTRIMMERSUCCESSSTATE) },
                         onAdFailed = { navController.navigate(AUDIOTRIMMERSUCCESSSTATE) }

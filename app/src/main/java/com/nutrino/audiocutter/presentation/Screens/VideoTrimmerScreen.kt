@@ -208,7 +208,7 @@ fun VideoTrimmerScreen(
                     navController.navigate(VIDEOTRIMMERSUCCESSSTATE)
                 } else {
                     // Unified ad request (show if ready, otherwise load then show) and always navigate after
-                    adsViewModel.requestAndShowAd(
+                    adsViewModel.requestAndShowRewardedAd(
                         activity = activity,
                         onAdDismissed = { navController.navigate(VIDEOTRIMMERSUCCESSSTATE) },
                         onAdFailed = { navController.navigate(VIDEOTRIMMERSUCCESSSTATE) }

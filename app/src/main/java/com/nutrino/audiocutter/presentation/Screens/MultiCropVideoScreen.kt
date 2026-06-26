@@ -159,7 +159,7 @@ fun MultiCropVideoScreen(
                 }
             } else {
                 // Show ad (if ready, otherwise load then show) and always navigate after
-                adsViewModel.requestAndShowAd(
+                adsViewModel.requestAndShowRewardedAd(
                     activity = activity,
                     onAdDismissed = {
                         navController.navigate(MULTICROPVIDEOSUCCESSSTATE) {

@@ -192,7 +192,7 @@ fun AudioExtractorScreen(
                         navController.navigate(AUDIOEXTRACTORSUCCESSSTATE)
                     } else {
                         // Unified ad request (show if ready, otherwise load then show) and always navigate after
-                        adsViewModel.requestAndShowAd(
+                        adsViewModel.requestAndShowRewardedAd(
                             activity = activity,
                             onAdDismissed = { navController.navigate(AUDIOEXTRACTORSUCCESSSTATE) },
                             onAdFailed = { navController.navigate(AUDIOEXTRACTORSUCCESSSTATE) }
