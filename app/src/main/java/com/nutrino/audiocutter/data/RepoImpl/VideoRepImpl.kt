@@ -18,6 +18,7 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
 import com.nutrino.audiocutter.data.DataClass.Video
+import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +27,10 @@ import kotlinx.coroutines.flow.flow
 import java.io.File
 
 @UnstableApi
-class VideoRepImpl (private val context: Context) : VideoRepository{
+class VideoRepImpl (
+    private val context: Context,
+    private val analyticsRepository: AnalyticsRepository
+) : VideoRepository{
     override suspend fun getAllVideos(): Flow<ResultState<List<Video>>> = flow{
         val videoFiles = mutableListOf<Video>()
         emit(ResultState.Loading)
@@ -120,6 +124,7 @@ class VideoRepImpl (private val context: Context) : VideoRepository{
                 .addListener(object : Transformer.Listener {
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                         val savedUri = saveVideoFile(outputFile, "${filename}_${System.currentTimeMillis()}")
+                        analyticsRepository.logEventsNonSuspend("trim_video_success", null)
                         resultChannel.trySend(ResultState.Success(savedUri.toString())) // ✅ Send success
                     }
 
@@ -128,6 +133,9 @@ class VideoRepImpl (private val context: Context) : VideoRepository{
                         exportResult: ExportResult,
                         exportException: ExportException
                     ) {
+                        analyticsRepository.logEventsNonSuspend("trim_video_error", android.os.Bundle().apply {
+                            putString("error", exportException.message)
+                        })
                         resultChannel.trySend(ResultState.Error(exportException.message ?: "Unknown error")) // ✅ Send error
                     }
                 })
@@ -175,6 +183,7 @@ class VideoRepImpl (private val context: Context) : VideoRepository{
                 .addListener(object : Transformer.Listener {
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                         val savedUri = saveAudioFile(outputFile, "${filename}_${System.currentTimeMillis()}.m4a")
+                        analyticsRepository.logEventsNonSuspend("extract_audio_success", null)
                         resultChannel.trySend(ResultState.Success(savedUri.toString()))
                     }
 
@@ -183,6 +192,9 @@ class VideoRepImpl (private val context: Context) : VideoRepository{
                         exportResult: ExportResult,
                         exportException: ExportException
                     ) {
+                        analyticsRepository.logEventsNonSuspend("extract_audio_error", android.os.Bundle().apply {
+                            putString("error", exportException.message)
+                        })
                         resultChannel.trySend(ResultState.Error(exportException.message ?: "Audio extraction failed"))
                     }
                 })

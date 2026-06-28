@@ -2,11 +2,15 @@ package com.nutrino.audiocutter.presentation.Navigation
 
 import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.nutrino.audiocutter.presentation.ViewModel.AnalyticsViewModel
 import com.nutrino.audiocutter.presentation.Screens.AllAudioScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioExtractorErrorScreen
 import com.nutrino.audiocutter.presentation.Screens.AudioExtractorScreen
@@ -65,8 +69,23 @@ import com.nutrino.audiocutter.presentation.Screens.AudioVolumeBoosterErrorScree
 
 @OptIn(UnstableApi::class)
 @Composable
-fun MainApp() {
+fun MainApp(
+    analyticsViewModel: AnalyticsViewModel = hiltViewModel()
+) {
     val navcontroller = rememberNavController()
+
+    DisposableEffect(navcontroller) {
+        val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+            val route = destination.route?.substringBefore("?") ?: "Unknown"
+            val screenName = route.substringAfterLast(".")
+            analyticsViewModel.screenViewLog(screenName)
+        }
+        navcontroller.addOnDestinationChangedListener(listener)
+        onDispose {
+            navcontroller.removeOnDestinationChangedListener(listener)
+        }
+    }
+
     NavHost(navController = navcontroller, startDestination = SELECTFEATURESCREEN) {
 
         composable <SELECTFEATURESCREEN>{

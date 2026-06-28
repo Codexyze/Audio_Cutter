@@ -13,6 +13,9 @@ media3Transformer = "1.10.1"
 foundation = "1.11.2"
 googleGmsGoogleServices = "4.4.4"
 firebaseMessaging = "25.0.2"
+firebaseAnalytics = "23.2.0"
+firebaseCrashlytics = "20.0.6"
+googleFirebaseCrashlytics = "3.0.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,10 +36,13 @@ androidx-navigation={group="androidx.navigation",name="navigation-compose",versi
 androidx-media3-transformer = { group = "androidx.media3", name = "media3-transformer", version.ref = "media3Transformer" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
 

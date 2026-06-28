@@ -3,7 +3,7 @@ package com.nutrino.audiocutter.presentation.ViewModel
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.media3.exoplayer.ExoPlayer
-import com.nutrino.audiocutter.core.MediaPlayerManager
+import com.nutrino.audiocutter.core.media.MediaPlayerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 @HiltViewModel

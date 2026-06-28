@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import androidx.core.net.toUri
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
+import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.RecordAudioRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @UnstableApi
 class RecordAudioRepoImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val analyticsRepository: AnalyticsRepository
 ) : RecordAudioRepository {
 
     private var mediaRecorder: MediaRecorder? = null
@@ -109,16 +111,26 @@ class RecordAudioRepoImpl @Inject constructor(
                     "audio/mp4"
                 )
                 if (savedUri != null) {
+                    analyticsRepository.logEventsNonSuspend("record_audio_success", null)
                     emit(ResultState.Success(savedUri.toString()))
                 } else {
+                    analyticsRepository.logEventsNonSuspend("record_audio_error", android.os.Bundle().apply {
+                        putString("error", "Failed to save recording")
+                    })
                     emit(ResultState.Error("Failed to save recording"))
                 }
             } else {
+                analyticsRepository.logEventsNonSuspend("record_audio_error", android.os.Bundle().apply {
+                    putString("error", "Recording file not found")
+                })
                 emit(ResultState.Error("Recording file not found"))
             }
 
         } catch (e: Exception) {
             Log.e("RecordAudio", "Error stopping recording: ${e.message}", e)
+            analyticsRepository.logEventsNonSuspend("record_audio_error", android.os.Bundle().apply {
+                putString("error", e.message)
+            })
             mediaRecorder?.release()
             mediaRecorder = null
             recording = false

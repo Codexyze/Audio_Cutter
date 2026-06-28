@@ -19,6 +19,7 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
 import com.nutrino.audiocutter.data.DataClass.CropSegment
+import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropAudioRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.channels.Channel
@@ -29,7 +30,8 @@ import javax.inject.Inject
 
 @UnstableApi
 class MultiCropAudioRepoImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val analyticsRepository: AnalyticsRepository
 ) : MultiCropAudioRepository {
 
     override suspend fun multiCropAudio(
@@ -101,6 +103,7 @@ class MultiCropAudioRepoImpl @Inject constructor(
                             outputFile,
                             "${filename}_${System.currentTimeMillis()}.m4a"
                         )
+                        analyticsRepository.logEventsNonSuspend("multi_crop_audio_success", null)
                         // Send success result with saved URI
                         resultChannel.trySend(ResultState.Success(savedUri.toString()))
                     }
@@ -111,6 +114,9 @@ class MultiCropAudioRepoImpl @Inject constructor(
                         exportResult: ExportResult,
                         exportException: ExportException
                     ) {
+                        analyticsRepository.logEventsNonSuspend("multi_crop_audio_error", android.os.Bundle().apply {
+                            putString("error", exportException.message)
+                        })
                         // Send error result with exception message
                         resultChannel.trySend(
                             ResultState.Error(

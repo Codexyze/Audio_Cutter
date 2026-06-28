@@ -17,6 +17,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +27,9 @@ import java.io.File
 
 
 @UnstableApi
-class AudioTimmerRepoImpl : AudioTrimmerRepository {
+class AudioTimmerRepoImpl(
+    private val analyticsRepository: AnalyticsRepository
+) : AudioTrimmerRepository {
 
     override suspend fun TrimAudio(
         context: Context,
@@ -59,6 +62,7 @@ class AudioTimmerRepoImpl : AudioTrimmerRepository {
                 .addListener(object : Transformer.Listener {
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                         val savedUri = saveAudioFile(context, outputFile, "${filename}_${System.currentTimeMillis()}")
+                        analyticsRepository.logEventsNonSuspend("trim_audio_success", null)
                         resultChannel.trySend(ResultState.Success(savedUri.toString())) // ✅ Send success
                     }
 
@@ -67,6 +71,9 @@ class AudioTimmerRepoImpl : AudioTrimmerRepository {
                         exportResult: ExportResult,
                         exportException: ExportException
                     ) {
+                        analyticsRepository.logEventsNonSuspend("trim_audio_error", android.os.Bundle().apply {
+                            putString("error", exportException.message)
+                        })
                         resultChannel.trySend(ResultState.Error(exportException.message ?: "Unknown error")) // ✅ Send error
                     }
                 })

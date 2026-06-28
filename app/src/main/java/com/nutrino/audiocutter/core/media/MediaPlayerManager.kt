@@ -1,4 +1,4 @@
-package com.nutrino.audiocutter.core
+package com.nutrino.audiocutter.core.media
 
 import android.net.Uri
 import androidx.media3.common.MediaItem

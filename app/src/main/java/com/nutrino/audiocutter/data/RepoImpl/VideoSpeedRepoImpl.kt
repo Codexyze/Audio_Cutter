@@ -18,6 +18,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.VideoSpeedRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +29,8 @@ import javax.inject.Inject
 
 @UnstableApi
 class VideoSpeedRepoImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val analyticsRepository: AnalyticsRepository
 ) : VideoSpeedRepository {
 
     override suspend fun ChangeVideoSpeed(
@@ -76,6 +78,7 @@ class VideoSpeedRepoImpl @Inject constructor(
                             displayName = "${filename}_${System.currentTimeMillis()}"
                         )
 
+                        analyticsRepository.logEventsNonSuspend("change_video_speed_success", null)
                         if (savedUri != null) {
                             resultChannel.trySend(ResultState.Success(savedUri.toString()))
                         } else {
@@ -88,6 +91,9 @@ class VideoSpeedRepoImpl @Inject constructor(
                         exportResult: ExportResult,
                         exportException: ExportException
                     ) {
+                        analyticsRepository.logEventsNonSuspend("change_video_speed_error", android.os.Bundle().apply {
+                            putString("error", exportException.message)
+                        })
                         resultChannel.trySend(
                             ResultState.Error(exportException.message ?: "Failed to change video speed")
                         )

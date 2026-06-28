@@ -19,6 +19,7 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
 import com.nutrino.audiocutter.data.DataClass.CropSegment
+import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.channels.Channel
@@ -29,7 +30,8 @@ import javax.inject.Inject
 
 @UnstableApi
 class MultiCropVideoRepoImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val analyticsRepository: AnalyticsRepository
 ) : MultiCropVideoRepository {
 
     override suspend fun multiCropVideo(
@@ -102,6 +104,7 @@ class MultiCropVideoRepoImpl @Inject constructor(
                             outputFile,
                             "${filename}_${System.currentTimeMillis()}.mp4"
                         )
+                        analyticsRepository.logEventsNonSuspend("multi_crop_video_success", null)
                         if (savedUri != null) {
                             resultChannel.trySend(ResultState.Success(savedUri.toString()))
                         } else {
@@ -118,6 +121,10 @@ class MultiCropVideoRepoImpl @Inject constructor(
                         // Log detailed error information
                         Log.e("MultiCropVideo", "Transformation error: ${exportException.message}", exportException)
                         Log.e("MultiCropVideo", "Error code: ${exportException.errorCode}")
+
+                        analyticsRepository.logEventsNonSuspend("multi_crop_video_error", android.os.Bundle().apply {
+                            putString("error", exportException.message)
+                        })
 
                         val errorMessage = when {
                             exportException.message?.contains("codec", ignoreCase = true) == true ->

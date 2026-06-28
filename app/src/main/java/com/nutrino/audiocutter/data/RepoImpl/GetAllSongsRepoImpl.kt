@@ -18,6 +18,7 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
 import com.nutrino.audiocutter.data.DataClass.Song
+import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +29,10 @@ import javax.inject.Inject
 
 
 @UnstableApi
-class GetAllSongsRepoImpl @Inject constructor(private val context: Context): GetAllSongRepository {
+class GetAllSongsRepoImpl @Inject constructor(
+    private val context: Context,
+    private val analyticsRepository: AnalyticsRepository
+): GetAllSongRepository {
     override suspend fun getAllSongs(): Flow<ResultState<List<Song>>> = flow{
         val songs = mutableListOf<Song>()
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -173,6 +177,7 @@ class GetAllSongsRepoImpl @Inject constructor(private val context: Context): Get
                 .addListener(object : Transformer.Listener {
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                         val savedUri = saveAudioFile(outputFile, "${filename}_${System.currentTimeMillis()}.m4a")
+                        analyticsRepository.logEventsNonSuspend("merge_audio_success", null)
                         resultChannel.trySend(ResultState.Success(savedUri.toString()))
                     }
 
@@ -181,6 +186,9 @@ class GetAllSongsRepoImpl @Inject constructor(private val context: Context): Get
                         exportResult: ExportResult,
                         exportException: ExportException
                     ) {
+                        analyticsRepository.logEventsNonSuspend("merge_audio_error", android.os.Bundle().apply {
+                            putString("error", exportException.message)
+                        })
                         resultChannel.trySend(ResultState.Error(exportException.message ?: "Merge failed"))
                     }
                 })

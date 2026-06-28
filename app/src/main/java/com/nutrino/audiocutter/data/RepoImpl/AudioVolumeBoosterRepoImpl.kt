@@ -19,6 +19,7 @@ import androidx.media3.transformer.Effects
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioVolumeBoosterRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.channels.Channel
@@ -29,7 +30,8 @@ import javax.inject.Inject
 
 @UnstableApi
 class AudioVolumeBoosterRepoImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val analyticsRepository: AnalyticsRepository
 ) : AudioVolumeBoosterRepository {
 
     override suspend fun boostAudioVolume(
@@ -78,6 +80,7 @@ class AudioVolumeBoosterRepoImpl @Inject constructor(
                             displayName = "${filename}_${System.currentTimeMillis()}"
                         )
 
+                        analyticsRepository.logEventsNonSuspend("boost_volume_success", null)
                         if (savedUri != null) {
                             resultChannel.trySend(ResultState.Success(savedUri.toString()))
                         } else {
@@ -90,6 +93,9 @@ class AudioVolumeBoosterRepoImpl @Inject constructor(
                         exportResult: ExportResult,
                         exportException: ExportException
                     ) {
+                        analyticsRepository.logEventsNonSuspend("boost_volume_error", android.os.Bundle().apply {
+                            putString("error", exportException.message)
+                        })
                         resultChannel.trySend(
                             ResultState.Error(exportException.message ?: "Failed to boost audio volume")
                         )
