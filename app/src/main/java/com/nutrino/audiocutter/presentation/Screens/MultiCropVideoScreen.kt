@@ -1,6 +1,7 @@
 package com.nutrino.audiocutter.presentation.Screens
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -106,7 +107,9 @@ fun MultiCropVideoScreen(
     // Initialize player
     LaunchedEffect(uri) {
         try {
-            mediaPlayerViewModel.initializePlayer(uri.toUri())
+            // Use Uri.fromFile to handle special characters in filenames like #
+            val fileUri = android.net.Uri.fromFile(java.io.File(uri))
+            mediaPlayerViewModel.initializePlayer(fileUri)
             videoLoadError = false
         } catch (e: Exception) {
             android.util.Log.e("MultiCropVideo", "Error loading video: ${e.message}")
@@ -218,28 +221,9 @@ fun MultiCropVideoScreen(
                 text = {
                     Column {
                         Text(
-                            text = "Multi Crop Video is currently in beta stage.",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                            text = "Some files may not work as expected. This is a beta feature.",
+                            style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text(
-                            text = "⚠️ Important Notes:",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.error
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "• This feature may not work for all video formats\n" +
-                                   "• Best results with MP4 files (H.264 codec)\n" +
-                                   "• Some videos may fail to process\n" +
-                                   "• Processing may take time for large videos",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -577,9 +561,11 @@ fun MultiCropVideoScreen(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
+                                    // Use Uri.fromFile to handle special characters in filenames like #
+                                    val fileUri = android.net.Uri.fromFile(java.io.File(uri))
                                     multiCropViewModel.multiCropVideo(
                                         context = context,
-                                        uri = uri,
+                                        uri = fileUri,
                                         segments = segments,
                                         filename = filename.value
                                     )

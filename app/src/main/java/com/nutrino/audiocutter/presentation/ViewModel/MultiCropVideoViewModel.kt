@@ -1,6 +1,7 @@
 package com.nutrino.audiocutter.presentation.ViewModel
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nutrino.audiocutter.data.DataClass.CropSegment
@@ -45,7 +46,7 @@ class MultiCropVideoViewModel @Inject constructor(
     // Function to perform multi-crop video operation
     fun multiCropVideo(
         context: Context,
-        uri: String,
+        uri: Uri,
         segments: List<CropSegment>,
         filename: String
     ) {

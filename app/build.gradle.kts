@@ -45,7 +45,7 @@ android {
         minSdk = 24
         targetSdk = 37
         versionCode = 29
-        versionName = "rewarded-ads-fix"
+        versionName = "replaced-ads-to-rewarded"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

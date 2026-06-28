@@ -77,6 +77,10 @@ fun AudioExtractorScreen(
     val startValue = rememberSaveable { mutableStateOf(0f) }
     val endValue = rememberSaveable { mutableStateOf(videoDuration.toFloat()) }
 
+    // Manual time entry states (HH:MM:SS or MM:SS)
+    val startText = rememberSaveable { mutableStateOf("") }
+    val endText = rememberSaveable { mutableStateOf("") }
+
     val filename = rememberSaveable { mutableStateOf("Extracted $videoName") }
 
     // Flag to ensure ad only attempts once per successful extraction
@@ -99,6 +103,27 @@ fun AudioExtractorScreen(
         } else {
             String.format(Locale.getDefault(), "%d:%02d", minutes, secs)
         }
+    }
+
+    // Helper function to parse time string (HH:MM:SS or MM:SS or SS) to milliseconds
+    fun parseTimeToMillis(timeStr: String): Long? {
+        return try {
+            val parts = timeStr.split(":").map { it.trim().toLong() }
+            when (parts.size) {
+                1 -> parts[0] * 1000L // SS
+                2 -> (parts[0] * 60 + parts[1]) * 1000L // MM:SS
+                3 -> (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000L // HH:MM:SS
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    // Initialize text fields
+    LaunchedEffect(videoDuration) {
+        if (startText.value.isEmpty()) startText.value = formatTime(0)
+        if (endText.value.isEmpty()) endText.value = formatTime(videoDuration / 1000)
     }
 
     LaunchedEffect(uri) {
@@ -125,6 +150,17 @@ fun AudioExtractorScreen(
                     fileType = FileTypes.AUDIO_FILE
                 )
             )
+        }
+    }
+
+    // Monitor playback position and pause at endValue
+    LaunchedEffect(Unit) {
+        val player = mediaPlayerViewModel.getPlayer()
+        while (true) {
+            if (player.isPlaying && player.currentPosition >= endValue.value) {
+                player.pause()
+            }
+            kotlinx.coroutines.delay(100) // Check every 100ms
         }
     }
 
@@ -240,13 +276,78 @@ fun AudioExtractorScreen(
                     RangeSlider(
                         value = startValue.value..endValue.value,
                         onValueChange = {
+                            val oldStart = startValue.value
+                            val oldEnd = endValue.value
+
                             startValue.value = it.start
                             endValue.value = it.endInclusive
+
+                            // Seek player to the handle that moved
+                            if (it.start != oldStart) {
+                                mediaPlayerViewModel.getPlayer().seekTo(it.start.toLong())
+                            } else if (it.endInclusive != oldEnd) {
+                                mediaPlayerViewModel.getPlayer().pause()
+                            }
+
+                            // Update text fields when slider moves
+                            startText.value = formatTime(it.start.toLong() / 1000)
+                            endText.value = formatTime(it.endInclusive.toLong() / 1000)
                         },
                         valueRange = 0f..videoDuration.toFloat(),
                         steps = 0, // Always allow slider to work
                         modifier = Modifier.fillMaxWidth(0.85f)
                     )
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth(0.85f)
+                    ) {
+                        OutlinedTextField(
+                            value = startText.value,
+                            onValueChange = { newValue ->
+                                startText.value = newValue
+                                val parsed = parseTimeToMillis(newValue)
+                                if (parsed != null) {
+                                    val milli = parsed.toFloat()
+                                    if (milli >= 0 && milli < endValue.value) {
+                                        startValue.value = milli
+                                        mediaPlayerViewModel.getPlayer().seekTo(milli.toLong())
+                                    }
+                                }
+                            },
+                            label = { Text("Start (HH:MM:SS)", fontSize = 12.sp) },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                            textStyle = TextStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 14.sp
+                            )
+                        )
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        OutlinedTextField(
+                            value = endText.value,
+                            onValueChange = { newValue ->
+                                endText.value = newValue
+                                val parsed = parseTimeToMillis(newValue)
+                                if (parsed != null) {
+                                    val milli = parsed.toFloat()
+                                    if (milli > startValue.value && milli <= videoDuration) {
+                                        endValue.value = milli
+                                        mediaPlayerViewModel.getPlayer().pause()
+                                    }
+                                }
+                            },
+                            label = { Text("End (HH:MM:SS)", fontSize = 12.sp) },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                            textStyle = TextStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 14.sp
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth(0.85f)

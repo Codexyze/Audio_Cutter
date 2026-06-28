@@ -147,6 +147,17 @@ fun VideoTrimmerScreen(
         }
     }
 
+    // Monitor playback position and pause at endValue
+    LaunchedEffect(Unit) {
+        val player = mediaPlayerViewModel.getPlayer()
+        while (true) {
+            if (player.isPlaying && player.currentPosition >= endValue.value) {
+                player.pause()
+            }
+            kotlinx.coroutines.delay(100) // Check every 100ms
+        }
+    }
+
 
 
     DisposableEffect(Unit) {
@@ -251,8 +262,19 @@ fun VideoTrimmerScreen(
                 RangeSlider(
                     value = startValue.value..endValue.value,
                     onValueChange = {
+                        val oldStart = startValue.value
+                        val oldEnd = endValue.value
+
                         startValue.value = it.start
                         endValue.value = it.endInclusive
+
+                        // Seek player to the handle that moved
+                        if (it.start != oldStart) {
+                            mediaPlayerViewModel.getPlayer().seekTo(it.start.toLong())
+                        } else if (it.endInclusive != oldEnd) {
+                            mediaPlayerViewModel.getPlayer().pause()
+                        }
+
                         // Update text fields when slider moves
                         startText.value = formatTime(it.start.toLong() / 1000)
                         endText.value = formatTime(it.endInclusive.toLong() / 1000)
@@ -274,6 +296,7 @@ fun VideoTrimmerScreen(
                                 val milli = parsed.toFloat()
                                 if (milli >= 0 && milli < endValue.value) {
                                     startValue.value = milli
+                                    mediaPlayerViewModel.getPlayer().seekTo(milli.toLong())
                                 }
                             }
                         },
@@ -293,6 +316,7 @@ fun VideoTrimmerScreen(
                                 val milli = parsed.toFloat()
                                 if (milli > startValue.value && milli <= videoDuration) {
                                     endValue.value = milli
+                                    mediaPlayerViewModel.getPlayer().pause()
                                 }
                             }
                         },

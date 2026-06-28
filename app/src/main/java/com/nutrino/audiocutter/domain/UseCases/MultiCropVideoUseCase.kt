@@ -1,6 +1,7 @@
 package com.nutrino.audiocutter.domain.UseCases
 
 import android.content.Context
+import android.net.Uri
 import com.nutrino.audiocutter.data.DataClass.CropSegment
 import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
@@ -13,7 +14,7 @@ class MultiCropVideoUseCase @Inject constructor(
 
     suspend operator fun invoke(
         context: Context,
-        uri: String,
+        uri: Uri,
         segments: List<CropSegment>,
         filename: String
     ): Flow<ResultState<String>> {

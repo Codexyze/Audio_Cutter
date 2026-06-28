@@ -34,7 +34,7 @@ class MultiCropVideoRepoImpl @Inject constructor(
 
     override suspend fun multiCropVideo(
         context: Context,
-        uri: String,
+        uri: Uri,
         segments: List<CropSegment>,
         filename: String
     ): Flow<ResultState<String>> = flow {
@@ -93,7 +93,6 @@ class MultiCropVideoRepoImpl @Inject constructor(
             //  Build Transformer with video configuration and listeners
             val transformer = Transformer.Builder(context)
                 .setVideoMimeType(MimeTypes.VIDEO_H264) // Output format: H264 video
-                .setAudioMimeType(MimeTypes.AUDIO_AAC) // Output format: AAC audio (ensures compatibility with non-AAC input like Vorbis, Opus, AMR)
                 .addListener(object : Transformer.Listener {
                     //  On successful completion
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
@@ -163,35 +162,45 @@ class MultiCropVideoRepoImpl @Inject constructor(
     // Android 10+ (Q and above) - Save using MediaStore API
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveToDownloads(sourceFile: File, displayName: String): Uri? {
+        val resolver = context.contentResolver
         // Prepare content values for MediaStore
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
             put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_MOVIES + "/AudioCutter")
+            put(MediaStore.MediaColumns.IS_PENDING, 1)
         }
 
-        val resolver = context.contentResolver
         // Get the video collection URI for external storage
         val videoCollection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
         // Insert a new entry in MediaStore
-        val uri = resolver.insert(videoCollection, contentValues)
+        val itemUri = resolver.insert(videoCollection, contentValues)
 
-        uri?.let {
-            try {
-                // Open output stream and copy the file content
-                resolver.openOutputStream(it)?.use { outputStream ->
-                    sourceFile.inputStream().use { inputStream ->
-                        inputStream.copyTo(outputStream)
-                    }
-                }
-                // Delete the cached file after successful copy
-                sourceFile.delete()
-                Log.d("MultiCropVideo", "Saved to MediaStore: $uri")
-            } catch (e: Exception) {
-                Log.e("MultiCropVideo", "Error writing to MediaStore", e)
-            }
+        if (itemUri == null) {
+            Log.e("MultiCropVideo", "Failed to create MediaStore entry")
+            return null
         }
-        return uri
+
+        try {
+            // Open output stream and copy the file content
+            resolver.openOutputStream(itemUri)?.use { outputStream ->
+                sourceFile.inputStream().use { inputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+
+            // Clear IS_PENDING to make the file visible
+            contentValues.clear()
+            contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
+            resolver.update(itemUri, contentValues, null, null)
+
+            // Delete the cached file after successful copy
+            sourceFile.delete()
+            Log.d("MultiCropVideo", "Saved to MediaStore: $itemUri")
+        } catch (e: Exception) {
+            Log.e("MultiCropVideo", "Error writing to MediaStore", e)
+        }
+        return itemUri
     }
 
     //  Android 9 and below - Save using legacy file system
