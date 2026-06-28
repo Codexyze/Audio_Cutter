@@ -19,19 +19,23 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,14 +57,17 @@ fun ProPackageScreen(
     val getAllPackageState = revenueCatViewmodel.getAllPackageState.collectAsStateWithLifecycle()
     val isUserProState = revenueCatViewmodel.isUserProState.collectAsStateWithLifecycle()
     val buyPremiumPackageState = revenueCatViewmodel.buyPremiumPackageState.collectAsStateWithLifecycle()
+    val getAppUserIdState = revenueCatViewmodel.getAppUserIdState.collectAsStateWithLifecycle()
     val isProUser = isUserProState.value.data
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
     val activity = context as? Activity
     val isBuyingPackage = buyPremiumPackageState.value.isLoading
 
     LaunchedEffect(Unit) {
         revenueCatViewmodel.getAllPackageRevenueCat()
         revenueCatViewmodel.checkIsUserPro()
+        revenueCatViewmodel.getAppUserId()
     }
 
     LaunchedEffect(
@@ -170,6 +177,39 @@ fun ProPackageScreen(
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
+
+                    if (getAppUserIdState.value.data.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "User ID",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                )
+                                Text(
+                                    text = getAppUserIdState.value.data,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                )
+                            }
+                            IconButton(onClick = {
+                                clipboardManager.setText(AnnotatedString(getAppUserIdState.value.data))
+                                Toast.makeText(context, "User ID copied", Toast.LENGTH_SHORT).show()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.ContentCopy,
+                                    contentDescription = "Copy User ID",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),

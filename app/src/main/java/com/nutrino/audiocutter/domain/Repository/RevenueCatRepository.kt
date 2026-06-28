@@ -13,4 +13,6 @@ interface RevenueCatRepository {
     suspend fun buyPremiumPackage(activity: Activity,
                                   selectedPackage: Package): Flow<ResultState<Boolean>>
 
+    suspend fun getAppUserId(): Flow<ResultState<String>>
+
 }

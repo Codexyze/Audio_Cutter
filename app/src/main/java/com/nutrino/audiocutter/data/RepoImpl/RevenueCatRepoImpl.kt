@@ -87,5 +87,15 @@ class RevenueCatRepoImpl: RevenueCatRepository {
         }
     }
 
+    override suspend fun getAppUserId(): Flow<ResultState<String>> = flow {
+        emit(ResultState.Loading)
+        try {
+            val appUserId = Purchases.sharedInstance.appUserID
+            emit(ResultState.Success(appUserId))
+        } catch (e: Exception) {
+            emit(ResultState.Error(e.message ?: "Failed to get User ID"))
+        }
+    }
+
 
 }
