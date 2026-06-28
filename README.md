@@ -9,7 +9,7 @@ It lets users **trim audio & video, extract audio from videos, merge audio track
 This project follows **Clean Architecture + MVVM + Hilt**, making it modular, testable, and scalable.
 
 > 📦 **Latest Stable Release:**  
-> 👉 [Version 2.0.0](https://github.com/Codexyze/Audio_Cutter/releases)  
+> 👉 [Version 4.0.0](https://github.com/Codexyze/Audio_Cutter/releases/tag/v4.0.0)  
 >  
 ---
 > 🚀 Audio Cutter is now **live on the Play Store**:  
