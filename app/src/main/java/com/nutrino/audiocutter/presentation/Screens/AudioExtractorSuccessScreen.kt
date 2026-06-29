@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.nutrino.audiocutter.presentation.Navigation.RECENTSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.SELECTFEATURESCREEN
 import com.nutrino.audiocutter.presentation.components.BannerAdView
 
@@ -85,6 +86,24 @@ fun AudioExtractorSuccessScreen(
             ) {
                 Text(
                     text = "Go Home",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    navController.navigate(RECENTSCREEN)
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(56.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+            ) {
+                Text(
+                    text = "Go to Recent",
                     style = MaterialTheme.typography.titleMedium
                 )
             }

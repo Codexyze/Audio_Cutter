@@ -10,7 +10,7 @@ import com.nutrino.audiocutter.Constants.RoomConstants
 
 @Dao
 interface RecentTableDao {
-    @Query("SELECT * FROM ${RoomConstants.RECENT_TABLE_NAME}")
+    @Query("SELECT * FROM ${RoomConstants.RECENT_TABLE_NAME} ORDER BY date_modified DESC")
     fun getAllRecentEntries(): Flow<List<RecentTable>>
     
     @Upsert

@@ -38,12 +38,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Surface
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.Constants.Colors
 import com.nutrino.audiocutter.presentation.ViewModel.RevenueCatViewmodel
 import com.nutrino.audiocutter.presentation.ViewModel.UserPrefViewModel
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 
 
 @SuppressLint("ContextCastToActivity")
@@ -58,6 +65,25 @@ fun ProPackageScreen(
     val isUserProState = revenueCatViewmodel.isUserProState.collectAsStateWithLifecycle()
     val buyPremiumPackageState = revenueCatViewmodel.buyPremiumPackageState.collectAsStateWithLifecycle()
     val getAppUserIdState = revenueCatViewmodel.getAppUserIdState.collectAsStateWithLifecycle()
+    
+    val usageCount by userPrefViewModel.usageCount.collectAsStateWithLifecycle()
+    val lastUsageDate by userPrefViewModel.lastUsageDate.collectAsStateWithLifecycle()
+
+    val trialsLeft = remember(usageCount, lastUsageDate) {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val actualCount = if (lastUsageDate == today) usageCount else 0
+        (3 - actualCount).coerceAtLeast(0)
+    }
+
+    val refreshDateText = remember(lastUsageDate) {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val calendar = Calendar.getInstance()
+        if (lastUsageDate == today) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(calendar.time)
+    }
+
     val isProUser = isUserProState.value.data
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
@@ -151,29 +177,57 @@ fun ProPackageScreen(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (isProUser) {
-                            Icon(
-                                imageVector = Icons.Default.EmojiEvents,
-                                contentDescription = "Pro user",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (isProUser) {
+                                Icon(
+                                    imageVector = Icons.Default.EmojiEvents,
+                                    contentDescription = "Pro user",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = "Status: Pro",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            } else {
+                                Text(
+                                    text = "Status: Not Pro",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+
+                        // Usage info badge
+                        Surface(
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
                             Text(
-                                text = "Status: Pro",
-                                style = MaterialTheme.typography.titleMedium,
+                                text = if (isProUser) "Unlimited Trials" else "$trialsLeft Free Left",
+                                style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        } else {
-                            Text(
-                                text = "Status: Not Pro",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                fontWeight = FontWeight.SemiBold
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                fontWeight = FontWeight.Bold
                             )
                         }
+                    }
+
+                    if (!isProUser) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Next refresh on $refreshDateText",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))

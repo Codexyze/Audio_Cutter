@@ -14,5 +14,13 @@ class UserPrefUseCase @Inject constructor(
     suspend fun updateThemeSelection(theme: String) {
         repository.updateThemeSelection(theme = theme)
     }
+
+    fun getUsageCount(): Flow<Int> {
+        return repository.getUsageCount()
+    }
+
+    fun getLastUsageDate(): Flow<String> {
+        return repository.getLastUsageDate()
+    }
 }
 

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.nutrino.audiocutter.presentation.Navigation.RECENTSCREEN
 import com.nutrino.audiocutter.presentation.Navigation.SELECTFEATURESCREEN
 
 @Composable
@@ -76,6 +77,26 @@ fun MultiCropAudioSuccessScreen(navController: NavController) {
             ) {
                 Text(
                     text = "Go Home",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    navController.navigate(RECENTSCREEN)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                ),
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = "Go to Recent",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )

@@ -91,8 +91,13 @@ import com.nutrino.audiocutter.presentation.Navigation.THEMESELECTIONSCREEN
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
+import com.nutrino.audiocutter.presentation.ViewModel.UserPrefViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
 import androidx.core.net.toUri
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 data class FeatureItem(
     val title: String,
@@ -107,11 +112,30 @@ data class FeatureItem(
 @Composable
 fun SelectFeatureScreen(
     navController: NavController,
-    adsViewModel: AdsViewModel = hiltViewModel()
+    adsViewModel: AdsViewModel = hiltViewModel(),
+    userPrefViewModel: UserPrefViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     var showFeedbackDialog by remember { mutableStateOf(false) }
     val isUserProState by adsViewModel.isUserProState.collectAsStateWithLifecycle()
+
+    val usageCount by userPrefViewModel.usageCount.collectAsStateWithLifecycle()
+    val lastUsageDate by userPrefViewModel.lastUsageDate.collectAsStateWithLifecycle()
+
+    val trialsLeft = remember(usageCount, lastUsageDate) {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val actualCount = if (lastUsageDate == today) usageCount else 0
+        (3 - actualCount).coerceAtLeast(0)
+    }
+
+    val refreshDateText = remember(lastUsageDate) {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val calendar = Calendar.getInstance()
+        if (lastUsageDate == today) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(calendar.time)
+    }
 
     LaunchedEffect(showFeedbackDialog) {
         if (showFeedbackDialog) {
@@ -161,8 +185,35 @@ fun SelectFeatureScreen(
                     fontSize = 28.sp
                 ),
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 4.dp)
             )
+
+            // Usage Info
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = if (isUserProState.data) "Unlimited Trials" else "$trialsLeft Free Trials Left",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                
+                if (!isUserProState.data) {
+                    Text(
+                        text = "Refreshes on $refreshDateText",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
+            }
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),

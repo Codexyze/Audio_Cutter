@@ -19,14 +19,34 @@ class UserPrefViewModel @Inject constructor(
 	private val _themeSelection = MutableStateFlow(Colors.ORANGETHEME)
 	val themeSelection = _themeSelection.asStateFlow()
 
+	private val _usageCount = MutableStateFlow(0)
+	val usageCount = _usageCount.asStateFlow()
+
+	private val _lastUsageDate = MutableStateFlow("")
+	val lastUsageDate = _lastUsageDate.asStateFlow()
+
 	init {
 		observeThemeSelection()
+		observeUsageInfo()
 	}
 
 	private fun observeThemeSelection() {
 		viewModelScope.launch(Dispatchers.IO) {
 			userPrefUseCase.getThemeSelection().collect { currentTheme ->
 				_themeSelection.value = currentTheme
+			}
+		}
+	}
+
+	private fun observeUsageInfo() {
+		viewModelScope.launch(Dispatchers.IO) {
+			userPrefUseCase.getUsageCount().collect { count ->
+				_usageCount.value = count
+			}
+		}
+		viewModelScope.launch(Dispatchers.IO) {
+			userPrefUseCase.getLastUsageDate().collect { date ->
+				_lastUsageDate.value = date
 			}
 		}
 	}

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.presentation.Navigation.ALLAUDIOFORSPEEDSCREEN
+import com.nutrino.audiocutter.presentation.Navigation.RECENTSCREEN
 
 @Composable
 fun AudioSpeedSuccessScreen(navController: NavController) {
@@ -80,6 +81,25 @@ fun AudioSpeedSuccessScreen(navController: NavController) {
         ) {
             Text(
                 text = "Done",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                navController.navigate(RECENTSCREEN)
+            },
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .height(56.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+        ) {
+            Text(
+                text = "Go to Recent",
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White
             )
