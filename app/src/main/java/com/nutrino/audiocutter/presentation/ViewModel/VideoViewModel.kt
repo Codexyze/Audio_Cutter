@@ -7,9 +7,12 @@ import com.nutrino.audiocutter.domain.StateHandeling.GetAllVideoState
 import com.nutrino.audiocutter.domain.StateHandeling.VideoTrimmerState
 import com.nutrino.audiocutter.domain.StateHandeling.AudioExtractorState
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
+import com.nutrino.audiocutter.domain.StateHandeling.UserLimitState
 import com.nutrino.audiocutter.domain.UseCases.GetAllVideoUseCase
 import com.nutrino.audiocutter.domain.UseCases.TrimVideoUseCase
 import com.nutrino.audiocutter.domain.UseCases.ExtractAudioFromVideoUseCase
+import com.nutrino.audiocutter.domain.UseCases.userPref.CheckFeatureLimitUseCase
+import com.nutrino.audiocutter.domain.UseCases.userPref.IncrementUsageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +26,9 @@ import javax.inject.Inject
 class VideoViewModel @Inject constructor (
     private val getAllVideoUseCase: GetAllVideoUseCase,
     private val trimVideoUseCase: TrimVideoUseCase,
-    private val extractAudioFromVideoUseCase: ExtractAudioFromVideoUseCase
+    private val extractAudioFromVideoUseCase: ExtractAudioFromVideoUseCase,
+    private val checkFeatureLimitUseCase: CheckFeatureLimitUseCase,
+    private val incrementUsageUseCase: IncrementUsageUseCase
 ): ViewModel() {
     private val _getAllVideosState= MutableStateFlow(GetAllVideoState())
     val getAllVideosState = _getAllVideosState.asStateFlow()
@@ -33,6 +38,9 @@ class VideoViewModel @Inject constructor (
 
     private val _audioExtractorState = MutableStateFlow(AudioExtractorState())
     val audioExtractorState = _audioExtractorState.asStateFlow()
+
+    private val _userLimitState = MutableStateFlow(UserLimitState())
+    val userLimitState = _userLimitState.asStateFlow()
 
     fun getAllVideo(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -60,24 +68,34 @@ class VideoViewModel @Inject constructor (
                   filename: String){
 
         viewModelScope.launch(Dispatchers.Main) {
-            trimVideoUseCase.invoke(uri = uri, startTime = startTime, endTime = endTime,
-                filename = filename).collect {result->
-                when(result){
+            checkFeatureLimitUseCase().collect { limitResult ->
+                when (limitResult) {
                     is ResultState.Loading -> {
-                        _videoTrimmerState.value = VideoTrimmerState(isLoading = true)
-
+                        _userLimitState.value = UserLimitState(isLoading = true)
                     }
                     is ResultState.Success -> {
-                        _videoTrimmerState.value = VideoTrimmerState(isLoading = false, data = result.data)
-
+                        _userLimitState.value = UserLimitState(isLoading = false, isLimitReached = false)
+                        
+                        trimVideoUseCase.invoke(uri = uri, startTime = startTime, endTime = endTime,
+                            filename = filename).collect { result ->
+                            when (result) {
+                                is ResultState.Loading -> {
+                                    _videoTrimmerState.value = VideoTrimmerState(isLoading = true)
+                                }
+                                is ResultState.Success -> {
+                                    _videoTrimmerState.value = VideoTrimmerState(isLoading = false, data = result.data)
+                                    incrementUsageUseCase()
+                                }
+                                is ResultState.Error -> {
+                                    _videoTrimmerState.value = VideoTrimmerState(isLoading = false, error = result.message)
+                                }
+                            }
+                        }
                     }
-                    is ResultState.Error->{
-                        _videoTrimmerState.value = VideoTrimmerState(isLoading = false, error = result.message)
-
+                    is ResultState.Error -> {
+                        _userLimitState.value = UserLimitState(isLoading = false, isLimitReached = true, error = limitResult.message)
                     }
-
                 }
-
             }
         }
 
@@ -89,26 +107,40 @@ class VideoViewModel @Inject constructor (
                               filename: String){
 
         viewModelScope.launch(Dispatchers.Main) {
-            extractAudioFromVideoUseCase.invoke(uri = uri, startTime = startTime, endTime = endTime,
-                filename = filename).collect {result->
-                when(result){
+            checkFeatureLimitUseCase().collect { limitResult ->
+                when (limitResult) {
                     is ResultState.Loading -> {
-                        _audioExtractorState.value = AudioExtractorState(isLoading = true)
-
+                        _userLimitState.value = UserLimitState(isLoading = true)
                     }
                     is ResultState.Success -> {
-                        _audioExtractorState.value = AudioExtractorState(isLoading = false, data = result.data)
-
+                        _userLimitState.value = UserLimitState(isLoading = false, isLimitReached = false)
+                        
+                        extractAudioFromVideoUseCase.invoke(uri = uri, startTime = startTime, endTime = endTime,
+                            filename = filename).collect { result ->
+                            when (result) {
+                                is ResultState.Loading -> {
+                                    _audioExtractorState.value = AudioExtractorState(isLoading = true)
+                                }
+                                is ResultState.Success -> {
+                                    _audioExtractorState.value = AudioExtractorState(isLoading = false, data = result.data)
+                                    incrementUsageUseCase()
+                                }
+                                is ResultState.Error -> {
+                                    _audioExtractorState.value = AudioExtractorState(isLoading = false, error = result.message)
+                                }
+                            }
+                        }
                     }
-                    is ResultState.Error->{
-                        _audioExtractorState.value = AudioExtractorState(isLoading = false, error = result.message)
-
+                    is ResultState.Error -> {
+                        _userLimitState.value = UserLimitState(isLoading = false, isLimitReached = true, error = limitResult.message)
                     }
-
                 }
-
             }
         }
 
+    }
+
+    fun resetUserLimitError() {
+        _userLimitState.value = UserLimitState(isLimitReached = false, error = null)
     }
 }

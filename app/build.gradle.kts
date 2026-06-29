@@ -46,7 +46,7 @@ android {
         minSdk = 24
         targetSdk = 37
         versionCode = 30
-        versionName = "sleek-ux-fixed"
+        versionName = "sleek-ux-analytics"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

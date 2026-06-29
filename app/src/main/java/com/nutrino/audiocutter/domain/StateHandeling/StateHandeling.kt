@@ -235,3 +235,9 @@ data class AudioVolumeBoosterState(
     val error: String? = null
 )
 
+data class UserLimitState(
+    val isLoading: Boolean = false,
+    val isLimitReached: Boolean = false,
+    val error: String? = null
+)
+

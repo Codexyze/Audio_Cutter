@@ -23,10 +23,25 @@ class UserPrefrenceStore @Inject constructor(private val context: Context
     val themeSelection: Flow<String> = context.dataStore.data.map {
         it[THEME_SELECTION] ?: Colors.ORANGETHEME
     }
+    val usageCount: Flow<Int> = context.dataStore.data.map {
+        it[UserPrefStore.USAGE_COUNT] ?: 0
+    }
+    val lastUsageDate: Flow<String> = context.dataStore.data.map {
+        it[UserPrefStore.LAST_USAGE_DATE] ?: ""
+    }
 
     suspend fun updateThemeSelection(theme: String){
         context.dataStore.edit {
             it[THEME_SELECTION] = theme
+        }
+    }
+
+
+
+    suspend fun updateUsage(count: Int, date: String) {
+        context.dataStore.edit { preferences ->
+            preferences[UserPrefStore.USAGE_COUNT] = count
+            preferences[UserPrefStore.LAST_USAGE_DATE] = date
         }
     }
 

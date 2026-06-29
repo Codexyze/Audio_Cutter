@@ -26,11 +26,19 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.WorkspacePremium
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +57,7 @@ import com.nutrino.audiocutter.Constants.FileTypes
 import com.nutrino.audiocutter.data.room.entity.RecentTable
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOEXTRACTORERRORSTATE
 import com.nutrino.audiocutter.presentation.Navigation.AUDIOEXTRACTORSUCCESSSTATE
+import com.nutrino.audiocutter.presentation.Navigation.PROPACKAGESCREEN
 import com.nutrino.audiocutter.presentation.ViewModel.AdsViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.MediaPlayerViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.RecentViewModel
@@ -92,6 +101,84 @@ fun AudioExtractorScreen(
 
     val audioExtractorState = videoViewModel.audioExtractorState.collectAsState()
     val upsertRecentState = recentViewModel.upsertRecentEntryState.collectAsState()
+    val userLimitState by videoViewModel.userLimitState.collectAsState()
+
+    // Daily Limit Dialog
+    if (userLimitState.isLimitReached) {
+        val nextRefreshDate = remember {
+            val calendar = java.util.Calendar.getInstance()
+            calendar.add(java.util.Calendar.DAY_OF_YEAR, 1)
+            java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(calendar.time)
+        }
+
+        AlertDialog(
+            onDismissRequest = { videoViewModel.resetUserLimitError() },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.WorkspacePremium,
+                        contentDescription = "Pro",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Text(
+                        text = "Daily Limit Reached",
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Your free trial has expired for today.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Your daily limit will refresh tomorrow on $nextRefreshDate.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                    )
+                    Text(
+                        text = "Upgrade to Studio Pro now to get unlimited access and remove all restrictions instantly!",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        videoViewModel.resetUserLimitError()
+                        navController.navigate(PROPACKAGESCREEN)
+                    },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("Buy Studio Pro", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { videoViewModel.resetUserLimitError() }
+                ) {
+                    Text("Maybe Later", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp,
+            shape = RoundedCornerShape(24.dp)
+        )
+    }
 
     // Helper function to format time from seconds to MM:SS or HH:MM:SS
     fun formatTime(seconds: Long): String {
@@ -366,6 +453,8 @@ fun AudioExtractorScreen(
                 }
 
                 item {
+                    val isProcessing = audioExtractorState.value.isLoading || userLimitState.isLoading
+
                     Button(
                         onClick = {
                             val isStartValid = startTime >= 0 // Allow 0
@@ -396,9 +485,18 @@ fun AudioExtractorScreen(
                             .fillMaxWidth(0.75f)
                             .height(60.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        enabled = !isProcessing
                     ) {
-                        Text("Extract Audio 🎵", style = MaterialTheme.typography.titleMedium)
+                        if (isProcessing) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text("Extract Audio 🎵", style = MaterialTheme.typography.titleMedium)
+                        }
                     }
                 }
             }
