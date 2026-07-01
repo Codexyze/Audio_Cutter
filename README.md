@@ -24,6 +24,11 @@ This project follows **Clean Architecture + MVVM + Hilt**, making it modular, te
 
 ---
 
+> 🎶 Offical Promo for this product :  
+> 👉 https://youtu.be/nTOdyBkWt9E?si=XtqHkJ5PLhlJDMro
+
+---
+
 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
   <img src="https://github.com/user-attachments/assets/29243dbd-faf9-4434-8251-28c0da479be7" width="24%" />
   <img src="https://github.com/user-attachments/assets/d8b9cb2e-d1da-4723-bb68-bebbeff708f7" width="24%" />
