@@ -44,11 +44,17 @@ import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.WorkspacePremium
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -117,6 +123,7 @@ fun SelectFeatureScreen(
 ) {
     val context = LocalContext.current
     var showFeedbackDialog by remember { mutableStateOf(false) }
+    var showLimitInfoDialog by remember { mutableStateOf(false) }
     val isUserProState by adsViewModel.isUserProState.collectAsStateWithLifecycle()
 
     val usageCount by userPrefViewModel.usageCount.collectAsStateWithLifecycle()
@@ -125,7 +132,7 @@ fun SelectFeatureScreen(
     val trialsLeft = remember(usageCount, lastUsageDate) {
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         val actualCount = if (lastUsageDate == today) usageCount else 0
-        (3 - actualCount).coerceAtLeast(0)
+        (5 - actualCount).coerceAtLeast(0)
     }
 
     val refreshDateText = remember(lastUsageDate) {
@@ -178,15 +185,57 @@ fun SelectFeatureScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = "Select Feature",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 28.sp
-                ),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Select Feature",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 28.sp
+                    ),
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                // Pro Status Indicator
+                Surface(
+                    onClick = { navController.navigate(PROPACKAGESCREEN) },
+                    color = if (isUserProState.data) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) else Color.Transparent,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        if (isUserProState.data) {
+                            Icon(
+                                imageVector = Icons.Default.WorkspacePremium,
+                                contentDescription = "Pro",
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "Pro",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            Text(
+                                text = "Not Pro",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Usage Info
             Row(
@@ -196,14 +245,27 @@ fun SelectFeatureScreen(
             ) {
                 Surface(
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    onClick = { showLimitInfoDialog = true }
                 ) {
-                    Text(
-                        text = if (isUserProState.data) "Unlimited Trials" else "$trialsLeft Free Trials Left",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = if (isUserProState.data) "Unlimited Trials" else "$trialsLeft Free Trials Left",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Trial Info",
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
                 
                 if (!isUserProState.data) {
@@ -502,6 +564,206 @@ fun SelectFeatureScreen(
                     }
                 }
             }
+        }
+    }
+
+    // Feature Limit Info Dialog
+    if (showLimitInfoDialog) {
+        Dialog(onDismissRequest = { showLimitInfoDialog = false }) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(28.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 8.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Feature Usage Limits",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    if (isUserProState.data) {
+                        Text(
+                            text = "All features are free and unlimited for you! ✨",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF4CAF50), // Material Green
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
+                    
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Trial Limited Features (5 Daily Trials)",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            FeatureNavRow("Audio Trimmer", Icons.Default.ContentCut) {
+                                showLimitInfoDialog = false
+                                navController.navigate(HOMESCREEN)
+                            }
+                            FeatureNavRow("Video Trimmer", Icons.Default.VideoLibrary) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLVIDEOSCREEN)
+                            }
+                            FeatureNavRow("Video Speed", Icons.Default.VideoLibrary) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLVIDEOSFORSPEEDSCREEN)
+                            }
+                            FeatureNavRow("Audio Speed", Icons.Default.MusicNote) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLAUDIOFORSPEEDSCREEN)
+                            }
+                            FeatureNavRow("Mute Video", Icons.Default.VideoLibrary) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLVIDEOSFORMUTESCREEN)
+                            }
+                            FeatureNavRow("Audio Extractor", Icons.Default.GraphicEq) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLVIDEOFORAUDIOEXTRACTSCREEN)
+                            }
+                        }
+
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                        Text(
+                            text = "Unlimited Features",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF4CAF50) // Material Green
+                        )
+                        
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            FeatureNavRow("Audio Volume Booster", Icons.Default.GraphicEq) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLAUDIOFORVOLUMEBOOSTERSCREEN)
+                            }
+                            FeatureNavRow("Audio Merge", Icons.Default.MusicNote) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLAUDIOFORMERGESCREEN)
+                            }
+                            FeatureNavRow("Multi Crop Audio", Icons.Default.ContentCut) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLSONGSFORMULTICROPSCREEN)
+                            }
+                            FeatureNavRow("Multi Crop Video", Icons.Default.VideoLibrary) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLVIDEOSFORMULTICROPSCREEN)
+                            }
+                            FeatureNavRow("Convert Audio", Icons.Default.SwapHoriz) {
+                                showLimitInfoDialog = false
+                                navController.navigate(ALLSONGSFORCONVERTAUDIOFORMATSCREEN)
+                            }
+                            FeatureNavRow("Record Audio", Icons.Default.Mic) {
+                                showLimitInfoDialog = false
+                                navController.navigate(RECORDAUDIOSCREEN)
+                            }
+                            FeatureNavRow("Recent", Icons.Outlined.Schedule) {
+                                showLimitInfoDialog = false
+                                navController.navigate(RECENTSCREEN)
+                            }
+                            FeatureNavRow("Theme", Icons.Default.ColorLens) {
+                                showLimitInfoDialog = false
+                                navController.navigate(THEMESELECTIONSCREEN)
+                            }
+                        }
+
+                        if (!isUserProState.data) {
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "Premium Access",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = "Upgrade to Pro to remove all daily limits and enjoy unlimited access to every feature.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                )
+                                Button(
+                                    onClick = {
+                                        showLimitInfoDialog = false
+                                        navController.navigate(PROPACKAGESCREEN)
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text("Go Pro")
+                                }
+                            }
+                        }
+                    }
+                    
+                    TextButton(
+                        onClick = { showLimitInfoDialog = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Close")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FeatureNavRow(
+    title: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        color = Color.Transparent,
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(vertical = 8.dp, horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }

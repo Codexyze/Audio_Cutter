@@ -37,10 +37,10 @@ class CheckFeatureLimitUseCase @Inject constructor(
                         if (lastDate != today) {
                             userPrefRepository.updateUsage(0, today)
                             emit(ResultState.Success(true))
-                        } else if (count < 3) {
+                        } else if (count < 5) {
                             emit(ResultState.Success(true))
                         } else {
-                            emit(ResultState.Error("Daily limit of 3 reached. Upgrade to Pro for unlimited use!"))
+                            emit(ResultState.Error("Daily limit of 5 reached. Upgrade to Pro for unlimited use!"))
                         }
                     }
                 }
@@ -53,10 +53,10 @@ class CheckFeatureLimitUseCase @Inject constructor(
                     if (lastDate != today) {
                         userPrefRepository.updateUsage(0, today)
                         emit(ResultState.Success(true))
-                    } else if (count < 3) {
+                    } else if (count < 5) {
                         emit(ResultState.Success(true))
                     } else {
-                        emit(ResultState.Error("Daily limit of 3 reached. Upgrade to Pro for unlimited use!"))
+                        emit(ResultState.Error("Daily limit of 5 reached. Upgrade to Pro for unlimited use!"))
                     }
                 }
             }

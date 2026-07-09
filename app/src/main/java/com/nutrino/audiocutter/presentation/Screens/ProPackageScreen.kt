@@ -72,7 +72,7 @@ fun ProPackageScreen(
     val trialsLeft = remember(usageCount, lastUsageDate) {
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         val actualCount = if (lastUsageDate == today) usageCount else 0
-        (3 - actualCount).coerceAtLeast(0)
+        (5 - actualCount).coerceAtLeast(0)
     }
 
     val refreshDateText = remember(lastUsageDate) {
