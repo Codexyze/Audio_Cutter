@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import androidx.core.net.toUri
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.RecordAudioRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
@@ -21,7 +22,8 @@ import javax.inject.Inject
 @UnstableApi
 class RecordAudioRepoImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : RecordAudioRepository {
 
     private var mediaRecorder: MediaRecorder? = null
@@ -60,10 +62,12 @@ class RecordAudioRepoImpl @Inject constructor(
 
             recording = true
             paused = false
+            crashAnalyticsHelper.log("AudioRecord: Recording started - $filename")
             emit(ResultState.Success("Recording started"))
 
         } catch (e: Exception) {
             Log.e("RecordAudio", "Error starting recording: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "Error starting recording: $filename")
             recording = false
             paused = false
             emit(ResultState.Error(e.message ?: "Failed to start recording"))
@@ -75,9 +79,11 @@ class RecordAudioRepoImpl @Inject constructor(
             if (recording && !paused) {
                 mediaRecorder?.pause()
                 paused = true
+                crashAnalyticsHelper.log("AudioRecord: Recording paused")
             }
         } catch (e: Exception) {
             Log.e("RecordAudio", "Error pausing recording: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "Error pausing recording")
         }
     }
 
@@ -86,9 +92,11 @@ class RecordAudioRepoImpl @Inject constructor(
             if (recording && paused) {
                 mediaRecorder?.resume()
                 paused = false
+                crashAnalyticsHelper.log("AudioRecord: Recording resumed")
             }
         } catch (e: Exception) {
             Log.e("RecordAudio", "Error resuming recording: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "Error resuming recording")
         }
     }
 
@@ -112,17 +120,20 @@ class RecordAudioRepoImpl @Inject constructor(
                 )
                 if (savedUri != null) {
                     analyticsRepository.logEventsNonSuspend("record_audio_success", null)
+                    crashAnalyticsHelper.successLog("RecordAudio", "Successfully recorded audio: $currentFilename")
                     emit(ResultState.Success(savedUri.toString()))
                 } else {
                     analyticsRepository.logEventsNonSuspend("record_audio_error", android.os.Bundle().apply {
                         putString("error", "Failed to save recording")
                     })
+                    crashAnalyticsHelper.errorLog("RecordAudio", "Failed to save recording")
                     emit(ResultState.Error("Failed to save recording"))
                 }
             } else {
                 analyticsRepository.logEventsNonSuspend("record_audio_error", android.os.Bundle().apply {
                     putString("error", "Recording file not found")
                 })
+                crashAnalyticsHelper.errorLog("RecordAudio", "Recording file not found")
                 emit(ResultState.Error("Recording file not found"))
             }
 
@@ -131,6 +142,7 @@ class RecordAudioRepoImpl @Inject constructor(
             analyticsRepository.logEventsNonSuspend("record_audio_error", android.os.Bundle().apply {
                 putString("error", e.message)
             })
+            crashAnalyticsHelper.logNonFatalException(e, "Error stopping recording: $currentFilename")
             mediaRecorder?.release()
             mediaRecorder = null
             recording = false

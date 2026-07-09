@@ -19,6 +19,7 @@ import androidx.media3.transformer.Effects
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioVolumeBoosterRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
@@ -31,7 +32,8 @@ import javax.inject.Inject
 @UnstableApi
 class AudioVolumeBoosterRepoImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : AudioVolumeBoosterRepository {
 
     override suspend fun boostAudioVolume(
@@ -42,6 +44,7 @@ class AudioVolumeBoosterRepoImpl @Inject constructor(
         emit(ResultState.Loading)
 
         if (filename.isBlank()) {
+            crashAnalyticsHelper.errorLog("AudioVolumeBooster", "Filename is empty")
             emit(ResultState.Error("File name cannot be empty"))
             return@flow
         }
@@ -82,8 +85,10 @@ class AudioVolumeBoosterRepoImpl @Inject constructor(
 
                         analyticsRepository.logEventsNonSuspend("boost_volume_success", null)
                         if (savedUri != null) {
+                            crashAnalyticsHelper.successLog("AudioVolumeBooster", "Successfully boosted volume for $filename")
                             resultChannel.trySend(ResultState.Success(savedUri.toString()))
                         } else {
+                            crashAnalyticsHelper.errorLog("AudioVolumeBooster", "Failed to save boosted audio file")
                             resultChannel.trySend(ResultState.Error("Failed to save output audio"))
                         }
                     }
@@ -96,6 +101,8 @@ class AudioVolumeBoosterRepoImpl @Inject constructor(
                         analyticsRepository.logEventsNonSuspend("boost_volume_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Error boosting audio volume for $filename")
+                        crashAnalyticsHelper.errorLog("AudioVolumeBooster", exportException.message ?: "Failed to boost audio volume")
                         resultChannel.trySend(
                             ResultState.Error(exportException.message ?: "Failed to boost audio volume")
                         )
@@ -106,6 +113,7 @@ class AudioVolumeBoosterRepoImpl @Inject constructor(
             transformer.start(editedMediaItem, outputFile.absolutePath)
             emit(resultChannel.receive())
         } catch (e: Exception) {
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in boostAudioVolume for $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         } finally {
             resultChannel.close()

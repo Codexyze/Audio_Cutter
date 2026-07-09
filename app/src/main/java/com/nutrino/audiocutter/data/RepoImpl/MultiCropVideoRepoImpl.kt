@@ -18,6 +18,7 @@ import androidx.media3.transformer.EditedMediaItemSequence
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.DataClass.CropSegment
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropVideoRepository
@@ -31,7 +32,8 @@ import javax.inject.Inject
 @UnstableApi
 class MultiCropVideoRepoImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : MultiCropVideoRepository {
 
     override suspend fun multiCropVideo(
@@ -45,6 +47,7 @@ class MultiCropVideoRepoImpl @Inject constructor(
 
         // Validate segments list is not empty
         if (segments.isEmpty()) {
+            crashAnalyticsHelper.errorLog("MultiCropVideo", "No segments provided")
             emit(ResultState.Error("No segments selected"))
             return@flow
         }
@@ -58,6 +61,7 @@ class MultiCropVideoRepoImpl @Inject constructor(
                 // Validate that both start and end times are present
                 if (segment.start == null || segment.end == null) {
                     Log.e("MultiCropVideo", "Invalid segment: start or end is null")
+                    crashAnalyticsHelper.errorLog("MultiCropVideo", "Invalid segment: start or end is null")
                     return@mapNotNull null
                 }
 
@@ -79,6 +83,7 @@ class MultiCropVideoRepoImpl @Inject constructor(
 
             //  Validate that we have valid edited items
             if (editedItems.isEmpty()) {
+                crashAnalyticsHelper.errorLog("MultiCropVideo", "No valid segments to process")
                 emit(ResultState.Error("No valid segments to process"))
                 return@flow
             }
@@ -106,8 +111,10 @@ class MultiCropVideoRepoImpl @Inject constructor(
                         )
                         analyticsRepository.logEventsNonSuspend("multi_crop_video_success", null)
                         if (savedUri != null) {
+                            crashAnalyticsHelper.successLog("MultiCropVideo", "Successfully multi-cropped video: $filename")
                             resultChannel.trySend(ResultState.Success(savedUri.toString()))
                         } else {
+                            crashAnalyticsHelper.errorLog("MultiCropVideo", "Failed to save output file after multi-crop")
                             resultChannel.trySend(ResultState.Error("Failed to save output file"))
                         }
                     }
@@ -120,7 +127,7 @@ class MultiCropVideoRepoImpl @Inject constructor(
                     ) {
                         // Log detailed error information
                         Log.e("MultiCropVideo", "Transformation error: ${exportException.message}", exportException)
-                        Log.e("MultiCropVideo", "Error code: ${exportException.errorCode}")
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Error in MultiCropVideo for $filename")
 
                         analyticsRepository.logEventsNonSuspend("multi_crop_video_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
@@ -135,6 +142,7 @@ class MultiCropVideoRepoImpl @Inject constructor(
                                 "Video resolution too high. Try with a lower resolution video"
                             else -> exportException.message ?: "Multi-crop video failed. The video format may not be supported"
                         }
+                        crashAnalyticsHelper.errorLog("MultiCropVideo", errorMessage)
 
                         // Send error result with exception message
                         resultChannel.trySend(ResultState.Error(errorMessage))
@@ -151,6 +159,7 @@ class MultiCropVideoRepoImpl @Inject constructor(
         } catch (e: Exception) {
             // Handle any unexpected exceptions
             Log.e("MultiCropVideo", "Error during multi-crop: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in multiCropVideo for $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         }
     }

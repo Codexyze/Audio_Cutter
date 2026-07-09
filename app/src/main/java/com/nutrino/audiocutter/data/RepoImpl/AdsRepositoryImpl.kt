@@ -17,6 +17,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.nutrino.audiocutter.BuildConfig
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.channels.awaitClose
@@ -27,7 +28,8 @@ import javax.inject.Singleton
 
 @Singleton
 class AdsRepositoryImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : AdsRepository {
 
     private var interstitialAd: InterstitialAd? = null
@@ -64,6 +66,7 @@ class AdsRepositoryImpl @Inject constructor(
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
                     Log.d(TAG, "Interstitial ad loaded successfully")
+                    crashAnalyticsHelper.successLog("Ads", "Interstitial ad loaded successfully")
                     interstitialAd = ad
                     isLoading = false
                     trySend(ResultState.Success(true))
@@ -72,7 +75,7 @@ class AdsRepositoryImpl @Inject constructor(
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     Log.e(TAG, "Failed to load interstitial ad: ${error.message}")
-                    Log.e(TAG, "Error code: ${error.code}, domain: ${error.domain}")
+                    crashAnalyticsHelper.errorLog("Ads", "Failed to load interstitial ad: ${error.message}")
                     interstitialAd = null
                     isLoading = false
                     trySend(ResultState.Error("Failed to load ad: ${error.message}"))
@@ -100,6 +103,7 @@ class AdsRepositoryImpl @Inject constructor(
         interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
                 Log.d(TAG, "Ad was dismissed by user")
+                crashAnalyticsHelper.log("Ads: Interstitial ad dismissed")
                 interstitialAd = null
                 trySend(ResultState.Success(true))
                 close()
@@ -107,6 +111,7 @@ class AdsRepositoryImpl @Inject constructor(
 
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
                 Log.e(TAG, "Ad failed to show: ${error.message}")
+                crashAnalyticsHelper.errorLog("Ads", "Interstitial ad failed to show: ${error.message}")
                 interstitialAd = null
                 trySend(ResultState.Error("Failed to show ad: ${error.message}"))
                 close()
@@ -166,6 +171,7 @@ class AdsRepositoryImpl @Inject constructor(
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(ad: RewardedAd) {
                     Log.d(TAG, "Rewarded ad loaded successfully")
+                    crashAnalyticsHelper.successLog("Ads", "Rewarded ad loaded successfully")
                     rewardedAd = ad
                     isRewardedLoading = false
                     trySend(ResultState.Success(true))
@@ -174,6 +180,7 @@ class AdsRepositoryImpl @Inject constructor(
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     Log.e(TAG, "Failed to load rewarded ad: ${error.message}")
+                    crashAnalyticsHelper.errorLog("Ads", "Failed to load rewarded ad: ${error.message}")
                     rewardedAd = null
                     isRewardedLoading = false
                     trySend(ResultState.Error("Failed to load rewarded ad: ${error.message}"))

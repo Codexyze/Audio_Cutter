@@ -16,6 +16,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.ConvertAudioFormatRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
@@ -28,7 +29,8 @@ import javax.inject.Inject
 @UnstableApi
 class ConvertAudioFormatRepoImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : ConvertAudioFormatRepository {
 
     override suspend fun convertAudioFormat(
@@ -68,6 +70,7 @@ class ConvertAudioFormatRepoImpl @Inject constructor(
                             containerMimeType
                         )
                         analyticsRepository.logEventsNonSuspend("convert_audio_format_success", null)
+                        crashAnalyticsHelper.successLog("ConvertAudioFormat", "Successfully converted $filename to $outputExtension")
                         resultChannel.trySend(ResultState.Success(savedUri.toString()))
                     }
 
@@ -79,6 +82,8 @@ class ConvertAudioFormatRepoImpl @Inject constructor(
                         analyticsRepository.logEventsNonSuspend("convert_audio_format_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Error converting audio format for $filename")
+                        crashAnalyticsHelper.errorLog("ConvertAudioFormat", exportException.message ?: "Audio format conversion failed")
                         resultChannel.trySend(
                             ResultState.Error(
                                 exportException.message ?: "Audio format conversion failed"
@@ -94,6 +99,7 @@ class ConvertAudioFormatRepoImpl @Inject constructor(
 
         } catch (e: Exception) {
             Log.e("ConvertAudioFormat", "Error during conversion: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in convertAudioFormat for $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         }
     }

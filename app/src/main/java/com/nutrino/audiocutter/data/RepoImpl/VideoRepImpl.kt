@@ -17,6 +17,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.DataClass.Video
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.VideoRepository
@@ -25,11 +26,13 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.File
+import javax.inject.Inject
 
 @UnstableApi
-class VideoRepImpl (
+class VideoRepImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : VideoRepository{
     override suspend fun getAllVideos(): Flow<ResultState<List<Video>>> = flow{
         val videoFiles = mutableListOf<Video>()
@@ -78,15 +81,17 @@ class VideoRepImpl (
 
                }
                cursor.close()
+               crashAnalyticsHelper.successLog("VideoRepo", "Successfully fetched ${videoFiles.size} videos")
                emit(ResultState.Success(videoFiles))
 
 
            }else{
-
+               crashAnalyticsHelper.errorLog("VideoRepo", "No videos found")
                emit(ResultState.Error("No Video Found.."))
            }
 
         } catch (e: Exception) {
+            crashAnalyticsHelper.logNonFatalException(e, "Error loading videos")
             emit(ResultState.Error(e.message ?: "Error loading videos"))
         } finally {
             cursor?.close()
@@ -125,6 +130,7 @@ class VideoRepImpl (
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                         val savedUri = saveVideoFile(outputFile, "${filename}_${System.currentTimeMillis()}")
                         analyticsRepository.logEventsNonSuspend("trim_video_success", null)
+                        crashAnalyticsHelper.successLog("VideoRepo", "Successfully trimmed video: $filename")
                         resultChannel.trySend(ResultState.Success(savedUri.toString())) // ✅ Send success
                     }
 
@@ -136,6 +142,8 @@ class VideoRepImpl (
                         analyticsRepository.logEventsNonSuspend("trim_video_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Error trimming video: $filename")
+                        crashAnalyticsHelper.errorLog("VideoRepo", exportException.message ?: "Trim video failed")
                         resultChannel.trySend(ResultState.Error(exportException.message ?: "Unknown error")) // ✅ Send error
                     }
                 })
@@ -146,6 +154,7 @@ class VideoRepImpl (
             emit(resultChannel.receive()) // ✅ Await result and emit
 
         } catch (e: Exception) {
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in TrimVideo: $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         }
     }
@@ -184,6 +193,7 @@ class VideoRepImpl (
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                         val savedUri = saveAudioFile(outputFile, "${filename}_${System.currentTimeMillis()}.m4a")
                         analyticsRepository.logEventsNonSuspend("extract_audio_success", null)
+                        crashAnalyticsHelper.successLog("VideoRepo", "Successfully extracted audio from video: $filename")
                         resultChannel.trySend(ResultState.Success(savedUri.toString()))
                     }
 
@@ -195,6 +205,8 @@ class VideoRepImpl (
                         analyticsRepository.logEventsNonSuspend("extract_audio_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Error extracting audio from video: $filename")
+                        crashAnalyticsHelper.errorLog("VideoRepo", exportException.message ?: "Audio extraction failed")
                         resultChannel.trySend(ResultState.Error(exportException.message ?: "Audio extraction failed"))
                     }
                 })
@@ -205,6 +217,7 @@ class VideoRepImpl (
             emit(resultChannel.receive())
 
         } catch (e: Exception) {
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in ExtractAudioFromVideo: $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         }
     }

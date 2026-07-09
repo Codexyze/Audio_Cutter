@@ -18,6 +18,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioSpeedRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
@@ -30,7 +31,8 @@ import javax.inject.Inject
 @UnstableApi
 class AudioSpeedRepoImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : AudioSpeedRepository {
 
     override suspend fun ChangeAudioSpeed(
@@ -41,11 +43,13 @@ class AudioSpeedRepoImpl @Inject constructor(
         emit(ResultState.Loading)
 
         if (filename.isBlank()) {
+            crashAnalyticsHelper.errorLog("AudioSpeed", "Filename is empty")
             emit(ResultState.Error("File name cannot be empty"))
             return@flow
         }
 
         if (!speed.isFinite() || speed < MIN_SPEED || speed > MAX_SPEED) {
+            crashAnalyticsHelper.errorLog("AudioSpeed", "Invalid speed: $speed")
             emit(ResultState.Error("Speed must be between $MIN_SPEED and $MAX_SPEED"))
             return@flow
         }
@@ -79,8 +83,10 @@ class AudioSpeedRepoImpl @Inject constructor(
 
                         analyticsRepository.logEventsNonSuspend("change_audio_speed_success", null)
                         if (savedUri != null) {
+                            crashAnalyticsHelper.successLog("AudioSpeed", "Successfully changed speed of $filename to $speed")
                             resultChannel.trySend(ResultState.Success(savedUri.toString()))
                         } else {
+                            crashAnalyticsHelper.errorLog("AudioSpeed", "Failed to save audio file after speed change")
                             resultChannel.trySend(ResultState.Error("Failed to save output audio"))
                         }
                     }
@@ -93,6 +99,8 @@ class AudioSpeedRepoImpl @Inject constructor(
                         analyticsRepository.logEventsNonSuspend("change_audio_speed_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Error changing audio speed for $filename")
+                        crashAnalyticsHelper.errorLog("AudioSpeed", exportException.message ?: "Failed to change audio speed")
                         resultChannel.trySend(
                             ResultState.Error(exportException.message ?: "Failed to change audio speed")
                         )
@@ -103,6 +111,7 @@ class AudioSpeedRepoImpl @Inject constructor(
             transformer.start(editedMediaItem, outputFile.absolutePath)
             emit(resultChannel.receive())
         } catch (e: Exception) {
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in ChangeAudioSpeed for $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         } finally {
             resultChannel.close()

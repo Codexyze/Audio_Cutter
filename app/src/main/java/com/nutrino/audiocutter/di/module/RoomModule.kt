@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.nutrino.audiocutter.Constants.RoomConstants
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.RepoImpl.RecentRepositoryImpl
 import com.nutrino.audiocutter.data.room.database.AppDataBase
 import com.nutrino.audiocutter.domain.Repository.RecentRepository
@@ -51,8 +52,14 @@ object RoomModule {
 
     @Singleton
     @Provides
-    fun provideRecentRepository(appDataBase: AppDataBase): RecentRepository {
-        return RecentRepositoryImpl(appDataBase = appDataBase)
+    fun provideRecentRepository(
+        appDataBase: AppDataBase,
+        crashAnalyticsHelper: CrashAnalyticsHelper
+    ): RecentRepository {
+        return RecentRepositoryImpl(
+            appDataBase = appDataBase,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @Provides

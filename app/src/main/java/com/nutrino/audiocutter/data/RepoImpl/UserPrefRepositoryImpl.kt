@@ -1,12 +1,14 @@
 package com.nutrino.audiocutter.data.RepoImpl
 
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.userPref.UserPrefrenceStore
 import com.nutrino.audiocutter.domain.Repository.UserPrefRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UserPrefRepositoryImpl @Inject constructor(
-    private val userPrefrenceStore: UserPrefrenceStore
+    private val userPrefrenceStore: UserPrefrenceStore,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : UserPrefRepository {
 
     override fun getThemeSelection(): Flow<String> {
@@ -15,6 +17,7 @@ class UserPrefRepositoryImpl @Inject constructor(
 
     override suspend fun updateThemeSelection(theme: String) {
         userPrefrenceStore.updateThemeSelection(theme = theme)
+        crashAnalyticsHelper.setCustomKey("app_theme", theme)
     }
 
     override fun getUsageCount(): Flow<Int> {
@@ -27,6 +30,7 @@ class UserPrefRepositoryImpl @Inject constructor(
 
     override suspend fun updateUsage(count: Int, date: String) {
         userPrefrenceStore.updateUsage(count = count, date = date)
+        crashAnalyticsHelper.setCustomKey("usage_count", count.toString())
     }
 }
 

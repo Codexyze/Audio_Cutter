@@ -17,6 +17,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.AudioTrimmerRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
@@ -28,7 +29,8 @@ import java.io.File
 
 @UnstableApi
 class AudioTimmerRepoImpl(
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : AudioTrimmerRepository {
 
     override suspend fun TrimAudio(
@@ -63,6 +65,7 @@ class AudioTimmerRepoImpl(
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                         val savedUri = saveAudioFile(context, outputFile, "${filename}_${System.currentTimeMillis()}")
                         analyticsRepository.logEventsNonSuspend("trim_audio_success", null)
+                        crashAnalyticsHelper.successLog("AudioTrimmer", "Audio trimmed successfully: $filename")
                         resultChannel.trySend(ResultState.Success(savedUri.toString())) // ✅ Send success
                     }
 
@@ -74,6 +77,8 @@ class AudioTimmerRepoImpl(
                         analyticsRepository.logEventsNonSuspend("trim_audio_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Audio trimming failed for $filename")
+                        crashAnalyticsHelper.errorLog("AudioTrimmer", exportException.message ?: "Unknown error")
                         resultChannel.trySend(ResultState.Error(exportException.message ?: "Unknown error")) // ✅ Send error
                     }
                 })
@@ -84,6 +89,7 @@ class AudioTimmerRepoImpl(
             emit(resultChannel.receive()) // ✅ Await result and emit
 
         } catch (e: Exception) {
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in TrimAudio for $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         }
     }

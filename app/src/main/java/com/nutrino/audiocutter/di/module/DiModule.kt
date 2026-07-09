@@ -3,6 +3,7 @@ package com.nutrino.audiocutter.di.module
 import android.content.Context
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.core.media.MediaPlayerManager
 import com.nutrino.audiocutter.data.RepoImpl.AdsRepositoryImpl
 import com.nutrino.audiocutter.data.RepoImpl.AudioSpeedRepoImpl
@@ -64,9 +65,13 @@ object DiModule {
     @Provides
     fun provideAudioTrimmerRepositoryObj(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): AudioTrimmerRepository {
-        return AudioTimmerRepoImpl(analyticsRepository = analyticsRepository)
+        return AudioTimmerRepoImpl(
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @Provides
@@ -79,9 +84,14 @@ object DiModule {
     @Provides
     fun provideGetAllSongUseCaseObj(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): GetAllSongRepository {
-        return GetAllSongsRepoImpl(context = context, analyticsRepository = analyticsRepository)
+        return GetAllSongsRepoImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @Provides
@@ -93,18 +103,28 @@ object DiModule {
     @Provides
     fun provideVideoRepo(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): VideoRepository {
-        return VideoRepImpl(context = context, analyticsRepository = analyticsRepository)
+        return VideoRepImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @UnstableApi
     @Provides
     fun provideVideoSpeedRepo(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): VideoSpeedRepository {
-        return VideoSpeedRepoImpl(context = context, analyticsRepository = analyticsRepository)
+        return VideoSpeedRepoImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @Provides
@@ -134,8 +154,11 @@ object DiModule {
 
     @Provides
     @Singleton
-    fun provideAdsRepository(@ApplicationContext context: Context): AdsRepository {
-        return AdsRepositoryImpl(context = context)
+    fun provideAdsRepository(
+        @ApplicationContext context: Context,
+        crashAnalyticsHelper: CrashAnalyticsHelper
+    ): AdsRepository {
+        return AdsRepositoryImpl(context = context, crashAnalyticsHelper = crashAnalyticsHelper)
     }
 
     @Provides
@@ -152,9 +175,14 @@ object DiModule {
     @Provides
     fun provideMultiCropRepo(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): MultiCropAudioRepository {
-        return MultiCropAudioRepoImpl(context = context, analyticsRepository = analyticsRepository)
+        return MultiCropAudioRepoImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @UnstableApi
@@ -167,9 +195,14 @@ object DiModule {
     @Provides
     fun provideMultiCropVideoRepo(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): MultiCropVideoRepository {
-        return MultiCropVideoRepoImpl(context = context, analyticsRepository = analyticsRepository)
+        return MultiCropVideoRepoImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @UnstableApi
@@ -182,9 +215,14 @@ object DiModule {
     @Provides
     fun provideConvertAudioFormatRepo(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): ConvertAudioFormatRepository {
-        return ConvertAudioFormatRepoImpl(context = context, analyticsRepository = analyticsRepository)
+        return ConvertAudioFormatRepoImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @UnstableApi
@@ -198,9 +236,14 @@ object DiModule {
     @Singleton
     fun provideRecordAudioRepo(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): RecordAudioRepository {
-        return RecordAudioRepoImpl(context = context, analyticsRepository = analyticsRepository)
+        return RecordAudioRepoImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @Provides
@@ -212,9 +255,14 @@ object DiModule {
     @Provides
     fun provideAudioSpeedRepo(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): AudioSpeedRepository {
-        return AudioSpeedRepoImpl(context = context, analyticsRepository = analyticsRepository)
+        return AudioSpeedRepoImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @Provides
@@ -226,9 +274,14 @@ object DiModule {
     @Provides
     fun provideMuteVideoRepo(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): MuteVideoRepository {
-        return MuteVideoRepoImpl(context = context, analyticsRepository = analyticsRepository)
+        return MuteVideoRepoImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @Provides
@@ -240,9 +293,14 @@ object DiModule {
     @Provides
     fun provideAudioVolumeBoosterRepo(
         @ApplicationContext context: Context,
-        analyticsRepository: AnalyticsRepository
+        analyticsRepository: AnalyticsRepository,
+        crashAnalyticsHelper: CrashAnalyticsHelper
     ): AudioVolumeBoosterRepository {
-        return AudioVolumeBoosterRepoImpl(context = context, analyticsRepository = analyticsRepository)
+        return AudioVolumeBoosterRepoImpl(
+            context = context,
+            analyticsRepository = analyticsRepository,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @Provides

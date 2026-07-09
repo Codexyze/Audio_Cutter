@@ -3,6 +3,7 @@ package com.nutrino.audiocutter.di.module
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.RepoImpl.AnalyticsRepositoryImpl
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.UseCases.LogEventUseCase
@@ -24,9 +25,13 @@ object FirebaseAnalytics {
 
     @Provides
     @Singleton
-    fun provideAnalyticsRepository(firebaseAnalytics: FirebaseAnalytics): AnalyticsRepository {
+    fun provideAnalyticsRepository(
+        firebaseAnalytics: FirebaseAnalytics,
+        crashAnalyticsHelper: CrashAnalyticsHelper
+    ): AnalyticsRepository {
         return AnalyticsRepositoryImpl(
-            firebaseAnalytics = firebaseAnalytics
+            firebaseAnalytics = firebaseAnalytics,
+            crashAnalyticsHelper = crashAnalyticsHelper
         )
     }
 

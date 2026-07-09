@@ -16,6 +16,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.MuteVideoRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
@@ -28,7 +29,8 @@ import javax.inject.Inject
 @UnstableApi
 class MuteVideoRepoImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : MuteVideoRepository {
 
     override suspend fun muteVideo(
@@ -38,6 +40,7 @@ class MuteVideoRepoImpl @Inject constructor(
         emit(ResultState.Loading)
 
         if (filename.isBlank()) {
+            crashAnalyticsHelper.errorLog("MuteVideo", "Filename is empty")
             emit(ResultState.Error("File name cannot be empty"))
             return@flow
         }
@@ -66,8 +69,10 @@ class MuteVideoRepoImpl @Inject constructor(
 
                         analyticsRepository.logEventsNonSuspend("mute_video_success", null)
                         if (savedUri != null) {
+                            crashAnalyticsHelper.successLog("MuteVideo", "Successfully muted video: $filename")
                             resultChannel.trySend(ResultState.Success(savedUri.toString()))
                         } else {
+                            crashAnalyticsHelper.errorLog("MuteVideo", "Failed to save muted video file")
                             resultChannel.trySend(ResultState.Error("Failed to save output video"))
                         }
                     }
@@ -80,6 +85,8 @@ class MuteVideoRepoImpl @Inject constructor(
                         analyticsRepository.logEventsNonSuspend("mute_video_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Error muting video for $filename")
+                        crashAnalyticsHelper.errorLog("MuteVideo", exportException.message ?: "Failed to mute video")
                         resultChannel.trySend(
                             ResultState.Error(exportException.message ?: "Failed to mute video")
                         )
@@ -90,6 +97,7 @@ class MuteVideoRepoImpl @Inject constructor(
             transformer.start(editedMediaItem, outputFile.absolutePath)
             emit(resultChannel.receive())
         } catch (e: Exception) {
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in muteVideo for $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         } finally {
             resultChannel.close()

@@ -18,6 +18,7 @@ import androidx.media3.transformer.EditedMediaItemSequence
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.DataClass.CropSegment
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.MultiCropAudioRepository
@@ -31,7 +32,8 @@ import javax.inject.Inject
 @UnstableApi
 class MultiCropAudioRepoImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : MultiCropAudioRepository {
 
     override suspend fun multiCropAudio(
@@ -45,6 +47,7 @@ class MultiCropAudioRepoImpl @Inject constructor(
 
         // Validate segments list is not empty
         if (segments.isEmpty()) {
+            crashAnalyticsHelper.errorLog("MultiCropAudio", "No segments provided")
             emit(ResultState.Error("No segments selected"))
             return@flow
         }
@@ -58,6 +61,7 @@ class MultiCropAudioRepoImpl @Inject constructor(
                 // Validate that both start and end times are present
                 if (segment.start == null || segment.end == null) {
                     Log.e("MultiCropAudio", "Invalid segment: start or end is null")
+                    crashAnalyticsHelper.errorLog("MultiCropAudio", "Invalid segment: start or end is null")
                     return@mapNotNull null
                 }
 
@@ -79,6 +83,7 @@ class MultiCropAudioRepoImpl @Inject constructor(
 
             //  Validate that we have valid edited items
             if (editedItems.isEmpty()) {
+                crashAnalyticsHelper.errorLog("MultiCropAudio", "No valid segments to process")
                 emit(ResultState.Error("No valid segments to process"))
                 return@flow
             }
@@ -104,6 +109,7 @@ class MultiCropAudioRepoImpl @Inject constructor(
                             "${filename}_${System.currentTimeMillis()}.m4a"
                         )
                         analyticsRepository.logEventsNonSuspend("multi_crop_audio_success", null)
+                        crashAnalyticsHelper.successLog("MultiCropAudio", "Successfully multi-cropped audio: $filename")
                         // Send success result with saved URI
                         resultChannel.trySend(ResultState.Success(savedUri.toString()))
                     }
@@ -117,6 +123,8 @@ class MultiCropAudioRepoImpl @Inject constructor(
                         analyticsRepository.logEventsNonSuspend("multi_crop_audio_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Error in MultiCropAudio for $filename")
+                        crashAnalyticsHelper.errorLog("MultiCropAudio", exportException.message ?: "Multi-crop audio failed")
                         // Send error result with exception message
                         resultChannel.trySend(
                             ResultState.Error(
@@ -136,6 +144,7 @@ class MultiCropAudioRepoImpl @Inject constructor(
         } catch (e: Exception) {
             // Handle any unexpected exceptions
             Log.e("MultiCropAudio", "Error during multi-crop: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in multiCropAudio for $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         }
     }

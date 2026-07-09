@@ -1,5 +1,6 @@
 package com.nutrino.audiocutter.di.module
 
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.RepoImpl.RevenueCatRepoImpl
 import com.nutrino.audiocutter.domain.Repository.RevenueCatRepository
 import com.nutrino.audiocutter.domain.UseCases.revenueCat.BuyPremiumPackageUseCase
@@ -15,8 +16,8 @@ import dagger.hilt.components.SingletonComponent
 @Module
 object RevenueCatModule {
     @Provides
-    fun provideRevenueCatRepo(): RevenueCatRepository{
-        return RevenueCatRepoImpl()
+    fun provideRevenueCatRepo(crashAnalyticsHelper: CrashAnalyticsHelper): RevenueCatRepository{
+        return RevenueCatRepoImpl(crashAnalyticsHelper = crashAnalyticsHelper)
     }
 
     @Provides

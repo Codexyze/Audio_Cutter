@@ -18,6 +18,7 @@ import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.VideoSpeedRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
@@ -30,7 +31,8 @@ import javax.inject.Inject
 @UnstableApi
 class VideoSpeedRepoImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ) : VideoSpeedRepository {
 
     override suspend fun ChangeVideoSpeed(
@@ -41,11 +43,13 @@ class VideoSpeedRepoImpl @Inject constructor(
         emit(ResultState.Loading)
 
         if (filename.isBlank()) {
+            crashAnalyticsHelper.errorLog("VideoSpeed", "Filename is empty")
             emit(ResultState.Error("File name cannot be empty"))
             return@flow
         }
 
         if (!speed.isFinite() || speed < MIN_SPEED || speed > MAX_SPEED) {
+            crashAnalyticsHelper.errorLog("VideoSpeed", "Invalid speed: $speed")
             emit(ResultState.Error("Speed must be between $MIN_SPEED and $MAX_SPEED"))
             return@flow
         }
@@ -80,8 +84,10 @@ class VideoSpeedRepoImpl @Inject constructor(
 
                         analyticsRepository.logEventsNonSuspend("change_video_speed_success", null)
                         if (savedUri != null) {
+                            crashAnalyticsHelper.successLog("VideoSpeed", "Successfully changed speed of $filename to $speed")
                             resultChannel.trySend(ResultState.Success(savedUri.toString()))
                         } else {
+                            crashAnalyticsHelper.errorLog("VideoSpeed", "Failed to save output video after speed change")
                             resultChannel.trySend(ResultState.Error("Failed to save output video"))
                         }
                     }
@@ -94,6 +100,8 @@ class VideoSpeedRepoImpl @Inject constructor(
                         analyticsRepository.logEventsNonSuspend("change_video_speed_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Error changing video speed for $filename")
+                        crashAnalyticsHelper.errorLog("VideoSpeed", exportException.message ?: "Failed to change video speed")
                         resultChannel.trySend(
                             ResultState.Error(exportException.message ?: "Failed to change video speed")
                         )
@@ -104,6 +112,7 @@ class VideoSpeedRepoImpl @Inject constructor(
             transformer.start(editedMediaItem, outputFile.absolutePath)
             emit(resultChannel.receive())
         } catch (e: Exception) {
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in ChangeVideoSpeed for $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         } finally {
             resultChannel.close()

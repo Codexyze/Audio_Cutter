@@ -1,6 +1,7 @@
 package com.nutrino.audiocutter.data.RepoImpl
 
 import android.util.Log
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.room.database.AppDataBase
 import com.nutrino.audiocutter.data.room.entity.CropSegmentTable
 import com.nutrino.audiocutter.data.room.entity.RecentTable
@@ -11,7 +12,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class RecentRepositoryImpl @Inject constructor(
-    private val appDataBase: AppDataBase
+    private val appDataBase: AppDataBase,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ): RecentRepository {
     private companion object {
         const val TAG = "RecentRepository"
@@ -25,6 +27,8 @@ class RecentRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e(TAG, "getAllRecentEntries failed: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "getAllRecentEntries failed")
+            crashAnalyticsHelper.errorLog("Recent", "getAllRecentEntries failed: ${e.message}")
             emit(ResultState.Error("[getAllRecentEntries] ${e.message ?: "Something went wrong"}"))
         }
     }
@@ -33,9 +37,12 @@ class RecentRepositoryImpl @Inject constructor(
         emit(ResultState.Loading)
         try {
             appDataBase.recentTableDao().upsertRecentEntry(recentTable)
+            crashAnalyticsHelper.successLog("Recent", "Upserted recent entry: ${recentTable.output_name}")
             emit(ResultState.Success("Recent entry saved successfully"))
         } catch (e: Exception) {
             Log.e(TAG, "upsertRecentEntry failed: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "upsertRecentEntry failed")
+            crashAnalyticsHelper.errorLog("Recent", "upsertRecentEntry failed: ${e.message}")
             emit(ResultState.Error("[upsertRecentEntry] ${e.message ?: "Something went wrong"}"))
         }
     }
@@ -44,9 +51,12 @@ class RecentRepositoryImpl @Inject constructor(
         emit(ResultState.Loading)
         try {
             appDataBase.recentTableDao().deleteRecentEntry(recentTable)
+            crashAnalyticsHelper.successLog("Recent", "Deleted recent entry: ${recentTable.output_name}")
             emit(ResultState.Success("Recent entry deleted successfully"))
         } catch (e: Exception) {
             Log.e(TAG, "deleteRecentEntry failed: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "deleteRecentEntry failed")
+            crashAnalyticsHelper.errorLog("Recent", "deleteRecentEntry failed: ${e.message}")
             emit(ResultState.Error("[deleteRecentEntry] ${e.message ?: "Something went wrong"}"))
         }
     }
@@ -59,6 +69,8 @@ class RecentRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e(TAG, "getRecentEntriesByFeatureType failed: ${e.message}", e)
+            crashAnalyticsHelper.logNonFatalException(e, "getRecentEntriesByFeatureType failed")
+            crashAnalyticsHelper.errorLog("Recent", "getRecentEntriesByFeatureType failed: ${e.message}")
             emit(ResultState.Error("[getRecentEntriesByFeatureType] ${e.message ?: "Something went wrong"}"))
         }
     }

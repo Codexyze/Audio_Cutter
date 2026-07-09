@@ -1,6 +1,7 @@
 package com.nutrino.audiocutter.di.module
 
 import android.content.Context
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.RepoImpl.UserPrefRepositoryImpl
 import com.nutrino.audiocutter.data.userPref.UserPrefrenceStore
 import com.nutrino.audiocutter.domain.Repository.UserPrefRepository
@@ -24,8 +25,14 @@ object UserPrefModule {
     }
 
     @Provides
-    fun provideUserPrefRepository(userPrefrenceStore: UserPrefrenceStore): UserPrefRepository {
-        return UserPrefRepositoryImpl(userPrefrenceStore = userPrefrenceStore)
+    fun provideUserPrefRepository(
+        userPrefrenceStore: UserPrefrenceStore,
+        crashAnalyticsHelper: CrashAnalyticsHelper
+    ): UserPrefRepository {
+        return UserPrefRepositoryImpl(
+            userPrefrenceStore = userPrefrenceStore,
+            crashAnalyticsHelper = crashAnalyticsHelper
+        )
     }
 
     @Provides

@@ -17,6 +17,7 @@ import androidx.media3.transformer.EditedMediaItemSequence
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.Transformer
+import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.DataClass.Song
 import com.nutrino.audiocutter.domain.Repository.AnalyticsRepository
 import com.nutrino.audiocutter.domain.Repository.GetAllSongRepository
@@ -31,10 +32,12 @@ import javax.inject.Inject
 @UnstableApi
 class GetAllSongsRepoImpl @Inject constructor(
     private val context: Context,
-    private val analyticsRepository: AnalyticsRepository
+    private val analyticsRepository: AnalyticsRepository,
+    private val crashAnalyticsHelper: CrashAnalyticsHelper
 ): GetAllSongRepository {
     override suspend fun getAllSongs(): Flow<ResultState<List<Song>>> = flow{
         val songs = mutableListOf<Song>()
+        // ... (rest of projection)
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
@@ -82,8 +85,11 @@ class GetAllSongsRepoImpl @Inject constructor(
                 }
             }
             emit(ResultState.Success(data = songs))
+            crashAnalyticsHelper.successLog("GetAllSongs", "Successfully fetched ${songs.size} songs")
 
         }catch (e: Exception){
+            crashAnalyticsHelper.logNonFatalException(e, "Error fetching songs")
+            crashAnalyticsHelper.errorLog("GetAllSongs", e.message ?: "Unknown error")
             emit(ResultState.Error(message = e.message.toString()))
 
         }
@@ -139,8 +145,11 @@ class GetAllSongsRepoImpl @Inject constructor(
                 }
             }
             emit(ResultState.Success(data = songs))
+            crashAnalyticsHelper.successLog("GetAllSongsForMerge", "Successfully fetched ${songs.size} songs for merge")
 
         }catch (e: Exception){
+            crashAnalyticsHelper.logNonFatalException(e, "Error fetching songs for merge")
+            crashAnalyticsHelper.errorLog("GetAllSongsForMerge", e.message ?: "Unknown error")
             emit(ResultState.Error(message = e.message.toString()))
 
         }
@@ -178,6 +187,7 @@ class GetAllSongsRepoImpl @Inject constructor(
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
                         val savedUri = saveAudioFile(outputFile, "${filename}_${System.currentTimeMillis()}.m4a")
                         analyticsRepository.logEventsNonSuspend("merge_audio_success", null)
+                        crashAnalyticsHelper.successLog("MergeSongs", "Successfully merged songs into $filename")
                         resultChannel.trySend(ResultState.Success(savedUri.toString()))
                     }
 
@@ -189,6 +199,8 @@ class GetAllSongsRepoImpl @Inject constructor(
                         analyticsRepository.logEventsNonSuspend("merge_audio_error", android.os.Bundle().apply {
                             putString("error", exportException.message)
                         })
+                        crashAnalyticsHelper.logNonFatalException(exportException, "Merge songs failed for $filename")
+                        crashAnalyticsHelper.errorLog("MergeSongs", exportException.message ?: "Merge failed")
                         resultChannel.trySend(ResultState.Error(exportException.message ?: "Merge failed"))
                     }
                 })
@@ -199,6 +211,7 @@ class GetAllSongsRepoImpl @Inject constructor(
             emit(resultChannel.receive())
 
         } catch (e: Exception) {
+            crashAnalyticsHelper.logNonFatalException(e, "Exception in mergeSongs for $filename")
             emit(ResultState.Error(e.message ?: "Something went wrong"))
         }
     }
