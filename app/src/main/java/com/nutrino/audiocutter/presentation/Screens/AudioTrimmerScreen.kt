@@ -18,11 +18,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -247,9 +250,19 @@ fun AudioTrimmerScreen(
 
 
 
+    val isPlaying = remember { mutableStateOf(false) }
+
     DisposableEffect(Unit) {
+        val player = mediaPlayerViewModel.getPlayer()
+        val listener = object : androidx.media3.common.Player.Listener {
+            override fun onIsPlayingChanged(playing: Boolean) {
+                isPlaying.value = playing
+            }
+        }
+        player.addListener(listener)
         onDispose {
-            mediaPlayerViewModel.getPlayer().pause()
+            player.removeListener(listener)
+            player.pause()
         }
     }
 
@@ -346,30 +359,59 @@ fun AudioTrimmerScreen(
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                RangeSlider(
-                    value = startValue.value..endValue.value,
-                    onValueChange = {
-                        val oldStart = startValue.value
-                        val oldEnd = endValue.value
-                        
-                        startValue.value = it.start
-                        endValue.value = it.endInclusive
-                        
-                        // Seek player to the handle that moved
-                        if (it.start != oldStart) {
-                            mediaPlayerViewModel.getPlayer().seekTo(it.start.toLong())
-                        } else if (it.endInclusive != oldEnd) {
-                            mediaPlayerViewModel.getPlayer().pause()
-                        }
-                        
-                        // Update text fields when slider moves
-                        startText.value = formatTime(it.start.toLong() / 1000)
-                        endText.value = formatTime(it.endInclusive.toLong() / 1000)
-                    },
-                    valueRange = 0f..songDuration.toFloat(),
-                    steps = 0, // Always allow slider to work, even for songDuration = 0
-                    modifier = Modifier.fillMaxWidth(0.85f)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.9f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    IconButton(
+                        onClick = {
+                            val player = mediaPlayerViewModel.getPlayer()
+                            if (player.isPlaying) {
+                                player.pause()
+                            } else {
+                                // If player is at or beyond the end handle, seek back to start handle before playing
+                                if (player.currentPosition >= endValue.value || player.currentPosition < startValue.value) {
+                                    player.seekTo(startValue.value.toLong())
+                                }
+                                player.play()
+                            }
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isPlaying.value) Icons.Default.Pause else Icons.Default.PlayArrow,
+                            contentDescription = if (isPlaying.value) "Pause" else "Play",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+
+                    RangeSlider(
+                        value = startValue.value..endValue.value,
+                        onValueChange = {
+                            val oldStart = startValue.value
+                            val oldEnd = endValue.value
+
+                            startValue.value = it.start
+                            endValue.value = it.endInclusive
+
+                            // Seek player to the handle that moved
+                            if (it.start != oldStart) {
+                                mediaPlayerViewModel.getPlayer().seekTo(it.start.toLong())
+                            } else if (it.endInclusive != oldEnd) {
+                                mediaPlayerViewModel.getPlayer().pause()
+                            }
+
+                            // Update text fields when slider moves
+                            startText.value = formatTime(it.start.toLong() / 1000)
+                            endText.value = formatTime(it.endInclusive.toLong() / 1000)
+                        },
+                        valueRange = 0f..songDuration.toFloat(),
+                        steps = 0, // Always allow slider to work, even for songDuration = 0
+                        modifier = Modifier.weight(1f)
+                    )
+                }
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(0.85f)
