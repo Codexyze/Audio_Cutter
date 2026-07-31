@@ -16,6 +16,8 @@ firebaseMessaging = "25.0.2"
 firebaseAnalytics = "23.2.0"
 firebaseCrashlytics = "20.0.6"
 googleFirebaseCrashlytics = "3.0.7"
+ksp = "2.3.10"
+hilt = "2.60.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,8 +43,10 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
+legacy-kapt = { id = "com.android.legacy-kapt", version.ref = "agp" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
