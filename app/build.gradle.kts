@@ -4,9 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.serialization") version "2.4.10"
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.google.firebase.firebase.perf)
 }
 
 //These are test IDs only if app fails
@@ -25,7 +26,7 @@ val feedBackAds: String = project.findProperty("FEEDBACK_EMAIL") as? String ?:"y
 val bannerAdsID: String = project.findProperty("BANNER_ADS_ID")as? String ?:"ca-app-pub-3940256099942544/6300978111"
 
 //revenue cat Test api key
-val revenueCatApiKey: String = project.findProperty("REVENUE_CAT_API_KEY") as String?:"replace-with-api-key"
+val revenueCatApiKey: String = project.findProperty("REVENUE_CAT_API_KEY") as? String?:"replace-with-api-key"
 
 
 
@@ -44,9 +45,8 @@ android {
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 37
-        versionCode = 34
-        versionName = "sdk-update"
-
+        versionCode = 36
+        versionName = "2.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
 
@@ -87,6 +87,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.perf)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -98,15 +99,15 @@ dependencies {
     //  implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation(libs.androidx.navigation)
 
-    // Media3 - Use consistent version 1.5.0 for better compatibility with API 24+
-    implementation ("androidx.media3:media3-transformer:1.10.1")
-    implementation ("androidx.media3:media3-exoplayer:1.10.1")
-    implementation ("androidx.media3:media3-ui:1.10.1")
-    implementation ("androidx.media3:media3-common:1.10.1")
-    implementation ("androidx.media3:media3-session:1.10.1")
-    implementation("androidx.media3:media3-effect:1.10.1")
+    // Media3
+    implementation ("androidx.media3:media3-transformer:1.11.0")
+    implementation ("androidx.media3:media3-exoplayer:1.11.0")
+    implementation ("androidx.media3:media3-ui:1.11.0")
+    implementation ("androidx.media3:media3-common:1.11.0")
+    implementation ("androidx.media3:media3-session:1.11.0")
+    implementation("androidx.media3:media3-effect:1.11.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     implementation("com.google.dagger:hilt-android:2.60.1")
     ksp("com.google.dagger:hilt-android-compiler:2.60.1")
@@ -124,10 +125,10 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
 
     //RevenueCat
-    implementation("com.revenuecat.purchases:purchases:10.13.0")
-    implementation("com.revenuecat.purchases:purchases-ui:10.13.0")
+    implementation("com.revenuecat.purchases:purchases:10.17.0")
 
     //DataPrefStore
     implementation("androidx.datastore:datastore-preferences:1.2.1")
 
 }
+
