@@ -107,7 +107,7 @@ class VideoRepImpl @Inject constructor(
     ): Flow<ResultState<String>> = flow {
         emit(ResultState.Loading)
 
-        val resultChannel = Channel<ResultState<String>>() // ✅ Create channel for result
+        val resultChannel = Channel<ResultState<String>>() // Create channel for result
 
         try {
             val clippingConfiguration = MediaItem.ClippingConfiguration.Builder()
@@ -131,7 +131,7 @@ class VideoRepImpl @Inject constructor(
                         val savedUri = saveVideoFile(outputFile, "${filename}_${System.currentTimeMillis()}")
                         analyticsRepository.logEventsNonSuspend("trim_video_success", null)
                         crashAnalyticsHelper.successLog("VideoRepo", "Successfully trimmed video: $filename")
-                        resultChannel.trySend(ResultState.Success(savedUri.toString())) // ✅ Send success
+                        resultChannel.trySend(ResultState.Success(savedUri.toString())) // Send success
                     }
 
                     override fun onError(
@@ -144,14 +144,14 @@ class VideoRepImpl @Inject constructor(
                         })
                         crashAnalyticsHelper.logNonFatalException(exportException, "Error trimming video: $filename")
                         crashAnalyticsHelper.errorLog("VideoRepo", exportException.message ?: "Trim video failed")
-                        resultChannel.trySend(ResultState.Error(exportException.message ?: "Unknown error")) // ✅ Send error
+                        resultChannel.trySend(ResultState.Error(exportException.message ?: "Unknown error")) // Send error
                     }
                 })
                 .build()
 
             transformer.start(editedMediaItem, outputFile.absolutePath)
 
-            emit(resultChannel.receive()) // ✅ Await result and emit
+            emit(resultChannel.receive()) // Await result and emit
 
         } catch (e: Exception) {
             crashAnalyticsHelper.logNonFatalException(e, "Exception in TrimVideo: $filename")

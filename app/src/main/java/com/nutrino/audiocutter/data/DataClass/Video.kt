@@ -1,7 +1,5 @@
 package com.nutrino.audiocutter.data.DataClass
 
-import android.graphics.Bitmap
-
 data class Video(
     val id: String,
     val path: String,

@@ -4,8 +4,8 @@ import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.data.RepoImpl.RevenueCatRepoImpl
 import com.nutrino.audiocutter.domain.Repository.RevenueCatRepository
 import com.nutrino.audiocutter.domain.UseCases.revenueCat.BuyPremiumPackageUseCase
-import com.nutrino.audiocutter.domain.UseCases.revenueCat.GetAppUserIdUseCase
 import com.nutrino.audiocutter.domain.UseCases.revenueCat.GetAllPackagesUseCase
+import com.nutrino.audiocutter.domain.UseCases.revenueCat.GetAppUserIdUseCase
 import com.nutrino.audiocutter.domain.UseCases.revenueCat.IsUserProUseCase
 import dagger.Module
 import dagger.Provides

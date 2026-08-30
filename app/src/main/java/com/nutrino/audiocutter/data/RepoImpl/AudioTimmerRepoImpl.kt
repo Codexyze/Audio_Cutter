@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
@@ -42,7 +41,7 @@ class AudioTimmerRepoImpl(
     ): Flow<ResultState<String>> = flow {
         emit(ResultState.Loading)
 
-        val resultChannel = Channel<ResultState<String>>() // ✅ Create channel for result
+        val resultChannel = Channel<ResultState<String>>() // Create channel for result
 
         try {
             val clippingConfiguration = MediaItem.ClippingConfiguration.Builder()
@@ -66,7 +65,7 @@ class AudioTimmerRepoImpl(
                         val savedUri = saveAudioFile(context, outputFile, "${filename}_${System.currentTimeMillis()}")
                         analyticsRepository.logEventsNonSuspend("trim_audio_success", null)
                         crashAnalyticsHelper.successLog("AudioTrimmer", "Audio trimmed successfully: $filename")
-                        resultChannel.trySend(ResultState.Success(savedUri.toString())) // ✅ Send success
+                        resultChannel.trySend(ResultState.Success(savedUri.toString())) // Send success
                     }
 
                     override fun onError(
@@ -79,14 +78,14 @@ class AudioTimmerRepoImpl(
                         })
                         crashAnalyticsHelper.logNonFatalException(exportException, "Audio trimming failed for $filename")
                         crashAnalyticsHelper.errorLog("AudioTrimmer", exportException.message ?: "Unknown error")
-                        resultChannel.trySend(ResultState.Error(exportException.message ?: "Unknown error")) // ✅ Send error
+                        resultChannel.trySend(ResultState.Error(exportException.message ?: "Unknown error")) // Send error
                     }
                 })
                 .build()
 
             transformer.start(editedMediaItem, outputFile.absolutePath)
 
-            emit(resultChannel.receive()) // ✅ Await result and emit
+            emit(resultChannel.receive()) // Await result and emit
 
         } catch (e: Exception) {
             crashAnalyticsHelper.logNonFatalException(e, "Exception in TrimAudio for $filename")

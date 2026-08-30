@@ -119,7 +119,7 @@ class MultiCropVideoRepoImpl @Inject constructor(
                         }
                     }
 
-                    // ❌ On error
+                    // On error
                     override fun onError(
                         composition: Composition,
                         exportResult: ExportResult,

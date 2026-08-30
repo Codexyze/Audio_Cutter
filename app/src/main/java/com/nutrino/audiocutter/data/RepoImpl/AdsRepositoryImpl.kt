@@ -9,20 +9,22 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.OnUserEarnedRewardListener
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.nutrino.audiocutter.BuildConfig
 import com.nutrino.audiocutter.core.crashanalytics.CrashAnalyticsHelper
 import com.nutrino.audiocutter.domain.Repository.AdsRepository
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,6 +39,33 @@ class AdsRepositoryImpl @Inject constructor(
     private var isLoading = false
     private var isRewardedLoading = false
     private val TAG = "AdsRepository"
+
+    // Use Main dispatcher for SDK calls, SupervisorJob to prevent one failure from killing the scope
+    private val repoScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override fun initialize(activity: Activity) {
+        Log.d(TAG, "Initializing AdMob SDK...")
+        // MobileAds.initialize can be called from any thread, but usually triggered from UI
+        MobileAds.initialize(activity) { status ->
+            Log.d(TAG, "AdMob SDK Initialized. Status: $status")
+            status.adapterStatusMap.forEach { (adapter, info) ->
+                Log.d(TAG, "Adapter: $adapter, State: ${info.initializationState}, Desc: ${info.description}")
+            }
+
+            // Start loading ads immediately after initialization
+            // MUST be on Main Thread to avoid java.lang.IllegalStateException: #008
+            repoScope.launch {
+                loadInterstitialAd().collect { result ->
+                    Log.d(TAG, "Initial Interstitial Load State: $result")
+                }
+            }
+            repoScope.launch {
+                loadRewardedAd().collect { result ->
+                    Log.d(TAG, "Initial Rewarded Load State: $result")
+                }
+            }
+        }
+    }
 
     override suspend fun loadInterstitialAd(): Flow<ResultState<Boolean>> = callbackFlow {
         if (isLoading) {

@@ -1,12 +1,12 @@
 package com.nutrino.audiocutter.data.room.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import androidx.room.Delete
-import kotlinx.coroutines.flow.Flow
-import com.nutrino.audiocutter.data.room.entity.RecentTable
 import com.nutrino.audiocutter.Constants.RoomConstants
+import com.nutrino.audiocutter.data.room.entity.RecentTable
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecentTableDao {

@@ -45,8 +45,9 @@ android {
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 37
-        versionCode = 36
-        versionName = "2.0.0"
+        versionCode = 37
+        //major ui update
+        versionName = "2.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
 
@@ -121,7 +122,7 @@ dependencies {
     //Room
     val room_version = "2.8.4"
     implementation("androidx.room:room-runtime:$room_version")
-    ksp("androidx.room:room-compiler:$room_version") // Use kapt for Kotlin.
+    ksp("androidx.room:room-compiler:$room_version") // Use ksp for Kotlin.
     implementation("androidx.room:room-ktx:$room_version")
 
     //RevenueCat

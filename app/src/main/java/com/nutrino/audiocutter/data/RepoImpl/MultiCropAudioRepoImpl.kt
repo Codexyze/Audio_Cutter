@@ -114,7 +114,7 @@ class MultiCropAudioRepoImpl @Inject constructor(
                         resultChannel.trySend(ResultState.Success(savedUri.toString()))
                     }
 
-                    // ❌ On error
+                    // On error
                     override fun onError(
                         composition: Composition,
                         exportResult: ExportResult,

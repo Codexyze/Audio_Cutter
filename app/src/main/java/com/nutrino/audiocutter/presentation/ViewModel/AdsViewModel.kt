@@ -52,6 +52,10 @@ class AdsViewModel @Inject constructor(
         refreshIsUserProStatusForAds()
     }
 
+    fun initialize(activity: Activity) {
+        adsRepository.initialize(activity)
+    }
+
     fun refreshIsUserProStatusForAds() {
         viewModelScope.launch(Dispatchers.Main) {
             isUserProUseCase.invoke().collect { result ->

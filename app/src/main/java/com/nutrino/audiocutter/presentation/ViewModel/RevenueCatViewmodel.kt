@@ -1,16 +1,16 @@
 package com.nutrino.audiocutter.presentation.ViewModel
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import android.app.Activity
 import com.nutrino.audiocutter.domain.StateHandeling.BuyPremiumPackageState
-import com.nutrino.audiocutter.domain.StateHandeling.GetAppUserIdState
 import com.nutrino.audiocutter.domain.StateHandeling.GetAllPackageState
+import com.nutrino.audiocutter.domain.StateHandeling.GetAppUserIdState
 import com.nutrino.audiocutter.domain.StateHandeling.IsUserProState
 import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import com.nutrino.audiocutter.domain.UseCases.revenueCat.BuyPremiumPackageUseCase
-import com.nutrino.audiocutter.domain.UseCases.revenueCat.GetAppUserIdUseCase
 import com.nutrino.audiocutter.domain.UseCases.revenueCat.GetAllPackagesUseCase
+import com.nutrino.audiocutter.domain.UseCases.revenueCat.GetAppUserIdUseCase
 import com.nutrino.audiocutter.domain.UseCases.revenueCat.IsUserProUseCase
 import com.revenuecat.purchases.Package
 import dagger.hilt.android.lifecycle.HiltViewModel

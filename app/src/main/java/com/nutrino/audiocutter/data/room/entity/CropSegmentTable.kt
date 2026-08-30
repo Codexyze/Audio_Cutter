@@ -1,8 +1,8 @@
 package com.nutrino.audiocutter.data.room.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.ColumnInfo
 import com.nutrino.audiocutter.Constants.RoomConstants
 
 @Entity(tableName = RoomConstants.CROP_SEGMENT_TABLE_NAME)

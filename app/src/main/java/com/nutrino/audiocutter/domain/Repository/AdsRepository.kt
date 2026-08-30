@@ -6,6 +6,7 @@ import com.nutrino.audiocutter.domain.StateHandeling.ResultState
 import kotlinx.coroutines.flow.Flow
 
 interface AdsRepository {
+    fun initialize(activity: Activity)
     suspend fun loadInterstitialAd(): Flow<ResultState<Boolean>>
     suspend fun showInterstitialAd(activity: Activity): Flow<ResultState<Boolean>>
     fun isAdReady(): Boolean

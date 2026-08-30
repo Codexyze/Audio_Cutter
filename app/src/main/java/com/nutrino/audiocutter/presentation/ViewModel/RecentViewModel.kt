@@ -7,8 +7,8 @@ import com.nutrino.audiocutter.data.room.entity.RecentTable
 import com.nutrino.audiocutter.domain.StateHandeling.DeleteRecentCroppedSegmentState
 import com.nutrino.audiocutter.domain.StateHandeling.DeleteRecentEntryState
 import com.nutrino.audiocutter.domain.StateHandeling.GetAllRecentEntriesState
-import com.nutrino.audiocutter.domain.StateHandeling.GetRecentCropByFileTypeState
 import com.nutrino.audiocutter.domain.StateHandeling.GetCropSegmentsByFileNameState
+import com.nutrino.audiocutter.domain.StateHandeling.GetRecentCropByFileTypeState
 import com.nutrino.audiocutter.domain.StateHandeling.GetRecentCroppedSegmentFilesState
 import com.nutrino.audiocutter.domain.StateHandeling.GetRecentEntriesByDateModifiedAscState
 import com.nutrino.audiocutter.domain.StateHandeling.GetRecentEntriesByDateModifiedDescState

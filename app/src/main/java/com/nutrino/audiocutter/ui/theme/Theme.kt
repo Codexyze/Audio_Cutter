@@ -1,16 +1,15 @@
 package com.nutrino.audiocutter.ui.theme
 
+// be careful here
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nutrino.audiocutter.presentation.ViewModel.RevenueCatViewmodel
-// be careful here
-import com.nutrino.audiocutter.Constants.Colors as AppColors
 import com.nutrino.audiocutter.presentation.ViewModel.UserPrefViewModel
+import com.nutrino.audiocutter.Constants.Colors as AppColors
 
 private val AppBlack = Color(0xFF000000)
 private val AppWhite = Color(0xFFFFFFFF)

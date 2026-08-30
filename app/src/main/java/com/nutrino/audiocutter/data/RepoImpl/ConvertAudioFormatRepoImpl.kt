@@ -56,7 +56,7 @@ class ConvertAudioFormatRepoImpl @Inject constructor(
 
             // Map codec MIME type to container MIME type for MediaStore saving
             val containerMimeType = when (outputMimeType) {
-                "audio/mp4a-latm" -> "audio/mp4"   // AAC codec → MP4 container
+                "audio/mp4a-latm" -> "audio/mp4"   // AAC codec -> MP4 container
                 else -> "audio/mp4"                  // Fallback to MP4
             }
 
