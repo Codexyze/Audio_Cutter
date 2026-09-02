@@ -1,6 +1,5 @@
 package com.nutrino.audiocutter.presentation.Screens.recent
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
@@ -129,16 +128,7 @@ fun RecentScreen(
 
     LaunchedEffect(Unit) {
         recentViewModel.getAllRecentEntries()
-        
-        // Launch ad on screen open - if it fails, just continue silently
-        val activity = context as? Activity
-        if (activity != null) {
-            adsViewModel.requestAndShowAd(
-                activity = activity,
-                onAdDismissed = { /* Do nothing */ },
-                onAdFailed = { /* Do nothing, silently continue */ }
-            )
-        }
+
     }
 
     LaunchedEffect(state.data) {
