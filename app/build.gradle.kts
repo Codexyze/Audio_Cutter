@@ -45,9 +45,10 @@ android {
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 37
-        versionCode = 37
-        //major ui update
-        versionName = "2.0.1"
+        versionCode = 38
+        //2.0.1 (homescreen updated ) major ui update
+        //2.0.2 (pro screen better packages , volume booster 500X
+        versionName = "2.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
 
@@ -126,7 +127,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
 
     //RevenueCat
-    implementation("com.revenuecat.purchases:purchases:10.17.0")
+    implementation("com.revenuecat.purchases:purchases:10.19.1")
 
     //DataPrefStore
     implementation("androidx.datastore:datastore-preferences:1.2.1")
