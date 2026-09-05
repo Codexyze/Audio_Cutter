@@ -47,6 +47,9 @@ import androidx.navigation.NavController
 import com.nutrino.audiocutter.Constants.Colors
 import com.nutrino.audiocutter.presentation.ViewModel.RevenueCatViewmodel
 import com.nutrino.audiocutter.presentation.ViewModel.UserPrefViewModel
+import com.revenuecat.purchases.Package
+import com.revenuecat.purchases.PackageType
+import com.revenuecat.purchases.models.Period
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -302,12 +305,33 @@ fun ProPackageScreen(
                                         .padding(16.dp),
                                     verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Text(
-                                        text = pkg.product.title,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = pkg.product.title,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier.weight(1f)
+                                        )
+
+                                        Surface(
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(8.dp)
+                                        ) {
+                                            Text(
+                                                text = pkg.getDurationText(),
+                                                style = MaterialTheme.typography.labelMedium,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary,
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                            )
+                                        }
+                                    }
+
                                     if (pkg.product.description.isNotBlank()) {
                                         Text(
                                             text = pkg.product.description,
@@ -343,6 +367,33 @@ fun ProPackageScreen(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+fun Package.getDurationText(): String {
+    return when (packageType) {
+        PackageType.MONTHLY -> "1 Month"
+        PackageType.TWO_MONTH -> "2 Months"
+        PackageType.THREE_MONTH -> "3 Months"
+        PackageType.SIX_MONTH -> "6 Months"
+        PackageType.ANNUAL -> "12 Months (1 Year)"
+        PackageType.WEEKLY -> "1 Week"
+        PackageType.LIFETIME -> "Lifetime Access"
+        else -> {
+            val period = product.period
+            if (period != null) {
+                val value = period.value
+                when (period.unit) {
+                    Period.Unit.MONTH -> if (value == 1) "1 Month" else "$value Months"
+                    Period.Unit.YEAR -> if (value == 1) "12 Months (1 Year)" else "${value * 12} Months"
+                    Period.Unit.WEEK -> if (value == 1) "1 Week" else "$value Weeks"
+                    Period.Unit.DAY -> if (value == 1) "1 Day" else "$value Days"
+                    else -> "Subscription Plan"
+                }
+            } else {
+                "Subscription Plan"
             }
         }
     }

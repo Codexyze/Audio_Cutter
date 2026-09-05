@@ -1,5 +1,5 @@
 [versions]
-agp = "9.3.1"
+agp = "9.3.2"
 kotlin = "2.4.10"
 coreKtx = "1.19.0"
 junit = "4.13.2"
@@ -8,15 +8,14 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
 composeBom = "2026.08.00"
-nav_version = "2.9.8"
-media3Transformer = "1.11.0"
+nav_version = "2.10.0"
 foundation = "1.12.0"
 googleGmsGoogleServices = "4.5.0"
-firebaseMessaging = "25.1.1"
+firebaseMessaging = "25.1.2"
 firebaseAnalytics = "23.2.0"
 firebaseCrashlytics = "20.1.0"
-googleFirebaseCrashlytics = "3.0.7"
-ksp = "2.3.10"
+googleFirebaseCrashlytics = "3.0.8"
+ksp = "2.3.11"
 hilt = "2.60.1"
 firebasePerf = "22.0.6"
 googleFirebaseFirebasePerf = "2.0.2"
@@ -37,7 +36,6 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation={group="androidx.navigation",name="navigation-compose",version.ref="nav_version"}
-androidx-media3-transformer = { group = "androidx.media3", name = "media3-transformer", version.ref = "media3Transformer" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
@@ -49,7 +47,6 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "googleFirebaseCrashlytics" }
-legacy-kapt = { id = "com.android.legacy-kapt", version.ref = "agp" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 google-firebase-firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "googleFirebaseFirebasePerf" }

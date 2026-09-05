@@ -208,7 +208,7 @@ fun AudioVolumeBoosterScreen(
                         Slider(
                             value = volumeFactor,
                             onValueChange = { volumeFactor = it },
-                            valueRange = 0f..2f,
+                            valueRange = 0f..5f,
                             modifier = Modifier.fillMaxWidth()
                         )
                         Row(
@@ -217,7 +217,8 @@ fun AudioVolumeBoosterScreen(
                         ) {
                             Text("0%", style = MaterialTheme.typography.bodySmall)
                             Text("100%", style = MaterialTheme.typography.bodySmall)
-                            Text("200%", style = MaterialTheme.typography.bodySmall)
+                            Text("300%", style = MaterialTheme.typography.bodySmall)
+                            Text("500%", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
