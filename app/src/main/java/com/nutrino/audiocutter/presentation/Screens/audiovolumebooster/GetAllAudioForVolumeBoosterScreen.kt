@@ -22,10 +22,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
@@ -52,6 +54,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -123,7 +126,20 @@ fun GetAllAudioForVolumeBoosterScreen(navController: NavController) {
             .background(MaterialTheme.colorScheme.background)
     ) {
         TopAppBar(
-            title = { Text("Select Audio for Volume") },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text("Select Audio for Volume")
+                }
+            },
             navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
@@ -143,6 +159,7 @@ fun GetAllAudioForVolumeBoosterScreen(navController: NavController) {
             when {
                 state.isLoading -> {
                     CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -151,6 +168,7 @@ fun GetAllAudioForVolumeBoosterScreen(navController: NavController) {
                     Text(
                         text = "Error: ${state.error}",
                         color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -185,7 +203,18 @@ fun GetAllAudioForVolumeBoosterScreen(navController: NavController) {
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                             placeholder = { Text("Search audio files...") },
                             leadingIcon = {
-                                Icon(Icons.Default.Search, "Search")
+                                Icon(Icons.Default.Search, "Search", tint = MaterialTheme.colorScheme.primary)
+                            },
+                            trailingIcon = {
+                                if (searchQuery.isNotEmpty()) {
+                                    IconButton(onClick = { searchQuery = "" }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Clear,
+                                            contentDescription = "Clear",
+                                            tint = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
                             },
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
@@ -218,9 +247,15 @@ fun GetAllAudioForVolumeBoosterScreen(navController: NavController) {
 @Composable
 fun SongItemForAudioVolume(song: Song, navController: NavController) {
     Card(
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(
+            0.5.dp,
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
@@ -246,20 +281,22 @@ fun SongItemForAudioVolume(song: Song, navController: NavController) {
                     contentDescription = "Album Art",
                     modifier = Modifier
                         .size(56.dp)
-                        .clip(CircleShape)
+                        .clip(RoundedCornerShape(10.dp)),
+                    contentScale = ContentScale.Crop
                 )
             } else {
                 Box(
                     modifier = Modifier
                         .size(56.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer),
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Default.MusicNote,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(26.dp)
                     )
                 }
             }
@@ -267,11 +304,13 @@ fun SongItemForAudioVolume(song: Song, navController: NavController) {
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
                     text = song.title ?: "Unknown Title",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1
                 )
@@ -279,17 +318,25 @@ fun SongItemForAudioVolume(song: Song, navController: NavController) {
                 Text(
                     text = song.artist ?: "Unknown Artist",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
                     maxLines = 1
                 )
 
                 Text(
                     text = formatDuration(song.duration),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1
                 )
             }
+
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                modifier = Modifier.size(20.dp)
+            )
         }
     }
 }

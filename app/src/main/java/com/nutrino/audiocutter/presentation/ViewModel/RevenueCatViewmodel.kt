@@ -45,20 +45,21 @@ class RevenueCatViewmodel @Inject constructor(
             getAllPackagesUseCase.invoke().collect { resultState ->
                 when(resultState){
                     is ResultState.Loading -> {
-                        _getAllPackageState.value = GetAllPackageState(
+                        _getAllPackageState.value = _getAllPackageState.value.copy(
                             isLoading = true
                         )
                     }
                     is ResultState.Error->{
-                        _getAllPackageState.value = GetAllPackageState(
-                            isLoading = false ,
+                        _getAllPackageState.value = _getAllPackageState.value.copy(
+                            isLoading = false,
                             error = resultState.message
                         )
                     }
                     is ResultState.Success -> {
                         _getAllPackageState.value = GetAllPackageState(
                             isLoading = false,
-                            data =  resultState.data
+                            data = resultState.data,
+                            error = null
                         )
                     }
                 }
@@ -72,12 +73,12 @@ class RevenueCatViewmodel @Inject constructor(
             isUserProUseCase.invoke().collect { resultState ->
                 when (resultState) {
                     is ResultState.Loading -> {
-                        _isUserProState.value = IsUserProState(
+                        _isUserProState.value = _isUserProState.value.copy(
                             isLoading = true
                         )
                     }
                     is ResultState.Error -> {
-                        _isUserProState.value = IsUserProState(
+                        _isUserProState.value = _isUserProState.value.copy(
                             isLoading = false,
                             error = resultState.message
                         )
@@ -85,7 +86,8 @@ class RevenueCatViewmodel @Inject constructor(
                     is ResultState.Success -> {
                         _isUserProState.value = IsUserProState(
                             isLoading = false,
-                            data = resultState.data
+                            data = resultState.data,
+                            error = null
                         )
                     }
                 }
@@ -101,13 +103,13 @@ class RevenueCatViewmodel @Inject constructor(
             ).collect { resultState ->
                 when (resultState) {
                     is ResultState.Loading -> {
-                        _buyPremiumPackageState.value = BuyPremiumPackageState(
+                        _buyPremiumPackageState.value = _buyPremiumPackageState.value.copy(
                             isLoading = true
                         )
                     }
 
                     is ResultState.Error -> {
-                        _buyPremiumPackageState.value = BuyPremiumPackageState(
+                        _buyPremiumPackageState.value = _buyPremiumPackageState.value.copy(
                             isLoading = false,
                             error = resultState.message
                         )
@@ -117,7 +119,8 @@ class RevenueCatViewmodel @Inject constructor(
                     is ResultState.Success -> {
                         _buyPremiumPackageState.value = BuyPremiumPackageState(
                             isLoading = false,
-                            data = resultState.data
+                            data = resultState.data,
+                            error = null
                         )
                         checkIsUserPro()
                     }
@@ -131,12 +134,12 @@ class RevenueCatViewmodel @Inject constructor(
             getAppUserIdUseCase.invoke().collect { resultState ->
                 when (resultState) {
                     is ResultState.Loading -> {
-                        _getAppUserIdState.value = GetAppUserIdState(
+                        _getAppUserIdState.value = _getAppUserIdState.value.copy(
                             isLoading = true
                         )
                     }
                     is ResultState.Error -> {
-                        _getAppUserIdState.value = GetAppUserIdState(
+                        _getAppUserIdState.value = _getAppUserIdState.value.copy(
                             isLoading = false,
                             error = resultState.message
                         )
@@ -144,7 +147,8 @@ class RevenueCatViewmodel @Inject constructor(
                     is ResultState.Success -> {
                         _getAppUserIdState.value = GetAppUserIdState(
                             isLoading = false,
-                            data = resultState.data
+                            data = resultState.data,
+                            error = null
                         )
                     }
                 }

@@ -4,35 +4,47 @@ import android.app.Activity
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,17 +52,19 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
@@ -67,6 +81,8 @@ import com.nutrino.audiocutter.presentation.ViewModel.RecentViewModel
 import com.nutrino.audiocutter.presentation.ViewModel.VideoSpeedViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 private const val MIN_SPEED = 0.25f
@@ -85,17 +101,18 @@ fun VideoSpeedScreen(
     videoDuration: Long = 0,
     videoName: String = ""
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
 
     val outputName = rememberSaveable { mutableStateOf("Speed $videoName") }
     val adShown = rememberSaveable { mutableStateOf(false) }
 
-    var speedValue by rememberSaveable { mutableStateOf(1f) }
+    var speedValue by rememberSaveable { mutableFloatStateOf(1f) }
     var speedText by rememberSaveable { mutableStateOf("1.00") }
     var speedDropdownExpanded by rememberSaveable { mutableStateOf(false) }
     val speedOptions = rememberSaveable {
         (1..12).map { step -> step * 0.25f }
     }
+    val quickPresets = remember { listOf(0.50f, 0.75f, 1.00f, 1.25f, 1.50f, 2.00f) }
 
     val videoSpeedState by videoSpeedViewModel.videoSpeedState.collectAsState()
     val upsertRecentState = recentViewModel.upsertRecentEntryState.collectAsState()
@@ -104,9 +121,9 @@ fun VideoSpeedScreen(
     // Daily Limit Dialog
     if (userLimitState.isLimitReached) {
         val nextRefreshDate = remember {
-            val calendar = java.util.Calendar.getInstance()
-            calendar.add(java.util.Calendar.DAY_OF_YEAR, 1)
-            java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(calendar.time)
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(calendar.time)
         }
 
         AlertDialog(
@@ -231,19 +248,57 @@ fun VideoSpeedScreen(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AndroidView(
-                factory = {
-                    PlayerView(it).apply {
-                        player = mediaPlayerViewModel.getPlayer()
-                        useController = true
-                        setShowNextButton(false)
-                        setShowPreviousButton(false)
-                    }
-                },
+            // Player View Framed in Studio Card Container
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp)
-            )
+                    .padding(16.dp),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Speed,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = "Video Speed Preview",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+
+                    AndroidView(
+                        factory = {
+                            PlayerView(it).apply {
+                                player = mediaPlayerViewModel.getPlayer()
+                                useController = true
+                                setShowNextButton(false)
+                                setShowPreviousButton(false)
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(240.dp)
+                    )
+                }
+            }
 
             when {
                 videoSpeedState.isLoading -> {
@@ -281,7 +336,7 @@ fun VideoSpeedScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
@@ -289,111 +344,208 @@ fun VideoSpeedScreen(
                         value = outputName.value,
                         onValueChange = { outputName.value = it },
                         label = { Text("Video File Name", color = MaterialTheme.colorScheme.primary) },
-                        modifier = Modifier.fillMaxWidth(0.88f),
+                        modifier = Modifier.fillMaxWidth(0.92f),
+                        shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
                         ),
-                        textStyle = TextStyle(color = MaterialTheme.colorScheme.primary),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                         singleLine = true
                     )
                 }
 
+                // Tempo Controls Studio Card Container
                 item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(0.88f),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Card(
+                        modifier = Modifier.fillMaxWidth(0.92f),
+                        shape = RoundedCornerShape(20.dp),
+                        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        OutlinedTextField(
-                            value = speedText,
-                            onValueChange = { newValue ->
-                                speedText = newValue
-                                val parsed = newValue.toFloatOrNull()
-                                if (parsed != null && parsed in MIN_SPEED..MAX_SPEED) {
-                                    speedValue = parsed
-                                }
-                            },
-                            label = { Text("Custom Speed") },
-                            modifier = Modifier.weight(1f),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                            ),
-                            textStyle = TextStyle(color = MaterialTheme.colorScheme.primary),
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                            singleLine = true
-                        )
-
-                        ExposedDropdownMenuBox(
-                            expanded = speedDropdownExpanded,
-                            onExpandedChange = { speedDropdownExpanded = !speedDropdownExpanded },
-                            modifier = Modifier.weight(1f)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(14.dp)
                         ) {
-                            OutlinedTextField(
-                                value = String.format(Locale.getDefault(), "%.2fx", speedValue),
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text("Preset") },
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = speedDropdownExpanded)
-                                },
-                                modifier = Modifier
-                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                    .fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                                ),
-                                textStyle = TextStyle(color = MaterialTheme.colorScheme.primary)
+                            Text(
+                                text = "Tempo Controls",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
                             )
 
-                            ExposedDropdownMenu(
-                                expanded = speedDropdownExpanded,
-                                onDismissRequest = { speedDropdownExpanded = false }
+                            // Speed Readout Badge Pill (Monospaced, Jitter-Free)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                speedOptions.forEach { option ->
-                                    DropdownMenuItem(
-                                        text = {
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f),
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                                ) {
+                                    val formattedSpeedText = remember(speedValue) {
+                                        String.format(Locale.getDefault(), "%.2fx", speedValue)
+                                    }
+                                    Text(
+                                        text = formattedSpeedText,
+                                        style = MaterialTheme.typography.titleLarge.copy(
+                                            fontFamily = FontFamily.Monospace,
+                                            fontWeight = FontWeight.Bold
+                                        ),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                                    )
+                                }
+                            }
+
+                            // Quick Tempo Preset Chips
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                items(quickPresets) { preset ->
+                                    val isSelected = (speedValue - preset).let { kotlin.math.abs(it) < 0.01f }
+                                    val presetTextFormatted = remember(preset) {
+                                        String.format(Locale.getDefault(), "%.2fx", preset)
+                                    }
+                                    FilterChip(
+                                        selected = isSelected,
+                                        onClick = {
+                                            speedValue = preset
+                                            speedText = String.format(Locale.getDefault(), "%.2f", preset)
+                                        },
+                                        label = {
                                             Text(
-                                                text = String.format(Locale.getDefault(), "%.2fx", option),
-                                                color = MaterialTheme.colorScheme.onSurface
+                                                text = presetTextFormatted,
+                                                style = MaterialTheme.typography.labelMedium.copy(
+                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                                )
                                             )
                                         },
-                                        onClick = {
-                                            speedValue = option
-                                            speedText = String.format(Locale.getDefault(), "%.2f", option)
-                                            speedDropdownExpanded = false
-                                        }
+                                        colors = FilterChipDefaults.filterChipColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                            selectedLabelColor = MaterialTheme.colorScheme.primary
+                                        ),
+                                        border = FilterChipDefaults.filterChipBorder(
+                                            enabled = true,
+                                            selected = isSelected,
+                                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                            selectedBorderColor = MaterialTheme.colorScheme.primary
+                                        ),
+                                        shape = RoundedCornerShape(8.dp)
                                     )
+                                }
+                            }
+
+                            // Tempo Slider
+                            Slider(
+                                value = speedValue,
+                                onValueChange = {
+                                    speedValue = it
+                                    speedText = String.format(Locale.getDefault(), "%.2f", it)
+                                },
+                                valueRange = MIN_SPEED..MAX_SPEED,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+
+                            // Custom Numeric Entry & Preset Dropdown Row
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                OutlinedTextField(
+                                    value = speedText,
+                                    onValueChange = { newValue ->
+                                        speedText = newValue
+                                        val parsed = newValue.toFloatOrNull()
+                                        if (parsed != null && parsed in MIN_SPEED..MAX_SPEED) {
+                                            speedValue = parsed
+                                        }
+                                    },
+                                    label = { Text("Custom Speed") },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(10.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                    ),
+                                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+                                    singleLine = true
+                                )
+
+                                ExposedDropdownMenuBox(
+                                    expanded = speedDropdownExpanded,
+                                    onExpandedChange = { speedDropdownExpanded = !speedDropdownExpanded },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    val formattedDropdownValue = remember(speedValue) {
+                                        String.format(Locale.getDefault(), "%.2fx", speedValue)
+                                    }
+                                    OutlinedTextField(
+                                        value = formattedDropdownValue,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        label = { Text("Preset List") },
+                                        trailingIcon = {
+                                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = speedDropdownExpanded)
+                                        },
+                                        modifier = Modifier
+                                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                            .fillMaxWidth(),
+                                        shape = RoundedCornerShape(10.dp),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                        ),
+                                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                                    )
+
+                                    ExposedDropdownMenu(
+                                        expanded = speedDropdownExpanded,
+                                        onDismissRequest = { speedDropdownExpanded = false }
+                                    ) {
+                                        speedOptions.forEach { option ->
+                                            val optionTextFormatted = remember(option) {
+                                                String.format(Locale.getDefault(), "%.2fx", option)
+                                            }
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(
+                                                        text = optionTextFormatted,
+                                                        color = MaterialTheme.colorScheme.onSurface
+                                                    )
+                                                },
+                                                onClick = {
+                                                    speedValue = option
+                                                    speedText = String.format(Locale.getDefault(), "%.2f", option)
+                                                    speedDropdownExpanded = false
+                                                }
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
+                // Apply Speed Primary CTA Button
                 item {
-                    Text(
-                        text = "Speed: ${String.format(Locale.getDefault(), "%.2f", speedValue)}x",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Slider(
-                        value = speedValue,
-                        onValueChange = {
-                            speedValue = it
-                            speedText = String.format(Locale.getDefault(), "%.2f", it)
-                        },
-                        valueRange = MIN_SPEED..MAX_SPEED,
-                        modifier = Modifier.fillMaxWidth(0.88f)
-                    )
-                }
-
-
-                item {
-                    val isProcessing = videoSpeedState.isLoading || userLimitState.isLoading
+                    val isProcessing = userLimitState.isLoading
 
                     Button(
                         onClick = {
@@ -426,9 +578,9 @@ fun VideoSpeedScreen(
                             )
                         },
                         modifier = Modifier
-                            .fillMaxWidth(0.76f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
+                            .fillMaxWidth(0.92f)
+                            .height(52.dp),
+                        shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         enabled = !isProcessing
                     ) {
@@ -439,7 +591,17 @@ fun VideoSpeedScreen(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Apply Speed", style = MaterialTheme.typography.titleMedium)
+                            Icon(
+                                imageVector = Icons.Default.Speed,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Apply Speed",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }

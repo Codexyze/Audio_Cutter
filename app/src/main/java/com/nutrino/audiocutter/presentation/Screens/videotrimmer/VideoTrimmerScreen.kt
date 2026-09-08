@@ -144,7 +144,7 @@ fun VideoTrimmerScreen(
         val nextRefreshDate = remember {
             val calendar = java.util.Calendar.getInstance()
             calendar.add(java.util.Calendar.DAY_OF_YEAR, 1)
-            java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(calendar.time)
+            java.text.SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(calendar.time)
         }
 
         AlertDialog(

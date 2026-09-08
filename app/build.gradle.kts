@@ -47,7 +47,7 @@ android {
         targetSdk = 37
         versionCode = 38
         //2.0.1 (homescreen updated ) major ui update
-        //2.0.2 (pro screen better packages , volume booster 500X
+        //2.0.2 (pro screen better packages , volume booster 500
         versionName = "2.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -127,7 +127,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
 
     //RevenueCat
-    implementation("com.revenuecat.purchases:purchases:10.19.1")
+    implementation("com.revenuecat.purchases:purchases:10.20.0")
 
     //DataPrefStore
     implementation("androidx.datastore:datastore-preferences:1.2.1")

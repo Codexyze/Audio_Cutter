@@ -24,7 +24,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,8 +51,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -59,7 +61,6 @@ import com.nutrino.audiocutter.presentation.Navigation.AUDIOTRIMMERSCREEN
 import com.nutrino.audiocutter.presentation.Utils.formatDuration
 import com.nutrino.audiocutter.presentation.ViewModel.GetAllSongViewModel
 import com.nutrino.audiocutter.presentation.components.BannerAdView
-
 
 @Composable
 fun AllAudioScreen(navController: NavController) {
@@ -209,19 +210,29 @@ fun AllAudioScreen(navController: NavController) {
 }
 
 @Composable
-fun SongItem(song: Song,navController: NavController) {
+fun SongItem(song: Song, navController: NavController) {
     Card(
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier.fillMaxWidth().clickable{
-            val durationLong = song.duration?.toLongOrNull() ?: 0L
-            navController.navigate(AUDIOTRIMMERSCREEN(
-                uri = song.path,
-                songDuration = durationLong,
-                songName = song.title.orEmpty()
-            ))
-        }
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(
+            0.5.dp,
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                val durationLong = song.duration?.toLongOrNull() ?: 0L
+                navController.navigate(
+                    AUDIOTRIMMERSCREEN(
+                        uri = song.path,
+                        songDuration = durationLong,
+                        songName = song.title.orEmpty()
+                    )
+                )
+            }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -234,44 +245,62 @@ fun SongItem(song: Song,navController: NavController) {
                     bitmap = song.albumArt.asImageBitmap(),
                     contentDescription = "Album Art",
                     modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(8.dp)),
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop
                 )
             } else {
-                // Placeholder
                 Box(
                     modifier = Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("🎵", fontSize = 24.sp)
+                    Icon(
+                        imageVector = Icons.Default.MusicNote,
+                        contentDescription = "Music",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(26.dp)
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
                 Text(
                     text = song.title ?: "Unknown Title",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1
                 )
 
                 Text(
-                    text = "Artist: ${song.artist ?: "Unknown"}",
+                    text = song.artist ?: "Unknown Artist",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
+                    maxLines = 1
                 )
 
                 Text(
-                    text = "Duration: ${formatDuration(song.duration)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    text = formatDuration(song.duration),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
                 )
             }
+
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                modifier = Modifier.size(20.dp)
+            )
         }
     }
 }

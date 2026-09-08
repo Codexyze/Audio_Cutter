@@ -8,14 +8,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -25,6 +31,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
@@ -88,15 +96,15 @@ fun ConvertAudioFormatScreen(
 ) {
     val context = LocalContext.current
 
-    // Output formats actually supported by Media3 Transformer's setAudioMimeType()
-    // Only AAC is fully supported - MP3, Vorbis, AMR, OGG all throw IllegalStateException
-    val supportedFormats = listOf(
-        AudioFormatOption("AAC (.m4a)", MimeTypes.AUDIO_AAC, "m4a"),
-        AudioFormatOption("MP3 (.mp3) — Coming Soon", "", "mp3", comingSoon = true),
-        AudioFormatOption("WAV (.wav) — Coming Soon", "", "wav", comingSoon = true),
-        AudioFormatOption("OGG (.ogg) — Coming Soon", "", "ogg", comingSoon = true),
-        AudioFormatOption("FLAC (.flac) — Coming Soon", "", "flac", comingSoon = true)
-    )
+    val supportedFormats = remember {
+        listOf(
+            AudioFormatOption("AAC (.m4a)", MimeTypes.AUDIO_AAC, "m4a"),
+            AudioFormatOption("MP3 (.mp3) — Coming Soon", "", "mp3", comingSoon = true),
+            AudioFormatOption("WAV (.wav) — Coming Soon", "", "wav", comingSoon = true),
+            AudioFormatOption("OGG (.ogg) — Coming Soon", "", "ogg", comingSoon = true),
+            AudioFormatOption("FLAC (.flac) — Coming Soon", "", "flac", comingSoon = true)
+        )
+    }
 
     // State
     val filename = rememberSaveable { mutableStateOf("Converted $songName") }
@@ -164,20 +172,57 @@ fun ConvertAudioFormatScreen(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // ExoPlayer View
-            AndroidView(
-                factory = {
-                    PlayerView(it).apply {
-                        player = mediaPlayerViewModel.getPlayer()
-                        useController = true
-                        setShowNextButton(false)
-                        setShowPreviousButton(false)
-                    }
-                },
+            // ExoPlayer Studio Card Container
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp)
-            )
+                    .padding(16.dp),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.SwapHoriz,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = "Audio Format Preview",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+
+                    AndroidView(
+                        factory = {
+                            PlayerView(it).apply {
+                                player = mediaPlayerViewModel.getPlayer()
+                                useController = true
+                                setShowNextButton(false)
+                                setShowPreviousButton(false)
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(240.dp)
+                    )
+                }
+            }
 
             // Handle states
             when {
@@ -218,32 +263,23 @@ fun ConvertAudioFormatScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Song name display
-                item {
-                    Text(
-                        text = songName,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-
                 // Filename input
                 item {
                     OutlinedTextField(
                         value = filename.value,
                         onValueChange = { filename.value = it },
-                        label = { Text("Save As", color = MaterialTheme.colorScheme.primary) },
+                        label = { Text("Output Filename", color = MaterialTheme.colorScheme.primary) },
                         placeholder = { Text("Enter filename for converted audio", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) },
-                        modifier = Modifier.fillMaxWidth(0.9f),
+                        modifier = Modifier.fillMaxWidth(0.92f),
+                        shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
                         ),
-                        textStyle = TextStyle(color = MaterialTheme.colorScheme.primary),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text)
                     )
@@ -252,25 +288,25 @@ fun ConvertAudioFormatScreen(
                 // Format selector section
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(0.9f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                        modifier = Modifier.fillMaxWidth(0.92f),
+                        shape = RoundedCornerShape(20.dp),
+                        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
                         ),
-                        shape = RoundedCornerShape(16.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Text(
                                 "Select Output Format",
                                 color = MaterialTheme.colorScheme.primary,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
                             )
-
-                            Spacer(modifier = Modifier.height(12.dp))
 
                             // Dropdown for format selection
                             ExposedDropdownMenuBox(
@@ -289,11 +325,12 @@ fun ConvertAudioFormatScreen(
                                     modifier = Modifier
                                         .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                                         .fillMaxWidth(),
+                                    shape = RoundedCornerShape(10.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
                                     ),
-                                    textStyle = TextStyle(color = MaterialTheme.colorScheme.primary)
+                                    textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface)
                                 )
 
                                 ExposedDropdownMenu(
@@ -325,34 +362,13 @@ fun ConvertAudioFormatScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(12.dp))
-
                             // Format info
                             Text(
-                                text = "Output: ${supportedFormats[selectedFormatIndex].extension.uppercase()} format",
+                                text = "Target: ${supportedFormats[selectedFormatIndex].extension.uppercase()} format",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                    }
-                }
-
-                // Info card
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(0.9f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = "Convert your audio to different formats. Select the desired output format from the dropdown and click convert. The converted file will be saved to Music/AudioCutter folder.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(12.dp)
-                        )
                     }
                 }
 
@@ -378,19 +394,33 @@ fun ConvertAudioFormatScreen(
                             }
                         },
                         modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .height(56.dp),
-                        enabled = true,
+                            .fillMaxWidth(0.92f)
+                            .height(52.dp),
+                        enabled = !convertState.isLoading,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text(
-                            text = "Convert Audio",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if (convertState.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.SwapHoriz,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Convert Audio",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
@@ -400,4 +430,3 @@ fun ConvertAudioFormatScreen(
         BannerAdView(modifier = Modifier.fillMaxWidth())
     }
 }
-

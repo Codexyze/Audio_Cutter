@@ -1,5 +1,8 @@
 package com.nutrino.audiocutter.presentation.Screens.home
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -20,6 +24,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -35,9 +41,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.nutrino.audiocutter.Constants.Colors
@@ -66,17 +75,34 @@ fun ThemeSelectionScreen(
     }
 
     val themeOptions = listOf(
-        ThemeOption("Red", Colors.REDTHEME, Color(0xFFFF0B55)),
-        ThemeOption("Green", Colors.GREENTHEME, Color(0xFF8BC34A)),
-        ThemeOption("Blue", Colors.BLUETHEME, Color(0xFF03A9F4)),
-        ThemeOption("Yellow", Colors.YELLOWTHEME, Color(0xFFFFEB3B)),
-        ThemeOption("Purple", Colors.PURPLETHEME, Color(0xFFDF77EE)),
-        ThemeOption("Pink", Colors.PINKTHEME, Color(0xFFF35389)),
-        ThemeOption("Orange", Colors.ORANGETHEME, Color(0xFFF54E1B))
+        ThemeOption("Crimson Red", Colors.REDTHEME, Color(0xFFFF0B55)),
+        ThemeOption("Lime Green", Colors.GREENTHEME, Color(0xFF8BC34A)),
+        ThemeOption("Sky Blue", Colors.BLUETHEME, Color(0xFF03A9F4)),
+        ThemeOption("Electric Yellow", Colors.YELLOWTHEME, Color(0xFFFFEB3B)),
+        ThemeOption("Orchid Purple", Colors.PURPLETHEME, Color(0xFFDF77EE)),
+        ThemeOption("Deep Pink", Colors.PINKTHEME, Color(0xFFF35389)),
+        ThemeOption("Fiery Orange", Colors.ORANGETHEME, Color(0xFFF54E1B)),
+        // 16 Additional Professional Studio Themes
+        ThemeOption("Cyber Cyan", Colors.TEALTHEME, Color(0xFF00E5FF)),
+        ThemeOption("Emerald Studio", Colors.EMERALDTHEME, Color(0xFF00E676)),
+        ThemeOption("Cosmic Indigo", Colors.INDIGOTHEME, Color(0xFF651FFF)),
+        ThemeOption("Cyber Amber", Colors.AMBERTHEME, Color(0xFFFFC400)),
+        ThemeOption("Vivid Crimson", Colors.CRIMSONTHEME, Color(0xFFD50000)),
+        ThemeOption("Sunset Coral", Colors.CORALTHEME, Color(0xFFFF6E40)),
+        ThemeOption("Neon Lime", Colors.LIMETHEME, Color(0xFFAEEA00)),
+        ThemeOption("Royal Violet", Colors.VIOLETTHEME, Color(0xFFB388FF)),
+        ThemeOption("Ruby Rose", Colors.ROSETHEME, Color(0xFFFF1744)),
+        ThemeOption("Aquamarine", Colors.AQUATHEME, Color(0xFF1DE9B6)),
+        ThemeOption("Electric Blue", Colors.ELECTRICBLUETHEME, Color(0xFF2979FF)),
+        ThemeOption("Magenta Plum", Colors.PLUMTHEME, Color(0xFFE040FB)),
+        ThemeOption("Solar Gold", Colors.SOLARTHEME, Color(0xFFFF9100)),
+        ThemeOption("Studio Mint", Colors.MINTTHEME, Color(0xFF64FFDA)),
+        ThemeOption("Hot Magenta", Colors.MAGENTATHEME, Color(0xFFFF007F)),
+        ThemeOption("Titanium Ice", Colors.SILVERTHEME, Color(0xFFE0E6ED))
     )
 
     when {
-        isUserProState.isLoading -> {
+        !isUserProState.data && isUserProState.isLoading -> {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -87,7 +113,7 @@ fun ThemeSelectionScreen(
             }
         }
 
-        isUserProState.error != null -> {
+        !isUserProState.data && isUserProState.error != null -> {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -95,7 +121,7 @@ fun ThemeSelectionScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No Internet",
+                    text = "No Internet Connection",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White
                 )
@@ -124,60 +150,121 @@ fun ThemeSelectionScreen(
                                 tint = Color.White
                             )
                         }
-                        Text(
-                            text = "Theme Selection",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        Column {
+                            Text(
+                                text = "Theme Selection",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "Customize your studio accent color",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.6f)
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = "Pick a theme color",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        columns = GridCells.Fixed(2),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f)
                     ) {
-                        items(themeOptions) { option ->
+                        items(themeOptions, key = { it.value }) { option ->
                             val isSelected = selectedTheme == option.value
+                            val animatedScale by animateFloatAsState(
+                                targetValue = if (isSelected) 1.03f else 1.0f,
+                                animationSpec = spring(stiffness = Spring.StiffnessMedium),
+                                label = "scale"
+                            )
 
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .scale(animatedScale)
+                                    .clickable {
+                                        userPrefViewModel.updateThemeSelection(option.value)
+                                    },
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(
+                                    width = if (isSelected) 2.dp else 1.dp,
+                                    color = if (isSelected) option.color else MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
+                                ),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected)
+                                        option.color.copy(alpha = 0.15f)
+                                    else
+                                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 1.dp)
                             ) {
-                                Card(
+                                Column(
                                     modifier = Modifier
-                                        .size(84.dp)
-                                        .clickable {
-                                            userPrefViewModel.updateThemeSelection(option.value)
-                                        },
-                                    shape = CircleShape,
-                                    border = BorderStroke(
-                                        width = if (isSelected) 3.dp else 1.dp,
-                                        color = if (isSelected) Color.White else MaterialTheme.colorScheme.primary
-                                    ),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = option.color
-                                    ),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
-                                    Box(modifier = Modifier.fillMaxSize())
-                                }
+                                    // Mini UI Preview Strip Inside Card
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(48.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(Color(0xFF1A1A22))
+                                            .padding(8.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxSize(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(20.dp)
+                                                    .background(option.color, CircleShape)
+                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .height(14.dp)
+                                                    .width(48.dp)
+                                                    .background(option.color.copy(alpha = 0.8f), RoundedCornerShape(4.dp))
+                                            )
+                                        }
 
-                                Text(
-                                    text = option.title,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.White
-                                )
+                                        if (isSelected) {
+                                            Icon(
+                                                imageVector = Icons.Default.CheckCircle,
+                                                contentDescription = "Active Theme",
+                                                tint = option.color,
+                                                modifier = Modifier
+                                                    .size(22.dp)
+                                                    .align(Alignment.Center)
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = option.title,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                            color = if (isSelected) option.color else Color.White
+                                        )
+
+                                        Box(
+                                            modifier = Modifier
+                                                .size(12.dp)
+                                                .background(option.color, CircleShape)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -187,15 +274,26 @@ fun ThemeSelectionScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
                     ) {
-                        Text(
-                            text = "Theme updates instantly when you tap a color.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White,
-                            modifier = Modifier.padding(12.dp)
-                        )
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Palette,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "Theme updates instantly when you tap any color card.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.85f)
+                            )
+                        }
                     }
                 }
 

@@ -15,32 +15,43 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -55,20 +66,18 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun ProPackageScreen(
     navController: NavController,
     revenueCatViewmodel: RevenueCatViewmodel = hiltViewModel(),
     userPrefViewModel: UserPrefViewModel = hiltViewModel()
-
 ) {
     val getAllPackageState = revenueCatViewmodel.getAllPackageState.collectAsStateWithLifecycle()
     val isUserProState = revenueCatViewmodel.isUserProState.collectAsStateWithLifecycle()
     val buyPremiumPackageState = revenueCatViewmodel.buyPremiumPackageState.collectAsStateWithLifecycle()
     val getAppUserIdState = revenueCatViewmodel.getAppUserIdState.collectAsStateWithLifecycle()
-    
+
     val usageCount by userPrefViewModel.usageCount.collectAsStateWithLifecycle()
     val lastUsageDate by userPrefViewModel.lastUsageDate.collectAsStateWithLifecycle()
 
@@ -93,6 +102,11 @@ fun ProPackageScreen(
     val activity = context as? Activity
     val isBuyingPackage = buyPremiumPackageState.value.isLoading
 
+    val packages = getAllPackageState.value.data
+    var selectedPackage by remember(packages) {
+        mutableStateOf(packages.firstOrNull { it.packageType == PackageType.ANNUAL } ?: packages.firstOrNull())
+    }
+
     LaunchedEffect(Unit) {
         revenueCatViewmodel.getAllPackageRevenueCat()
         revenueCatViewmodel.checkIsUserPro()
@@ -109,7 +123,7 @@ fun ProPackageScreen(
         if (buyPremiumPackageState.value.error != null) {
             Toast.makeText(context, buyPremiumPackageState.value.error, Toast.LENGTH_SHORT).show()
         } else if (buyPremiumPackageState.value.data) {
-            userPrefViewModel.updateThemeSelection(theme = Colors.REDTHEME )
+            userPrefViewModel.updateThemeSelection(theme = Colors.REDTHEME)
             Toast.makeText(context, "Purchase successful", Toast.LENGTH_SHORT).show()
         }
     }
@@ -170,134 +184,112 @@ fun ProPackageScreen(
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Choose a plan to unlock premium features",
+                        text = "Choose a plan to unlock premium features and unlimited access",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                    Row(
+                    // Status & Credits Summary Card
+                    Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
                     ) {
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (isProUser) {
-                                Icon(
-                                    imageVector = Icons.Default.EmojiEvents,
-                                    contentDescription = "Pro user",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (isProUser) {
+                                    Icon(
+                                        imageVector = Icons.Default.EmojiEvents,
+                                        contentDescription = "Pro user",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Text(
+                                        text = "Status: Pro Active",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                } else {
+                                    Text(
+                                        text = "Status: Free Tier",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                            }
+
+                            Surface(
+                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
                                 Text(
-                                    text = "Status: Pro",
-                                    style = MaterialTheme.typography.titleMedium,
+                                    text = if (isProUser) "Unlimited Trials" else "$trialsLeft Free Left",
+                                    style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            } else {
-                                Text(
-                                    text = "Status: Not Pro",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    fontWeight = FontWeight.SemiBold
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
-                        }
-
-                        // Usage info badge
-                        Surface(
-                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = if (isProUser) "Unlimited Trials" else "$trialsLeft Free Left",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                fontWeight = FontWeight.Bold
-                            )
                         }
                     }
 
                     if (!isProUser) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Next refresh on $refreshDateText",
+                            text = "Next free trial refresh on $refreshDateText",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                            modifier = Modifier.padding(start = 4.dp)
                         )
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    if (getAppUserIdState.value.data.isNotEmpty()) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "User ID",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                )
-                                Text(
-                                    text = getAppUserIdState.value.data,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                                )
-                            }
-                            IconButton(onClick = {
-                                clipboardManager.setText(AnnotatedString(getAppUserIdState.value.data))
-                                Toast.makeText(context, "User ID copied", Toast.LENGTH_SHORT).show()
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.ContentCopy,
-                                    contentDescription = "Copy User ID",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                    }
-
+                    // Package Selection List
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 16.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentPadding = PaddingValues(bottom = 12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(getAllPackageState.value.data, key = { it.identifier }) { pkg ->
+                        items(packages, key = { it.identifier }) { pkg ->
+                            val isSelected = selectedPackage?.identifier == pkg.identifier
+                            val isBestValue = pkg.packageType == PackageType.ANNUAL
+
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 2.dp)
                                     .clickable(enabled = !isProUser) {
-                                        if (!isProUser) {
-                                            if (activity == null) {
-                                                Toast.makeText(context, "Issue with payment system", Toast.LENGTH_SHORT).show()
-                                            }else{
-                                                revenueCatViewmodel.buyPremiumPackage(
-                                                    activity = activity,
-                                                    selectedPackage = pkg
-                                                )
-
-                                            }
-
-                                        }
+                                        selectedPackage = pkg
                                     },
                                 shape = RoundedCornerShape(16.dp),
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surface
+                                border = BorderStroke(
+                                    width = if (isSelected && !isProUser) 2.dp else 1.dp,
+                                    color = if (isSelected && !isProUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                                 ),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected && !isProUser)
+                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+                                    else
+                                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = if (isBestValue) 4.dp else 1.dp)
                             ) {
                                 Column(
                                     modifier = Modifier
@@ -305,30 +297,79 @@ fun ProPackageScreen(
                                         .padding(16.dp),
                                     verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
+                                    // Top Row: Title, Best Value Tag, Radio Selector
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = pkg.product.title,
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.onSurface,
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                                             modifier = Modifier.weight(1f)
-                                        )
-
-                                        Surface(
-                                            color = MaterialTheme.colorScheme.primary,
-                                            shape = RoundedCornerShape(8.dp)
                                         ) {
+                                            if (!isProUser) {
+                                                RadioButton(
+                                                    selected = isSelected,
+                                                    onClick = { selectedPackage = pkg },
+                                                    colors = RadioButtonDefaults.colors(
+                                                        selectedColor = MaterialTheme.colorScheme.primary
+                                                    )
+                                                )
+                                            }
+
                                             Text(
-                                                text = pkg.getDurationText(),
-                                                style = MaterialTheme.typography.labelMedium,
+                                                text = pkg.product.title,
+                                                style = MaterialTheme.typography.titleMedium,
                                                 fontWeight = FontWeight.Bold,
-                                                color = MaterialTheme.colorScheme.onPrimary,
-                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                                color = MaterialTheme.colorScheme.onSurface
                                             )
+                                        }
+
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            if (isBestValue) {
+                                                Surface(
+                                                    color = Color(0xFFFF9800),
+                                                    shape = RoundedCornerShape(6.dp)
+                                                ) {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Default.Star,
+                                                            contentDescription = null,
+                                                            tint = Color.White,
+                                                            modifier = Modifier.size(12.dp)
+                                                        )
+                                                        Text(
+                                                            text = "BEST VALUE",
+                                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                                fontWeight = FontWeight.Bold,
+                                                                fontSize = 10.sp
+                                                            ),
+                                                            color = Color.White
+                                                        )
+                                                    }
+                                                }
+                                            }
+
+                                            Surface(
+                                                color = MaterialTheme.colorScheme.primary,
+                                                shape = RoundedCornerShape(8.dp)
+                                            ) {
+                                                Text(
+                                                    text = pkg.getDurationText(),
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.onPrimary,
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                                )
+                                            }
                                         }
                                     }
 
@@ -339,30 +380,112 @@ fun ProPackageScreen(
                                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                                         )
                                     }
+
                                     Text(
                                         text = pkg.product.price.formatted,
                                         style = MaterialTheme.typography.titleLarge,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary
                                     )
-                                    Button(
-                                        onClick = {
-                                            if (activity == null) {
-                                                Toast.makeText(context, "Issue with payment system", Toast.LENGTH_SHORT).show()
-                                            }else{
-                                                revenueCatViewmodel.buyPremiumPackage(
-                                                    activity = activity,
-                                                    selectedPackage = pkg
-                                                )
+                                }
+                            }
+                        }
 
-                                            }
-                                        },
-                                        enabled = !isProUser,
-                                        modifier = Modifier.fillMaxWidth()
+                        // Subdued Footer for RevenueCat App User ID
+                        item {
+                            if (getAppUserIdState.value.data.isNotEmpty()) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 12.dp, bottom = 4.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    HorizontalDivider(
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
+                                        modifier = Modifier.padding(bottom = 8.dp)
+                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                                     ) {
-                                        Text(if (isProUser) "Already Pro" else "Buy")
+                                        Text(
+                                            text = "Account ID: ${getAppUserIdState.value.data}",
+                                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f)
+                                        )
+                                        IconButton(
+                                            onClick = {
+                                                clipboardManager.setText(AnnotatedString(getAppUserIdState.value.data))
+                                                Toast.makeText(context, "Account ID copied", Toast.LENGTH_SHORT).show()
+                                            },
+                                            modifier = Modifier.size(20.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.ContentCopy,
+                                                contentDescription = "Copy Account ID",
+                                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
+                                                modifier = Modifier.size(12.dp)
+                                            )
+                                        }
                                     }
                                 }
+                            }
+                        }
+                    }
+
+                    // Single Floating Bottom CTA Button
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        color = Color.Transparent
+                    ) {
+                        val activePkg = selectedPackage
+                        Button(
+                            onClick = {
+                                if (!isProUser && activePkg != null) {
+                                    if (activity == null) {
+                                        Toast.makeText(context, "Issue with payment system", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        revenueCatViewmodel.buyPremiumPackage(
+                                            activity = activity,
+                                            selectedPackage = activePkg
+                                        )
+                                    }
+                                }
+                            },
+                            enabled = !isProUser && activePkg != null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(52.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            if (isProUser) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.CheckCircle,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Text(
+                                        text = "Pro Subscription Active",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            } else {
+                                val priceText = activePkg?.product?.price?.formatted ?: ""
+                                Text(
+                                    text = if (priceText.isNotBlank()) "Subscribe Now — $priceText" else "Buy Pro",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                     }

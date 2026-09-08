@@ -1,6 +1,5 @@
 package com.nutrino.audiocutter.ui.theme
 
-// be careful here
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
@@ -59,6 +58,24 @@ private val purpleColorPallete = appColorPalette(accent = Color(0xFFDF77EE))
 private val pinkColorPallete = appColorPalette(accent = Color(0xFFF35389))
 private val orangeColorPallete = appColorPalette(accent = Color(0xFFF54E1B))
 
+// 16 Additional Professional Studio Color Palettes
+private val tealColorPallete = appColorPalette(accent = Color(0xFF00E5FF))
+private val emeraldColorPallete = appColorPalette(accent = Color(0xFF00E676))
+private val indigoColorPallete = appColorPalette(accent = Color(0xFF651FFF))
+private val amberColorPallete = appColorPalette(accent = Color(0xFFFFC400))
+private val crimsonColorPallete = appColorPalette(accent = Color(0xFFD50000))
+private val coralColorPallete = appColorPalette(accent = Color(0xFFFF6E40))
+private val limeColorPallete = appColorPalette(accent = Color(0xFFAEEA00))
+private val violetColorPallete = appColorPalette(accent = Color(0xFFB388FF))
+private val roseColorPallete = appColorPalette(accent = Color(0xFFFF1744))
+private val aquaColorPallete = appColorPalette(accent = Color(0xFF1DE9B6))
+private val electricBlueColorPallete = appColorPalette(accent = Color(0xFF2979FF))
+private val plumColorPallete = appColorPalette(accent = Color(0xFFE040FB))
+private val solarColorPallete = appColorPalette(accent = Color(0xFFFF9100))
+private val mintColorPallete = appColorPalette(accent = Color(0xFF64FFDA))
+private val magentaColorPallete = appColorPalette(accent = Color(0xFFFF007F))
+private val silverColorPallete = appColorPalette(accent = Color(0xFFE0E6ED))
+
 
 @Composable
 fun AudioCutterTheme(
@@ -76,6 +93,22 @@ fun AudioCutterTheme(
         AppColors.PURPLETHEME -> purpleColorPallete
         AppColors.PINKTHEME -> pinkColorPallete
         AppColors.ORANGETHEME -> orangeColorPallete
+        AppColors.TEALTHEME -> tealColorPallete
+        AppColors.EMERALDTHEME -> emeraldColorPallete
+        AppColors.INDIGOTHEME -> indigoColorPallete
+        AppColors.AMBERTHEME -> amberColorPallete
+        AppColors.CRIMSONTHEME -> crimsonColorPallete
+        AppColors.CORALTHEME -> coralColorPallete
+        AppColors.LIMETHEME -> limeColorPallete
+        AppColors.VIOLETTHEME -> violetColorPallete
+        AppColors.ROSETHEME -> roseColorPallete
+        AppColors.AQUATHEME -> aquaColorPallete
+        AppColors.ELECTRICBLUETHEME -> electricBlueColorPallete
+        AppColors.PLUMTHEME -> plumColorPallete
+        AppColors.SOLARTHEME -> solarColorPallete
+        AppColors.MINTTHEME -> mintColorPallete
+        AppColors.MAGENTATHEME -> magentaColorPallete
+        AppColors.SILVERTHEME -> silverColorPallete
         else -> orangeColorPallete
     }
 

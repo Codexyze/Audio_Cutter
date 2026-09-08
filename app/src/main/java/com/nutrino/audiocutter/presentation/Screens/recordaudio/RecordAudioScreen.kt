@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,6 +61,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -180,7 +182,7 @@ fun RecordAudioScreen(
             ) {
                 // Title
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Record Audio",
                         style = MaterialTheme.typography.headlineMedium.copy(
@@ -191,9 +193,9 @@ fun RecordAudioScreen(
                     )
                 }
 
-                // Mic icon with animation
+                // Mic icon with pulse animation
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Box(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
@@ -202,7 +204,7 @@ fun RecordAudioScreen(
                             val infiniteTransition = rememberInfiniteTransition(label = "micPulse")
                             val micScale by infiniteTransition.animateFloat(
                                 initialValue = 1f,
-                                targetValue = 1.2f,
+                                targetValue = 1.18f,
                                 animationSpec = infiniteRepeatable(
                                     animation = tween(800, easing = FastOutSlowInEasing),
                                     repeatMode = RepeatMode.Reverse
@@ -211,7 +213,7 @@ fun RecordAudioScreen(
                             )
                             Box(
                                 modifier = Modifier
-                                    .size(120.dp)
+                                    .size(110.dp)
                                     .scale(micScale)
                                     .background(
                                         color = Color(0xFFFF5252).copy(alpha = 0.15f),
@@ -222,14 +224,14 @@ fun RecordAudioScreen(
                                 Icon(
                                     imageVector = Icons.Default.Mic,
                                     contentDescription = "Recording",
-                                    modifier = Modifier.size(60.dp),
+                                    modifier = Modifier.size(56.dp),
                                     tint = Color(0xFFFF5252)
                                 )
                             }
                         } else {
                             Box(
                                 modifier = Modifier
-                                    .size(120.dp)
+                                    .size(110.dp)
                                     .background(
                                         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
                                         shape = CircleShape
@@ -239,7 +241,7 @@ fun RecordAudioScreen(
                                 Icon(
                                     imageVector = Icons.Default.Mic,
                                     contentDescription = "Mic",
-                                    modifier = Modifier.size(60.dp),
+                                    modifier = Modifier.size(56.dp),
                                     tint = if (recordState.isPaused) Color(0xFFFFA726) else MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -247,12 +249,23 @@ fun RecordAudioScreen(
                     }
                 }
 
-                // Timer display
+                // Multi-bar Animated Audio Waveform Visualizer
+                item {
+                    AnimatedAudioWaveform(
+                        isRecording = recordState.isRecording && !recordState.isPaused,
+                        color = if (recordState.isPaused) Color(0xFFFFA726) else Color(0xFFFF5252),
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+
+                // Timer display with Monospace Font (Eliminates Number Jitter)
                 item {
                     Text(
                         text = formatTimer(elapsedSeconds),
                         style = MaterialTheme.typography.displayMedium.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 42.sp
                         ),
                         color = if (recordState.isRecording && !recordState.isPaused)
                             Color(0xFFFF5252)
@@ -267,8 +280,8 @@ fun RecordAudioScreen(
                     // Status text
                     Text(
                         text = when {
-                            recordState.isRecording && !recordState.isPaused -> "Recording..."
-                            recordState.isPaused -> "Paused"
+                            recordState.isRecording && !recordState.isPaused -> "Recording in Progress..."
+                            recordState.isPaused -> "Recording Paused"
                             else -> "Ready to Record"
                         },
                         style = MaterialTheme.typography.bodyLarge,
@@ -285,7 +298,8 @@ fun RecordAudioScreen(
                         onValueChange = { filename.value = it },
                         label = { Text("File Name", color = MaterialTheme.colorScheme.primary) },
                         placeholder = { Text("Enter filename for recording", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)) },
-                        modifier = Modifier.fillMaxWidth(0.85f),
+                        modifier = Modifier.fillMaxWidth(0.88f),
+                        shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.primary
@@ -297,93 +311,126 @@ fun RecordAudioScreen(
                     )
                 }
 
-                // Controls
+                // Control Buttons with Explicit Text Labels
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(0.9f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
                         ),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(20.dp)
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(24.dp),
+                                .padding(vertical = 20.dp, horizontal = 16.dp),
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             if (!recordState.isRecording) {
-                                // Start button
-                                IconButton(
-                                    onClick = {
-                                        if (!hasPermission) {
-                                            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                                            return@IconButton
-                                        }
-                                        if (filename.value.isBlank()) {
-                                            Toast.makeText(context, "Please enter a filename", Toast.LENGTH_SHORT).show()
-                                            return@IconButton
-                                        }
-                                        elapsedSeconds = 0L
-                                        timerRunning = true
-                                        recordAudioViewModel.startRecording(
-                                            context = context,
-                                            filename = filename.value.trim()
-                                        )
-                                    },
-                                    modifier = Modifier.size(72.dp),
-                                    colors = IconButtonDefaults.iconButtonColors(
-                                        containerColor = Color(0xFFFF5252)
-                                    )
+                                // Start Record Button
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.FiberManualRecord,
-                                        contentDescription = "Start Recording",
-                                        modifier = Modifier.size(36.dp),
-                                        tint = Color.White
+                                    IconButton(
+                                        onClick = {
+                                            if (!hasPermission) {
+                                                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                                return@IconButton
+                                            }
+                                            if (filename.value.isBlank()) {
+                                                Toast.makeText(context, "Please enter a filename", Toast.LENGTH_SHORT).show()
+                                                return@IconButton
+                                            }
+                                            elapsedSeconds = 0L
+                                            timerRunning = true
+                                            recordAudioViewModel.startRecording(
+                                                context = context,
+                                                filename = filename.value.trim()
+                                            )
+                                        },
+                                        modifier = Modifier.size(68.dp),
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            containerColor = Color(0xFFFF5252)
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.FiberManualRecord,
+                                            contentDescription = "Start Recording",
+                                            modifier = Modifier.size(32.dp),
+                                            tint = Color.White
+                                        )
+                                    }
+                                    Text(
+                                        text = "Record",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             } else {
-                                // Pause / Resume button
-                                IconButton(
-                                    onClick = {
-                                        if (recordState.isPaused) {
-                                            recordAudioViewModel.resumeRecording()
-                                        } else {
-                                            recordAudioViewModel.pauseRecording()
-                                        }
-                                    },
-                                    modifier = Modifier.size(72.dp),
-                                    colors = IconButtonDefaults.iconButtonColors(
-                                        containerColor = Color(0xFFFFA726)
-                                    )
+                                // Pause / Resume Button
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = if (recordState.isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
-                                        contentDescription = if (recordState.isPaused) "Resume" else "Pause",
-                                        modifier = Modifier.size(36.dp),
-                                        tint = Color.White
+                                    IconButton(
+                                        onClick = {
+                                            if (recordState.isPaused) {
+                                                recordAudioViewModel.resumeRecording()
+                                            } else {
+                                                recordAudioViewModel.pauseRecording()
+                                            }
+                                        },
+                                        modifier = Modifier.size(68.dp),
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            containerColor = Color(0xFFFFA726)
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = if (recordState.isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
+                                            contentDescription = if (recordState.isPaused) "Resume" else "Pause",
+                                            modifier = Modifier.size(32.dp),
+                                            tint = Color.White
+                                        )
+                                    }
+                                    Text(
+                                        text = if (recordState.isPaused) "Resume" else "Pause",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
 
-                                // Stop button
-                                IconButton(
-                                    onClick = {
-                                        timerRunning = false
-                                        recordAudioViewModel.stopRecording(context = context)
-                                    },
-                                    modifier = Modifier.size(72.dp),
-                                    colors = IconButtonDefaults.iconButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary
-                                    )
+                                // Stop & Save Button
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Stop,
-                                        contentDescription = "Stop Recording",
-                                        modifier = Modifier.size(36.dp),
-                                        tint = Color.White
+                                    IconButton(
+                                        onClick = {
+                                            timerRunning = false
+                                            recordAudioViewModel.stopRecording(context = context)
+                                        },
+                                        modifier = Modifier.size(68.dp),
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Stop,
+                                            contentDescription = "Stop Recording",
+                                            modifier = Modifier.size(32.dp),
+                                            tint = Color.White
+                                        )
+                                    }
+                                    Text(
+                                        text = "Stop & Save",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }
@@ -395,16 +442,16 @@ fun RecordAudioScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(0.9f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
                         ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = "Record audio from your device microphone. Enter a filename, tap the record button to start. Use pause/resume to control recording. The file will be saved to Music/AudioCutter folder.",
+                            text = "Record high-quality audio from your microphone. Tap Record to start, Pause to hold, and Stop & Save to finalize your file into Music / AudioCutter folder.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
                             modifier = Modifier.padding(12.dp)
                         )
                     }
@@ -414,5 +461,50 @@ fun RecordAudioScreen(
 
         // Banner Ad at bottom
         BannerAdView(modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@Composable
+fun AnimatedAudioWaveform(
+    isRecording: Boolean,
+    modifier: Modifier = Modifier,
+    color: Color = Color(0xFFFF5252)
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val barCount = 15
+        val infiniteTransition = rememberInfiniteTransition(label = "waveform")
+
+        repeat(barCount) { index ->
+            val duration = 350 + (index % 5) * 110
+            val heightFactor by infiniteTransition.animateFloat(
+                initialValue = 0.15f,
+                targetValue = 1.0f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(duration, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "heightFactor_$index"
+            )
+
+            val barHeight = if (isRecording) {
+                (8.dp + (24.dp * heightFactor))
+            } else {
+                4.dp
+            }
+
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .height(barHeight)
+                    .background(
+                        color = if (isRecording) color else color.copy(alpha = 0.25f),
+                        shape = RoundedCornerShape(2.dp)
+                    )
+            )
+        }
     }
 }
