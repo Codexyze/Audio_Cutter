@@ -45,10 +45,11 @@ android {
         applicationId = "com.nutrino.audiocutter"
         minSdk = 24
         targetSdk = 37
-        versionCode = 38
+        versionCode = 39
         //2.0.1 (homescreen updated ) major ui update
         //2.0.2 (pro screen better packages , volume booster 500
-        versionName = "2.0.2"
+        //2.1.2 complete ui update
+        versionName = "2.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
 
